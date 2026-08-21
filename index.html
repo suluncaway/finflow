@@ -2,20 +2,19 @@
 <html lang="tr" class="dark">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>FinFlow</title>
 
-  <!-- PWA & WebApp Meta Etiketleri -->
+  <!-- PWA & Mobil Meta Etiketleri -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="FinFlow">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="theme-color" content="#020617">
 
-  <!-- Manifest & FinFlow Özel İkonları -->
   <link rel="manifest" href="manifest.json">
-  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23818cf8'/%3E%3Cstop offset='50%25' stop-color='%236366f1'/%3E%3Cstop offset='100%25' stop-color='%2310b981'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='48' height='48' rx='12' fill='%230f172a'/%3E%3Cpath d='M12 14H34C35.1 14 36 14.9 36 16V17C36 18.1 35.1 19 34 19H18V24H30C31.1 24 32 24.9 32 26V27C32 28.1 31.1 29 30 29H18V34C18 35.1 17.1 36 16 36H14C12.9 36 12 35.1 12 34V14Z' fill='url(%23g)'/%3E%3Cpath d='M24 31L32 23L36 27L28 35H24V31Z' fill='%2310b981'/%3E%3C/svg%3E">
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23818cf8'/%3E%3Cstop offset='50%25' stop-color='%236366f1'/%3E%3Cstop offset='100%25' stop-color='%2310b981'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='48' height='48' rx='12' fill='%230f172a'/%3E%3Cpath d='M12 14H34C35.1 14 36 14.9 36 16V17C36 18.1 35.1 19 34 19H18V24H30C31.1 24 32 24.9 32 26V27C32 28.1 31.1 29 30 29H18V34C18 35.1 17.1 36 16 36H14C12.9 36 12 35.1 12 34V14Z' fill='url(%23g)'/%3E%3Cpath d='M24 31L32 23L36 27L28 35H24V31Z' fill='%2310b981'/%3E%3C/svg%3E">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="icon" type="image/png" href="icon-192.png">
 
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
@@ -35,7 +34,7 @@
     button, input, select { -webkit-tap-highlight-color: transparent; }
   </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen font-sans antialiased selection:bg-indigo-500 selection:text-white p-3 sm:p-6 md:p-8 pb-24 sm:pb-8">
+<body class="bg-slate-950 text-slate-100 min-h-screen font-sans antialiased selection:bg-indigo-500 selection:text-white p-3 sm:p-6 md:p-8 pb-28 sm:pb-8">
 
   <div class="max-w-7xl mx-auto space-y-4 sm:space-y-6">
 
@@ -93,6 +92,11 @@
           <span>Excel Yükle</span>
         </button>
 
+        <button id="notifBtn" onclick="toggleNotifications()" class="bg-slate-900 border border-slate-800 active:bg-slate-800 text-slate-200 px-3 py-2.5 sm:py-2 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition">
+          <i data-lucide="bell" id="notifIcon" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-400"></i>
+          <span id="notifText">Bildirimleri Aç</span>
+        </button>
+
         <button onclick="clearAllData()" class="p-2.5 sm:p-2 bg-rose-950/40 border border-rose-900 active:bg-rose-900 text-rose-300 rounded-xl text-xs flex items-center justify-center" title="Tümünü Sıfırla">
           <i data-lucide="trash-2" class="w-4 h-4"></i>
           <span class="sm:hidden text-xs font-semibold ml-1">Sıfırla</span>
@@ -104,13 +108,13 @@
       <i data-lucide="loader-2" class="w-3.5 h-3.5 animate-spin"></i> Portföyünüz yükleniyor...
     </div>
 
-    <!-- 1. MERKEZİ YAPAY ZEKA STRATEJİ DANIŞMANI -->
+    <!-- 1. MERKEZİ STRATEJİ DANIŞMANI -->
     <section class="bg-gradient-to-r from-indigo-950/60 via-purple-950/40 to-slate-900/80 border border-indigo-500/30 rounded-2xl p-4 sm:p-5 shadow-2xl space-y-3 sm:space-y-4">
       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2.5">
         <div class="flex items-center gap-2">
           <span class="p-1.5 bg-purple-500/20 text-purple-400 rounded-lg shrink-0"><i data-lucide="sparkles" class="w-4 h-4"></i></span>
           <div>
-            <h2 class="text-xs sm:text-sm font-bold text-white">Yapay Zeka Kapatma Stratejisti</h2>
+            <h2 class="text-xs sm:text-sm font-bold text-white">Akıllı Kapatma Stratejisti</h2>
             <span class="text-[9px] sm:text-[10px] bg-emerald-950 text-emerald-300 border border-emerald-800 px-1.5 py-0.2 rounded-full font-medium">Avalanche Modeli</span>
           </div>
         </div>
@@ -208,7 +212,7 @@
             <span class="text-[9px] sm:text-[10px] px-2 py-0.5 rounded bg-amber-950 text-amber-300 border border-amber-800 font-semibold">1. Sıraya Ekstra Yatırın</span>
           </div>
           <p class="text-[10px] sm:text-[11px] text-slate-400 mt-1.5">
-            Faiz ve limit aşım cezasını durdurmak için serbest nakitinizi sırayla bu borçlara aktarın:
+            Faiz maliyetini düşürmek için serbest nakitinizi sırayla bu borçlara aktarın:
           </p>
         </div>
 
@@ -220,7 +224,7 @@
       </div>
     </div>
 
-    <!-- 4. KATEGORİ SEKMELERİ (Masaüstü için) -->
+    <!-- 4. KATEGORİ SEKMELERİ -->
     <div class="hidden sm:flex border-b border-slate-800 space-x-3 overflow-x-auto no-scrollbar pb-1">
       <button onclick="switchCategory('all')" id="tab-all" class="pb-2.5 text-xs font-semibold border-b-2 border-indigo-500 text-indigo-400 flex items-center gap-1.5 whitespace-nowrap shrink-0">
         <i data-lucide="layout-grid" class="w-4 h-4"></i> Tümü
@@ -313,7 +317,7 @@
 
   </div>
 
-  <!-- MOBİL SABİT ALT NAVİGASYON (BOTTOM APP BAR) -->
+  <!-- MOBİL ALT NAVİGASYON (BOTTOM BAR) -->
   <nav class="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-slate-900/90 backdrop-blur-md border-t border-slate-800 px-3 py-2 flex justify-around items-center">
     <button onclick="switchCategory('all')" id="m-tab-all" class="flex flex-col items-center gap-1 text-indigo-400">
       <i data-lucide="layout-grid" class="w-5 h-5"></i>
@@ -476,6 +480,8 @@
       document.getElementById('loadingBanner')?.remove();
       isLoaded = true;
       renderAll();
+      updateNotifButtonUI();
+      checkDueDatesAndNotify();
     });
 
     async function loadState() {
@@ -698,6 +704,95 @@
       }
 
       out.textContent = report;
+    }
+
+    /* BİLDİRİM SİSTEMİ (NOTIFICATION API) */
+    async function toggleNotifications() {
+      if (!('Notification' in window)) {
+        alert('Tarayıcınız bildirim özelliğini desteklemiyor.');
+        return;
+      }
+
+      if (Notification.permission === 'granted') {
+        checkDueDatesAndNotify(true);
+      } else if (Notification.permission !== 'denied') {
+        const permission = await Notification.requestPermission();
+        updateNotifButtonUI();
+        if (permission === 'granted') {
+          sendAppNotification('FinFlow', 'Ödeme hatırlatıcı bildirimleri başarıyla aktif edildi.');
+          checkDueDatesAndNotify();
+        }
+      } else {
+        alert('Bildirim izinleri engellenmiş. Tarayıcı/site ayarlarından bildirimlere izin vermeniz gerekiyor.');
+      }
+    }
+
+    function updateNotifButtonUI() {
+      const btnText = document.getElementById('notifText');
+      const btnIcon = document.getElementById('notifIcon');
+      if (!btnText || !('Notification' in window)) return;
+
+      if (Notification.permission === 'granted') {
+        btnText.textContent = 'Bildirimler Aktif';
+        btnIcon.className = 'w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-400';
+      } else {
+        btnText.textContent = 'Bildirimleri Aç';
+        btnIcon.className = 'w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-400';
+      }
+    }
+
+    function sendAppNotification(title, body) {
+      if (Notification.permission !== 'granted') return;
+
+      if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+        navigator.serviceWorker.ready.then(reg => {
+          reg.showNotification(title, {
+            body: body,
+            icon: './icon-192.png',
+            badge: './icon-192.png',
+            vibrate: [200, 100, 200]
+          });
+        });
+      } else {
+        new Notification(title, {
+          body: body,
+          icon: './icon-192.png'
+        });
+      }
+    }
+
+    function checkDueDatesAndNotify(manualTrigger = false) {
+      if (!('Notification' in window) || Notification.permission !== 'granted') return;
+
+      const today = new Date().toISOString().split('T')[0];
+      const dueItems = [];
+
+      userPortfolio.cards.forEach(c => {
+        if (!c.isSettled && c.dueDate === today) {
+          dueItems.push(`${c.bank} Kartı (${formatTRY(c.minPay || c.debt * 0.2)} Asgari)`);
+        }
+      });
+
+      userPortfolio.kmh.forEach(k => {
+        if (!k.isSettled && k.dueDate === today) {
+          dueItems.push(`${k.bank} KMH (${formatTRY(k.debt)})`);
+        }
+      });
+
+      userPortfolio.loans.forEach(l => {
+        if (!l.isSettled && l.dueDate === today) {
+          dueItems.push(`${l.loanName || 'Kredi'} #${l.instNo} (${formatTRY(l.amount)})`);
+        }
+      });
+
+      if (dueItems.length > 0) {
+        sendAppNotification(
+          '⚠️ Bugün Son Ödeme Günü!',
+          `Ödenmesi gereken ${dueItems.length} borcunuz var: ${dueItems.join(', ')}`
+        );
+      } else if (manualTrigger) {
+        sendAppNotification('FinFlow', 'Bugün için vadesi dolan herhangi bir ödemeniz bulunmuyor.');
+      }
     }
 
     function openUniversalDebtModal() {
@@ -1150,7 +1245,6 @@
     function switchCategory(cat) {
       activeCategory = cat;
 
-      // Masaüstü Sekmeleri
       ['all', 'incomes', 'expenses', 'cards', 'kmh', 'installments'].forEach(c => {
         const btn = document.getElementById(`tab-${c}`);
         if (btn) {
@@ -1160,7 +1254,6 @@
         }
       });
 
-      // Mobil Alt Bar İkonları
       ['all', 'incomes', 'cards', 'installments'].forEach(c => {
         const mBtn = document.getElementById(`m-tab-${c}`);
         if (mBtn) {
@@ -1400,10 +1493,10 @@
                 if (!(debt > 0) || !name) return;
 
                 if (name.toLowerCase().includes('kart')) {
-                  userPortfolio.cards.push({ id: crypto.randomUUID(), bank: name, limit, debt, minPay: minPay || (debt * 0.2), dueDate, isSettled: false });
+                  userPortfolio.cards.push({ id: crypto.randomUUID(), bank: name, limit, debt: amount, minPay: minPay || (debt * 0.2), dueDate, isSettled: false });
                   cardCount++;
                 } else {
-                  userPortfolio.kmh.push({ id: crypto.randomUUID(), bank: name, limit, debt, monthlyPay: minPay || (debt * 0.05), dueDate, note: 'KMH Kullanımı', isSettled: false });
+                  userPortfolio.kmh.push({ id: crypto.randomUUID(), bank: name, limit, debt: amount, monthlyPay: minPay || (debt * 0.05), dueDate, note: 'KMH Kullanımı', isSettled: false });
                   kmhCount++;
                 }
               });
@@ -1437,7 +1530,7 @@
     }
   </script>
 
-  <!-- FinFlow Service Worker Kaydı -->
+  <!-- Service Worker Kaydı -->
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
