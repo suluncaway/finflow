@@ -3,17 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>FinFlow Pro - Borç, Gelir & AI Planlayıcı</title>
+  <title>FinFlow</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <style>
-    /* Mobilde yatay sekme kaydırması için scrollbar gizleme */
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-    /* Dokunmatik hedefler için yumuşak tıklama */
     button, input, select { -webkit-tap-highlight-color: transparent; }
   </style>
 </head>
@@ -28,12 +26,11 @@
           <i data-lucide="bot" class="w-5 h-5 sm:w-6 sm:h-6"></i>
         </div>
         <div>
-          <h1 class="text-lg sm:text-xl font-bold text-white leading-tight">FinFlow AI Portföy & Kapatma Paneli</h1>
+          <h1 class="text-lg sm:text-xl font-bold text-white leading-tight">FinFlow</h1>
           <p class="text-[11px] sm:text-xs text-slate-400">Gelir-Gider Dengesi ve Akıllı Borç Takip Sistemi</p>
         </div>
       </div>
 
-      <!-- Aksiyon Butonları (Mobilde Grid) -->
       <div class="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 pt-1">
         <button onclick="openIncomeModal()" class="bg-emerald-600 active:bg-emerald-700 text-white px-3 py-2.5 sm:py-2 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition shadow-lg shadow-emerald-600/20">
           <i data-lucide="plus-circle" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
@@ -108,7 +105,7 @@
       </div>
     </section>
 
-    <!-- 2. NET FİNANSAL SAĞLIK METRİKLERİ (Mobilde 2'li Grid) -->
+    <!-- 2. NET FİNANSAL SAĞLIK METRİKLERİ -->
     <section class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
       <div class="bg-slate-900/50 border border-slate-800/80 p-3 sm:p-4 rounded-xl sm:rounded-2xl">
         <div class="flex justify-between items-start">
@@ -183,7 +180,7 @@
       </div>
     </div>
 
-    <!-- 4. KATEGORİ SEKMELERİ (Mobilde Kaydırılabilir Tab Bar) -->
+    <!-- 4. KATEGORİ SEKMELERİ -->
     <div class="flex border-b border-slate-800 space-x-3 overflow-x-auto no-scrollbar pb-1 -mx-3 px-3 sm:mx-0 sm:px-0">
       <button onclick="switchCategory('all')" id="tab-all" class="pb-2.5 text-xs font-semibold border-b-2 border-indigo-500 text-indigo-400 flex items-center gap-1.5 whitespace-nowrap shrink-0">
         <i data-lucide="layout-grid" class="w-4 h-4"></i> Tümü
@@ -253,7 +250,6 @@
         </div>
       </div>
 
-      <!-- Masaüstü Tablo Görünümü -->
       <div class="hidden md:block overflow-x-auto">
         <table class="w-full text-left text-xs">
           <thead class="bg-slate-950/60 text-slate-400 border-b border-slate-800">
@@ -272,7 +268,6 @@
         </table>
       </div>
 
-      <!-- Mobil Kart Görünümü -->
       <div id="installmentsMobileList" class="md:hidden divide-y divide-slate-800/60 p-2 space-y-2"></div>
     </div>
 
@@ -1036,7 +1031,6 @@
         return;
       }
 
-      // Masaüstü Tablosu
       tbody.innerHTML = filtered.map(l => {
         const isLate = !l.isSettled && l.dueDate && l.dueDate <= today;
         return `
@@ -1062,7 +1056,6 @@
         `;
       }).join('');
 
-      // Mobil Kart Listesi
       mobileList.innerHTML = filtered.map(l => {
         const isLate = !l.isSettled && l.dueDate && l.dueDate <= today;
         return `
