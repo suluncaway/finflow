@@ -201,7 +201,7 @@
 
         <button onclick="openAIModal('vision')" class="soft-btn col-span-2 sm:col-span-1 bg-gradient-to-r from-purple-600 via-indigo-600 to-cyan-600 hover:opacity-95 active:scale-95 text-white px-3.5 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition shadow-md shadow-purple-600/30">
           <i data-lucide="scan-line" class="w-4 h-4"></i>
-          <span>📸 Ekrandan Borç Ekle (AI)</span>
+          <span>📸 Ekran / Findeks PDF Ekle (AI)</span>
           <span class="ai-credit-display text-[9px] bg-white/20 px-1.5 py-0.5 rounded-full font-black ml-0.5">5/5</span>
         </button>
         <button onclick="openUniversalDebtModal()" class="soft-btn col-span-2 sm:col-span-1 bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white px-4 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition shadow-md shadow-indigo-600/20">
@@ -763,7 +763,7 @@
       <!-- Alt Sekmeler -->
       <div class="flex border-b border-slate-800 gap-1 text-xs font-semibold">
         <button id="aiTabVisionBtn" onclick="switchAITab('vision')" class="pb-2 px-3 border-b-2 border-purple-500 text-purple-400 flex items-center gap-1.5 transition">
-          <i data-lucide="scan-line" class="w-3.5 h-3.5"></i> Ekrandan Borç Çıkar
+          <i data-lucide="file-scan" class="w-3.5 h-3.5"></i> Ekran / Findeks PDF Tara
         </button>
         <button id="aiTabChatBtn" onclick="switchAITab('chat')" class="pb-2 px-3 border-b-2 border-transparent text-slate-400 hover:text-white flex items-center gap-1.5 transition">
           <i data-lucide="message-square-quote" class="w-3.5 h-3.5"></i> Finans Danışmanı
@@ -776,37 +776,55 @@
       <!-- TAB 1: EKRAN GÖRÜNTÜSÜNDEN BORÇ YAKALAMA -->
       <div id="aiTabVision" class="space-y-3 overflow-y-auto flex-1 pr-1">
         <div class="text-xs text-slate-300">
-          Mobil bankacılık (Garanti, İş Bankası, Akbank, Yapı Kredi vb.) ekran görüntüsü, kredi kartı ekstresi veya dekont yükleyin. Yapay zeka tüm borç detaylarını otomatik çıkarsın.
+          Findeks Risk Raporu (PDF), mobil bankacılık ekran görüntüsü veya kredi kartı ekstresi yükleyin. Gemini 2.5 Flash tüm bankalardaki açık borçları, limitleri ve taksitleri topluca çıkarsın.
         </div>
 
-        <input type="file" id="aiVisionFileInput" accept="image/*" class="hidden" onchange="handleAIVisionFileSelected(this.files[0])">
+        <input type="file" id="aiVisionFileInput" accept="image/*, application/pdf, .pdf" class="hidden" onchange="handleAIVisionFileSelected(this.files[0])">
 
         <div id="aiDropzone" onclick="document.getElementById('aiVisionFileInput').click()" class="border-2 border-dashed border-slate-700 hover:border-purple-500/80 bg-slate-950/60 rounded-xl p-5 text-center cursor-pointer transition flex flex-col items-center justify-center gap-2 group">
           <div class="w-12 h-12 rounded-full bg-purple-950/60 border border-purple-800/80 flex items-center justify-center text-purple-400 group-hover:scale-110 transition">
             <i data-lucide="upload-cloud" class="w-6 h-6"></i>
           </div>
           <div>
-            <div class="text-xs font-semibold text-slate-200">Ekran Görüntüsü Yükleyin veya Sürükleyin</div>
-            <div class="text-[10px] text-slate-500 mt-0.5">PNG, JPG, WEBP • Doğrudan panodan <kbd class="px-1 py-0.5 bg-slate-800 rounded text-slate-300">Ctrl + V</kbd> ile yapıştırabilirsiniz!</div>
+            <div class="text-xs font-semibold text-slate-200">Findeks PDF Raporu veya Ekran Görüntüsü Yükleyin</div>
+            <div class="text-[10px] text-slate-500 mt-0.5"><b>PDF (Findeks, Ekstre)</b>, PNG, JPG • Doğrudan panodan <kbd class="px-1 py-0.5 bg-slate-800 rounded text-slate-300">Ctrl + V</kbd> ile yapıştırabilirsiniz!</div>
           </div>
         </div>
 
-        <!-- Resim Önizleme & Analiz Butonu -->
+        <!-- Belge / Resim Önizleme & Analiz Butonu -->
         <div id="aiImagePreviewBox" class="hidden space-y-2 bg-slate-950/80 p-3 rounded-xl border border-slate-800">
           <div class="flex items-center justify-between">
-            <span class="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
-              <i data-lucide="image" class="w-4 h-4 text-purple-400"></i> Yüklenen Görüntü
+            <span class="text-xs font-semibold text-slate-300 flex items-center gap-1.5" id="aiPreviewTitle">
+              <i data-lucide="file-check" class="w-4 h-4 text-purple-400"></i> Yüklenen Belge
             </span>
             <button onclick="clearAIVisionImage()" class="text-slate-500 hover:text-rose-400 text-xs flex items-center gap-1">
               <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Kaldır
             </button>
           </div>
-          <div class="relative max-h-48 overflow-hidden rounded-lg border border-slate-800 flex justify-center bg-black/40">
+          
+          <!-- Görsel Önizleme -->
+          <div id="aiImgPreviewContainer" class="relative max-h-48 overflow-hidden rounded-lg border border-slate-800 flex justify-center bg-black/40">
             <img id="aiPreviewImg" src="" alt="Önizleme" class="object-contain max-h-48 rounded-lg">
           </div>
-          <button id="aiAnalyzeBtn" onclick="analyzeDebtScreenshotWithAI()" class="soft-btn w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:opacity-90 py-2.5 rounded-xl text-xs font-bold text-white transition flex items-center justify-center gap-2 shadow-lg shadow-purple-600/20">
+
+          <!-- PDF Dosya Kartı Önizleme -->
+          <div id="aiPdfPreviewContainer" class="hidden p-4 rounded-xl bg-purple-950/20 border border-purple-800/60 flex items-center gap-3">
+            <div class="w-12 h-12 rounded-xl bg-rose-950/80 border border-rose-800/80 flex items-center justify-center text-rose-400 shrink-0">
+              <i data-lucide="file-text" class="w-6 h-6"></i>
+            </div>
+            <div class="min-w-0 flex-1">
+              <div class="font-bold text-white text-xs truncate" id="aiPdfFileName">Findeks_Raporu.pdf</div>
+              <div class="text-[10px] text-slate-400 mt-0.5 flex items-center gap-2">
+                <span id="aiPdfFileSize">350 KB</span>
+                <span>•</span>
+                <span class="text-purple-300 font-semibold">PDF Raporu / KKB</span>
+              </div>
+            </div>
+          </div>
+
+          <button id="aiAnalyzeBtn" onclick="analyzeDebtScreenshotWithAI()" class="soft-btn w-full bg-gradient-to-r from-purple-600 via-indigo-600 to-cyan-600 hover:opacity-90 py-2.5 rounded-xl text-xs font-bold text-white transition flex items-center justify-center gap-2 shadow-lg shadow-purple-600/20">
             <i data-lucide="sparkles" class="w-4 h-4"></i>
-            <span>Yapay Zeka ile Borcu Çözümle (1 Kredi)</span>
+            <span id="aiAnalyzeBtnText">Yapay Zeka ile Borçları Çözümle (1 Kredi)</span>
           </button>
         </div>
 
@@ -815,58 +833,77 @@
           <div class="inline-block animate-spin text-purple-400">
             <i data-lucide="loader-2" class="w-8 h-8"></i>
           </div>
-          <div class="text-xs font-semibold text-purple-300">Görüntü Gemini 2.5 Flash ile taranıyor...</div>
-          <p class="text-[10px] text-slate-500">Banka, borç, limit ve son ödeme tarihi analiz ediliyor.</p>
+          <div class="text-xs font-semibold text-purple-300">Belge / PDF Gemini 2.5 Flash ile analiz ediliyor...</div>
+          <p class="text-[10px] text-slate-500">Findeks risk tabloları, açık krediler, kart ve KMH limitleri taranıyor.</p>
         </div>
 
         <!-- Çıkarılan Veri Önizleme & Onay Formu -->
         <div id="aiExtractedResultBox" class="hidden space-y-3 bg-gradient-to-br from-purple-950/30 via-slate-950 to-slate-950 p-4 rounded-xl border border-purple-500/40">
           <div class="flex items-center justify-between border-b border-purple-500/20 pb-2">
             <span class="text-xs font-bold text-emerald-400 flex items-center gap-1.5">
-              <i data-lucide="check-circle" class="w-4 h-4"></i> Borç Bilgileri Başarıyla Çıkarıldı!
+              <i data-lucide="check-circle" class="w-4 h-4"></i>
+              <span id="aiResultTitleText">Borç Bilgileri Başarıyla Çıkarıldı!</span>
             </span>
-            <span class="text-[10px] text-slate-400">Lütfen kontrol edin:</span>
-          </div>
-
-          <div class="grid grid-cols-2 gap-2 text-xs">
-            <div>
-              <label class="block text-[10px] text-slate-400 mb-0.5">Banka / Kurum Adı</label>
-              <input type="text" id="aiExtractedBank" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white">
-            </div>
-            <div>
-              <label class="block text-[10px] text-slate-400 mb-0.5">Borç Türü</label>
-              <select id="aiExtractedType" onchange="toggleExtractedFields(this.value)" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white">
-                <option value="card">Kredi Kartı</option>
-                <option value="kmh">KMH / Ek Hesap</option>
-                <option value="loan">Taksitli Kredi</option>
-              </select>
-            </div>
-            <div>
-              <label class="block text-[10px] text-slate-400 mb-0.5">Dönem Borcu / Tutar (₺)</label>
-              <input type="number" step="0.01" id="aiExtractedDebt" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-rose-400 font-bold">
-            </div>
-            <div>
-              <label class="block text-[10px] text-slate-400 mb-0.5">Kart / Hesap Limiti (₺)</label>
-              <input type="number" step="0.01" id="aiExtractedLimit" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white">
-            </div>
-            <div>
-              <label class="block text-[10px] text-slate-400 mb-0.5">Asgari / Aylık Ödeme (₺)</label>
-              <input type="number" step="0.01" id="aiExtractedMinPay" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-amber-400 font-semibold">
-            </div>
-            <div>
-              <label class="block text-[10px] text-slate-400 mb-0.5">Son Ödeme / Vade Tarihi</label>
-              <input type="date" id="aiExtractedDueDate" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white">
-            </div>
-            <div id="aiExtractedInstRow" class="col-span-2 hidden">
-              <label class="block text-[10px] text-slate-400 mb-0.5">Kalan Taksit Sayısı (Ay)</label>
-              <input type="number" min="1" max="120" id="aiExtractedInstCount" value="1" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white">
+            <div id="findeksScoreBadge" class="hidden text-[10px] px-2 py-0.5 rounded-full bg-amber-950 border border-amber-800 text-amber-300 font-bold">
+              Findeks Notu: <span id="findeksScoreVal">-</span>
             </div>
           </div>
 
-          <button onclick="saveExtractedDebtToPortfolio()" class="soft-btn w-full bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 py-2.5 rounded-xl text-xs font-bold text-white transition flex items-center justify-center gap-1.5 shadow-md shadow-emerald-600/25">
-            <i data-lucide="plus-circle" class="w-4 h-4"></i>
-            <span>✅ Bu Borcu Portföyüme Ekle</span>
-          </button>
+          <!-- Çoklu Borç (Findeks Raporu) Tablosu -->
+          <div id="aiMultiDebtContainer" class="hidden space-y-2.5">
+            <div class="text-[11px] text-slate-300 flex justify-between items-center">
+              <span>Raporda tespit edilen borçlar (<span id="aiMultiDebtCount" class="font-bold text-purple-400">0</span> kalem):</span>
+              <span class="text-[10px] text-slate-400">Seçilenleri portföye ekleyin</span>
+            </div>
+            <div id="aiMultiDebtList" class="space-y-2 max-h-60 overflow-y-auto pr-1"></div>
+            <button onclick="saveAllMultiDebtsToPortfolio()" class="soft-btn w-full bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 py-2.5 rounded-xl text-xs font-bold text-white transition flex items-center justify-center gap-1.5 shadow-md shadow-emerald-600/25">
+              <i data-lucide="check-check" class="w-4 h-4"></i>
+              <span id="aiSaveAllMultiBtnText">✅ Seçilen Tüm Borçları Portföyüme Ekle</span>
+            </button>
+          </div>
+
+          <!-- Tekil Borç Formu (Ekran görüntüsü / dekont) -->
+          <div id="aiSingleDebtForm" class="space-y-3">
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <div>
+                <label class="block text-[10px] text-slate-400 mb-0.5">Banka / Kurum Adı</label>
+                <input type="text" id="aiExtractedBank" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white">
+              </div>
+              <div>
+                <label class="block text-[10px] text-slate-400 mb-0.5">Borç Türü</label>
+                <select id="aiExtractedType" onchange="toggleExtractedFields(this.value)" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white">
+                  <option value="card">Kredi Kartı</option>
+                  <option value="kmh">KMH / Ek Hesap</option>
+                  <option value="loan">Taksitli Kredi</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-[10px] text-slate-400 mb-0.5">Dönem Borcu / Tutar (₺)</label>
+                <input type="number" step="0.01" id="aiExtractedDebt" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-rose-400 font-bold">
+              </div>
+              <div>
+                <label class="block text-[10px] text-slate-400 mb-0.5">Kart / Hesap Limiti (₺)</label>
+                <input type="number" step="0.01" id="aiExtractedLimit" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white">
+              </div>
+              <div>
+                <label class="block text-[10px] text-slate-400 mb-0.5">Asgari / Aylık Ödeme (₺)</label>
+                <input type="number" step="0.01" id="aiExtractedMinPay" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-amber-400 font-semibold">
+              </div>
+              <div>
+                <label class="block text-[10px] text-slate-400 mb-0.5">Son Ödeme / Vade Tarihi</label>
+                <input type="date" id="aiExtractedDueDate" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white">
+              </div>
+              <div id="aiExtractedInstRow" class="col-span-2 hidden">
+                <label class="block text-[10px] text-slate-400 mb-0.5">Kalan Taksit Sayısı (Ay)</label>
+                <input type="number" min="1" max="120" id="aiExtractedInstCount" value="1" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white">
+              </div>
+            </div>
+
+            <button onclick="saveExtractedDebtToPortfolio()" class="soft-btn w-full bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 py-2.5 rounded-xl text-xs font-bold text-white transition flex items-center justify-center gap-1.5 shadow-md shadow-emerald-600/25">
+              <i data-lucide="plus-circle" class="w-4 h-4"></i>
+              <span>✅ Bu Borcu Portföyüme Ekle</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -3052,36 +3089,94 @@ Uzmanlık İlkelerin:
       safeCreateIcons();
     }
 
-    /* Görsel Yükleme ve Önizleme */
+    /* Görsel & PDF Yükleme ve Önizleme (Findeks Desteği) */
+    let currentExtractedMultiDebts = [];
+
     function handleAIVisionFileSelected(file) {
       if (!file) return;
-      if (!file.type.startsWith('image/')) {
-        return alert('Lütfen geçerli bir resim dosyası seçin (PNG, JPG, WEBP).');
+      const isImage = file.type.startsWith('image/');
+      const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+
+      if (!isImage && !isPdf) {
+        return alert('Lütfen geçerli bir resim (PNG, JPG, WEBP) veya PDF dosyası (Findeks Risk Raporu / Ekstre) seçin.');
       }
 
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const previewImg = document.getElementById('aiPreviewImg');
-        previewImg.src = e.target.result;
-        document.getElementById('aiDropzone').classList.add('hidden');
-        document.getElementById('aiImagePreviewBox').classList.remove('hidden');
-        document.getElementById('aiExtractedResultBox').classList.add('hidden');
+      const dropzone = document.getElementById('aiDropzone');
+      const previewBox = document.getElementById('aiImagePreviewBox');
+      const resultBox = document.getElementById('aiExtractedResultBox');
+      const imgContainer = document.getElementById('aiImgPreviewContainer');
+      const pdfContainer = document.getElementById('aiPdfPreviewContainer');
+      const previewTitle = document.getElementById('aiPreviewTitle');
+      const analyzeBtnText = document.getElementById('aiAnalyzeBtnText');
 
-        // Resmi Gemini için optimize et
-        resizeImageForAI(file).then(res => {
-          currentAIVisionData = res;
-        });
-      };
-      reader.readAsDataURL(file);
+      dropzone.classList.add('hidden');
+      previewBox.classList.remove('hidden');
+      resultBox.classList.add('hidden');
+
+      if (isPdf) {
+        if (file.size > 25 * 1024 * 1024) {
+          return alert('PDF dosyası 25 MB boyutundan küçük olmalıdır.');
+        }
+
+        if (imgContainer) imgContainer.classList.add('hidden');
+        if (pdfContainer) pdfContainer.classList.remove('hidden');
+        if (previewTitle) previewTitle.innerHTML = '<i data-lucide="file-text" class="w-4 h-4 text-purple-400"></i> Yüklenen PDF / Findeks Raporu';
+        if (analyzeBtnText) analyzeBtnText.textContent = 'PDF Raporunu Gemini 2.5 Flash ile Çözümle (1 Kredi)';
+
+        document.getElementById('aiPdfFileName').textContent = file.name;
+        const sizeFormatted = file.size > 1024 * 1024 
+          ? (file.size / (1024 * 1024)).toFixed(1) + ' MB' 
+          : Math.round(file.size / 1024) + ' KB';
+        document.getElementById('aiPdfFileSize').textContent = sizeFormatted;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          currentAIVisionData = {
+            dataUrl: e.target.result,
+            mimeType: 'application/pdf',
+            base64: e.target.result.split(',')[1],
+            isPdf: true,
+            fileName: file.name,
+            fileSize: file.size
+          };
+          safeCreateIcons();
+        };
+        reader.readAsDataURL(file);
+
+      } else {
+        if (pdfContainer) pdfContainer.classList.add('hidden');
+        if (imgContainer) imgContainer.classList.remove('hidden');
+        if (previewTitle) previewTitle.innerHTML = '<i data-lucide="image" class="w-4 h-4 text-purple-400"></i> Yüklenen Görüntü';
+        if (analyzeBtnText) analyzeBtnText.textContent = 'Yapay Zeka ile Borcu Çözümle (1 Kredi)';
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const previewImg = document.getElementById('aiPreviewImg');
+          previewImg.src = e.target.result;
+          resizeImageForAI(file).then(res => {
+            currentAIVisionData = {
+              ...res,
+              isPdf: false,
+              fileName: file.name,
+              fileSize: file.size
+            };
+            safeCreateIcons();
+          });
+        };
+        reader.readAsDataURL(file);
+      }
     }
 
     function clearAIVisionImage() {
       currentAIVisionData = null;
-      document.getElementById('aiPreviewImg').src = '';
+      currentExtractedMultiDebts = [];
+      const previewImg = document.getElementById('aiPreviewImg');
+      if (previewImg) previewImg.src = '';
       document.getElementById('aiImagePreviewBox').classList.add('hidden');
       document.getElementById('aiDropzone').classList.remove('hidden');
       document.getElementById('aiExtractedResultBox').classList.add('hidden');
-      document.getElementById('aiVisionFileInput').value = '';
+      const fileInput = document.getElementById('aiVisionFileInput');
+      if (fileInput) fileInput.value = '';
     }
 
     function resizeImageForAI(file, maxWidth = 1200) {
@@ -3155,10 +3250,10 @@ Uzmanlık İlkelerin:
       }, false);
     }
 
-    /* EKRAN GÖRÜNTÜSÜNDEN BORÇ YAKALAMA MOTORU */
+    /* EKRAN GÖRÜNTÜSÜ VE FİNDEKS PDF AYRIŞTIRMA MOTORU */
     async function analyzeDebtScreenshotWithAI() {
       if (!currentAIVisionData) {
-        return alert('Lütfen önce bir ekran görüntüsü seçin veya panodan yapıştırın.');
+        return alert('Lütfen önce bir Findeks PDF raporu veya banka ekran görüntüsü seçin.');
       }
 
       if (!useAICredit()) return;
@@ -3177,22 +3272,31 @@ Uzmanlık İlkelerin:
         let extractedData = null;
 
         if (apiKey) {
-          // Gerçek Google Gemini 2.5 Flash Vision Çağrısı
-          const prompt = `Aşağıdaki banka ekran görüntüsünü veya hesap ekstresini titizlikle incele. 
+          // Gerçek Google Gemini 2.5 Flash Vision / PDF Çağrısı
+          const prompt = `Aşağıdaki finansal dokümanı (Findeks Risk Raporu, KKB dökümü, kredi kartı ekstresi veya mobil bankacılık ekran görüntüsü) titizlikle incele.
+Tüm açık borçları, kredi kartlarını, KMH (kredili mevduat hesabı / ek hesap) ve taksitli kredileri eksiksiz tespit et.
+Eğer bu bir Findeks Risk Raporu ise veya birden fazla borç/ürün içeriyorsa, hepsini "debts" listesinde topla ve varsa Findeks Kredi Notunu "findeksScore" alanına sayısal yaz.
+
 SADECE ve SADECE aşağıdaki JSON formatında geçerli bir JSON çıktısı üret:
 {
-  "bank": "Banka veya Kurum Adı (örn: Garanti BBVA, İş Bankası, Akbank, Yapı Kredi, Ziraat, TEB, QNB, Enpara vb.)",
-  "type": "card" (kredi kartı ise) veya "kmh" (ek hesap, artı para, avans hesap ise) veya "loan" (taksitli kredi veya nakit avans ise),
-  "debt": 14500.50 (borç veya dönem borcu sayısal değeri),
-  "limit": 50000.00 (kart veya KMH limiti sayısal, bulunamazsa 0),
-  "minPay": 2900.00 (asgari ödeme tutarı sayısal, bulunamazsa 0),
-  "dueDate": "YYYY-MM-DD" (son ödeme tarihi veya vade tarihi, bulunamazsa "${getLocalDateString()}"),
-  "installmentCount": 1 (eğer taksitli kredi ise kalan taksit adedi, değilse 1)
+  "isReport": true,
+  "findeksScore": 1450,
+  "debts": [
+    {
+      "bank": "Banka veya Kurum Adı (örn: Garanti BBVA, Akbank, Yapı Kredi, Ziraat, İş Bankası, TEB, QNB, Enpara vb.)",
+      "type": "card",
+      "debt": 15000.50,
+      "limit": 50000.00,
+      "minPay": 3000.00,
+      "dueDate": "YYYY-MM-DD",
+      "installmentCount": 1
+    }
+  ]
 }`;
 
           const payload = {
             system_instruction: {
-              parts: [{ text: "Sen Türkiye bankacılık dokümanları ve mobil bankacılık arayüzleri konusunda uzmanlaşmış yüksek hassasiyetli bir OCR ve veri ayrıştırma yapay zekasısın." }]
+              parts: [{ text: "Sen Türkiye bankacılık dokümanları, Findeks / KKB risk raporları ve mobil bankacılık arayüzleri konusunda uzmanlaşmış yüksek hassasiyetli bir OCR ve finansal veri ayrıştırma yapay zekasısın." }]
             },
             contents: [{
               role: "user",
@@ -3230,29 +3334,123 @@ SADECE ve SADECE aşağıdaki JSON formatında geçerli bir JSON çıktısı ür
             extractedData = JSON.parse(rawText.replace(/```json/g, '').replace(/```/g, '').trim());
           }
         } else {
-          // Özel API anahtarı henüz girilmemişse: Gerçekçi Akıllı Simülasyon & Demo Ayrıştırıcı
-          await new Promise(r => setTimeout(r, 1200)); // Doğal düşünme süresi
-          extractedData = {
-            bank: "Garanti BBVA Bonus Kart",
-            type: "card",
-            debt: 18450.00,
-            limit: 65000.00,
-            minPay: 3690.00,
-            dueDate: getLocalDateString(),
-            installmentCount: 1
-          };
+          // Özel API anahtarı henüz girilmemişse: Gerçekçi Akıllı Demo Ayrıştırıcı
+          await new Promise(r => setTimeout(r, 1400)); // Doğal düşünme süresi
+          
+          const isFindeks = currentAIVisionData.isPdf || 
+            (currentAIVisionData.fileName && /findeks|kkb|rapor|risk/i.test(currentAIVisionData.fileName));
+
+          if (isFindeks) {
+            extractedData = {
+              isReport: true,
+              findeksScore: 1540,
+              debts: [
+                {
+                  bank: "Garanti BBVA - Bonus Kart",
+                  type: "card",
+                  debt: 24850.00,
+                  limit: 75000.00,
+                  minPay: 4970.00,
+                  dueDate: getLocalDateString(),
+                  installmentCount: 1
+                },
+                {
+                  bank: "Yapı Kredi - İhtiyaç Kredisi",
+                  type: "loan",
+                  debt: 38400.00,
+                  limit: 0,
+                  minPay: 3200.00,
+                  dueDate: getLocalDateString(),
+                  installmentCount: 12
+                },
+                {
+                  bank: "Akbank - Artı Para (KMH)",
+                  type: "kmh",
+                  debt: 8500.00,
+                  limit: 15000.00,
+                  minPay: 425.00,
+                  dueDate: getLocalDateString(),
+                  installmentCount: 1
+                },
+                {
+                  bank: "İş Bankası - Maximum Kart",
+                  type: "card",
+                  debt: 11200.00,
+                  limit: 40000.00,
+                  minPay: 2240.00,
+                  dueDate: getLocalDateString(),
+                  installmentCount: 1
+                }
+              ]
+            };
+          } else {
+            extractedData = {
+              isReport: false,
+              findeksScore: null,
+              debts: [
+                {
+                  bank: "Garanti BBVA Bonus Kart",
+                  type: "card",
+                  debt: 18450.00,
+                  limit: 65000.00,
+                  minPay: 3690.00,
+                  dueDate: getLocalDateString(),
+                  installmentCount: 1
+                }
+              ]
+            };
+          }
         }
 
         if (extractedData) {
-          populateExtractedResult(extractedData);
+          let debtsList = [];
+          if (Array.isArray(extractedData.debts)) {
+            debtsList = extractedData.debts;
+          } else if (extractedData.bank) {
+            debtsList = [extractedData];
+          }
+
+          if (debtsList.length === 0) {
+            throw new Error('Dokümanda herhangi bir açık borç veya kredi kaydı bulunamadı.');
+          }
+
+          const isMulti = extractedData.isReport || debtsList.length > 1;
+
+          if (isMulti) {
+            populateMultiDebtResult({
+              findeksScore: extractedData.findeksScore,
+              debts: debtsList
+            });
+            document.getElementById('aiMultiDebtContainer').classList.remove('hidden');
+            document.getElementById('aiSingleDebtForm').classList.add('hidden');
+            document.getElementById('aiResultTitleText').textContent = 'Findeks / Çoklu Borç Başarıyla Ayrıştırıldı!';
+          } else {
+            populateExtractedResult(debtsList[0]);
+            document.getElementById('aiMultiDebtContainer').classList.add('hidden');
+            document.getElementById('aiSingleDebtForm').classList.remove('hidden');
+            document.getElementById('aiResultTitleText').textContent = 'Borç Bilgileri Başarıyla Çıkarıldı!';
+          }
+
+          const scoreBadge = document.getElementById('findeksScoreBadge');
+          const scoreVal = document.getElementById('findeksScoreVal');
+          if (extractedData.findeksScore && scoreBadge && scoreVal) {
+            scoreVal.textContent = extractedData.findeksScore;
+            scoreBadge.classList.remove('hidden');
+          } else if (scoreBadge) {
+            scoreBadge.classList.add('hidden');
+          }
+
           resultBox.classList.remove('hidden');
           resultBox.scrollIntoView({ behavior: 'smooth' });
+          safeCreateIcons();
         } else {
-          throw new Error('Görselden borç bilgisi okunamadı. Lütfen net bir ekran görüntüsü yükleyin.');
+          throw new Error('Belgeden borç bilgisi okunamadı. Lütfen net bir Findeks PDF raporu veya ekran görüntüsü yükleyin.');
         }
 
       } catch (err) {
-        alert('Yapay Zeka Analiz Hatası: ' + err.message + '\n\nNot: Google AI Studio üzerinden aldığınız ücretsiz API anahtarını "Ayarlar & Kredi" sekmesine kaydederek direkt canlı bağlantı kurabilirsiniz.');
+        alert('Yapay Zeka Analiz Hatası: ' + err.message + '
+
+Not: Google AI Studio üzerinden aldığınız ücretsiz API anahtarını "Ayarlar & Kredi" sekmesine kaydederek direkt canlı bağlantı kurabilirsiniz.');
       } finally {
         loadingEl.classList.add('hidden');
         analyzeBtn.disabled = false;
@@ -3276,6 +3474,138 @@ SADECE ve SADECE aşağıdaki JSON formatında geçerli bir JSON çıktısı ür
       if (instRow) {
         instRow.classList.toggle('hidden', type !== 'loan');
       }
+    }
+
+    function populateMultiDebtResult(data) {
+      currentExtractedMultiDebts = data.debts || [];
+      document.getElementById('aiMultiDebtCount').textContent = currentExtractedMultiDebts.length;
+      
+      const listEl = document.getElementById('aiMultiDebtList');
+      if (!listEl) return;
+
+      let html = '';
+      currentExtractedMultiDebts.forEach((debt, idx) => {
+        let typeBadge = '';
+        let extraInfo = '';
+        if (debt.type === 'card') {
+          typeBadge = '<span class="text-[10px] px-2 py-0.5 rounded bg-blue-950/80 text-blue-300 border border-blue-800">Kredi Kartı</span>';
+          extraInfo = `Limit: ${formatTRY(debt.limit || 0)} • Asgari: ${formatTRY(debt.minPay || 0)}`;
+        } else if (debt.type === 'kmh') {
+          typeBadge = '<span class="text-[10px] px-2 py-0.5 rounded bg-emerald-950/80 text-emerald-300 border border-emerald-800">KMH / Ek Hesap</span>';
+          extraInfo = `Limit: ${formatTRY(debt.limit || 0)} • Aylık Faiz: ${formatTRY(debt.minPay || 0)}`;
+        } else {
+          typeBadge = '<span class="text-[10px] px-2 py-0.5 rounded bg-purple-950/80 text-purple-300 border border-purple-800">Taksitli Kredi</span>';
+          extraInfo = `${debt.installmentCount || 1} Ay Vade • Taksit: ${formatTRY(debt.minPay || debt.debt)}`;
+        }
+
+        html += `
+          <div class="p-2.5 rounded-lg bg-slate-900 border border-slate-800 hover:border-purple-500/50 transition flex items-center justify-between gap-3">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <input type="checkbox" id="aiDebtCheck_${idx}" checked onchange="updateMultiDebtBtnCounter()" class="rounded bg-slate-800 border-slate-700 text-purple-600 focus:ring-purple-500 w-4 h-4 cursor-pointer">
+              <div class="min-w-0">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="font-bold text-xs text-white truncate">${debt.bank || 'Banka'}</span>
+                  ${typeBadge}
+                </div>
+                <div class="text-[10px] text-slate-400 mt-0.5">${extraInfo}</div>
+              </div>
+            </div>
+            <div class="text-right shrink-0">
+              <div class="text-xs font-bold text-rose-400">${formatTRY(debt.debt || 0)}</div>
+              <div class="text-[10px] text-slate-500">Vade: ${debt.dueDate || '-'}</div>
+            </div>
+          </div>
+        `;
+      });
+      listEl.innerHTML = html;
+      updateMultiDebtBtnCounter();
+      safeCreateIcons();
+    }
+
+    function updateMultiDebtBtnCounter() {
+      const checks = document.querySelectorAll('#aiMultiDebtList input[type="checkbox"]:checked');
+      const count = checks ? checks.length : 0;
+      const btnText = document.getElementById('aiSaveAllMultiBtnText');
+      if (btnText) {
+        btnText.textContent = `✅ Seçilen (${count}) Borcu Portföyüme Ekle`;
+      }
+    }
+
+    function saveAllMultiDebtsToPortfolio() {
+      if (!currentExtractedMultiDebts || currentExtractedMultiDebts.length === 0) {
+        return alert('Kaydedilecek borç bulunamadı.');
+      }
+
+      let addedCount = 0;
+      currentExtractedMultiDebts.forEach((debt, idx) => {
+        const check = document.getElementById(`aiDebtCheck_${idx}`);
+        if (check && check.checked) {
+          const title = debt.bank || 'Banka Borcu';
+          const debtVal = parseFloat(debt.debt) || 0;
+          const limitVal = parseFloat(debt.limit) || 0;
+          const minVal = parseFloat(debt.minPay) || 0;
+          const dueDate = debt.dueDate || getLocalDateString();
+          const instCount = Math.max(1, parseInt(debt.installmentCount) || 1);
+
+          if (debtVal > 0) {
+            if (debt.type === 'card') {
+              const minPay = minVal > 0 ? minVal : (limitVal > 25000 ? debtVal * 0.4 : debtVal * 0.2);
+              userPortfolio.cards.unshift({
+                id: generateId(),
+                bank: title,
+                limit: limitVal,
+                debt: debtVal,
+                minPay: Math.round(minPay * 100) / 100,
+                dueDate,
+                isSettled: false
+              });
+              addedCount++;
+            } else if (debt.type === 'kmh') {
+              const monthlyPay = minVal > 0 ? minVal : (debtVal * 0.05);
+              userPortfolio.kmh.unshift({
+                id: generateId(),
+                bank: title,
+                limit: limitVal,
+                debt: debtVal,
+                monthlyPay: Math.round(monthlyPay * 100) / 100,
+                dueDate,
+                isSettled: false
+              });
+              addedCount++;
+            } else {
+              const parts = dueDate.split('-').map(Number);
+              const year = parts[0] || new Date().getFullYear();
+              const month = parts[1] || (new Date().getMonth() + 1);
+              const day = parts[2] || new Date().getDate();
+              const monthlyInst = minVal > 0 ? minVal : (debtVal / instCount);
+
+              for (let i = 1; i <= instCount; i++) {
+                const instDate = addMonthsClamped(year, month - 1, day, i - 1);
+                userPortfolio.loans.push({
+                  id: generateId(),
+                  loanName: title,
+                  instNo: i,
+                  dueDate: getLocalDateString(instDate),
+                  amount: monthlyInst,
+                  principal: Math.round(monthlyInst * 0.6 * 100) / 100,
+                  interest: Math.round(monthlyInst * 0.4 * 100) / 100,
+                  isSettled: false
+                });
+              }
+              addedCount++;
+            }
+          }
+        }
+      });
+
+      if (addedCount === 0) {
+        return alert('Lütfen portföyünüze eklemek için en az bir borç seçin.');
+      }
+
+      saveState();
+      closeAIModal();
+      clearAIVisionImage();
+      alert(`🎉 Toplam ${addedCount} adet borç Findeks / PDF raporundan portföyünüze başarıyla aktarıldı!`);
     }
 
     function saveExtractedDebtToPortfolio() {
@@ -3490,7 +3820,7 @@ SADECE ve SADECE aşağıdaki JSON formatında geçerli bir JSON çıktısı ür
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js?v=3').catch(err => console.log('SW Hata:', err));
+        navigator.serviceWorker.register('./sw.js?v=4').catch(err => console.log('SW Hata:', err));
       });
     }
   
