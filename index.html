@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>FinFlow Pro</title>
+  <title>FinFlow Pro - Finansal Strateji & Borç Yönetim Merkezi</title>
 
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -11,8 +11,26 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="theme-color" content="#020617">
 
-  <link rel="manifest" href="manifest.json">
-  <link rel="icon" type="image/png" href="icon-192.png">
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" type="image/png" href="./icon-192.png">
+  <link rel="apple-touch-icon" href="./icon-192.png">
+
+  <!-- Erken PIN kontrolü ile hassas finansal verilerin ekranda anlık parlamasını (FOUC) engelleme -->
+  <script>
+    try {
+      var _k = ['finflow_portfolio_v18', 'finflow_portfolio_v17', 'finflow_portfolio_v16'];
+      for (var _i = 0; _i < _k.length; _i++) {
+        var _raw = localStorage.getItem(_k[_i]);
+        if (_raw && _raw.indexOf('"pin"') !== -1) {
+          var _p = JSON.parse(_raw);
+          if (_p && _p.settings && _p.settings.pin && _p.settings.pin.trim() !== '') {
+            document.documentElement.classList.add('pin-required');
+            break;
+          }
+        }
+      }
+    } catch(e) {}
+  </script>
 
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
@@ -89,12 +107,16 @@
     .soft-btn:active {
       transform: scale(0.96);
     }
+
+    html.pin-required #mainAppContainer {
+      display: none;
+    }
   </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen font-sans antialiased selection:bg-indigo-500 selection:text-white p-3 sm:p-6 md:p-8 pb-32 sm:pb-12">
 
   <!-- PIN KİLİT EKRANI -->
-  <div id="pinLockScreen" class="fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-md flex flex-col items-center justify-center p-4 transition-all duration-300 hidden">
+  <div id="pinLockScreen" class="fixed inset-0 z-[100] bg-slate-950/98 backdrop-blur-md flex flex-col items-center justify-center p-4 transition-all duration-300 hidden">
     <div id="pinCard" class="max-w-xs w-full text-center space-y-6 transition-all duration-300">
       <div id="pinIconBox" class="w-16 h-16 bg-indigo-600/20 border border-indigo-500/40 rounded-2xl flex items-center justify-center mx-auto text-indigo-400 shadow-xl shadow-indigo-600/20 transition-all duration-300">
         <i data-lucide="lock" class="w-8 h-8"></i>
@@ -104,7 +126,7 @@
         <p class="text-xs text-slate-400 mt-1">Devam etmek için 4 haneli PIN kodunuzu girin.</p>
       </div>
       <div class="flex justify-center gap-3">
-        <input type="password" id="pinInput" maxlength="4" autofocus inputmode="numeric" onkeyup="if(event.key==='Enter') verifyPIN()" class="w-44 text-center tracking-[1em] text-2xl font-bold py-3 bg-slate-900 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 transition">
+        <input type="password" id="pinInput" maxlength="4" autofocus inputmode="numeric" pattern="[0-9]*" oninput="if(this.value.length === 4) verifyPIN()" onkeyup="if(event.key==='Enter') verifyPIN()" class="w-44 text-center tracking-[1em] text-2xl font-bold py-3 bg-slate-900 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 transition">
       </div>
       <p id="pinError" class="text-xs text-rose-400 hidden animate-fade-in">Geçersiz PIN! Tekrar deneyin.</p>
       <button onclick="verifyPIN()" class="soft-btn w-full py-3 bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 font-semibold rounded-xl text-sm transition shadow-lg shadow-indigo-600/25">Kilidi Aç</button>
@@ -138,6 +160,10 @@
         </div>
 
         <div class="flex items-center gap-2">
+          <button id="lockAppBtn" onclick="lockAppNow()" class="soft-btn bg-slate-900 border border-slate-800 hover:bg-slate-800 hover:border-slate-700 text-slate-300 p-2 sm:px-3 sm:py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition hidden" title="Uygulamayı Kilitle">
+            <i data-lucide="lock" class="w-4 h-4 text-rose-400"></i>
+            <span class="hidden sm:inline">Kilitle</span>
+          </button>
           <button onclick="openExportModal()" class="soft-btn bg-slate-900 border border-slate-800 hover:bg-slate-800 hover:border-slate-700 text-slate-300 p-2 sm:px-3 sm:py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition">
             <i data-lucide="download" class="w-4 h-4 text-cyan-400"></i>
             <span class="hidden sm:inline">Yedekle / Dışa Aktar</span>
@@ -373,7 +399,7 @@
           <i data-lucide="landmark" class="w-4 h-4"></i> Ek Hesap (KMH) Bakiyeleri
         </h2>
         <span class="text-[10px] text-slate-400 bg-slate-900 px-2 py-0.5 rounded border border-slate-800">
-          💡 Borç 0 ₺ olduğunda sonraki aylarda ödeme çıkmaz.
+          💡 Borç 0 ₺ olduğunda faiz maliyeti işlemez.
         </span>
       </div>
       <div id="kmhGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4"></div>
@@ -619,8 +645,9 @@
         <button onclick="closePinModal()" class="text-slate-400 hover:text-white transition"><i data-lucide="x" class="w-5 h-5"></i></button>
       </div>
       <div class="space-y-3">
-        <label class="block text-xs text-slate-300">Yeni 4 Haneli PIN Kodu Belirleyin (İptal için boş bırakın):</label>
-        <input type="password" id="pinSettingInput" maxlength="4" placeholder="Örn: 1234" class="w-full text-center tracking-widest text-lg font-bold bg-slate-950 border border-slate-800 rounded-lg py-2 text-white focus:outline-none focus:border-amber-500 transition">
+        <label class="block text-xs text-slate-300">Yeni 4 Haneli Sayısal PIN Kodu Belirleyin (İptal için boş bırakın):</label>
+        <input type="password" id="pinSettingInput" maxlength="4" inputmode="numeric" pattern="[0-9]*" placeholder="Örn: 1234" class="w-full text-center tracking-widest text-lg font-bold bg-slate-950 border border-slate-800 rounded-lg py-2 text-white focus:outline-none focus:border-amber-500 transition">
+        <p id="pinSettingError" class="text-[11px] text-rose-400 hidden"></p>
         <button onclick="savePINSetting()" class="soft-btn w-full bg-amber-600 hover:bg-amber-500 active:bg-amber-700 py-2.5 rounded-xl text-xs font-bold text-white transition shadow-md shadow-amber-600/20">PIN Ayarını Kaydet</button>
       </div>
     </div>
@@ -636,7 +663,7 @@
         <button onclick="closeUniversalDebtModal()" class="text-slate-400 hover:text-white transition"><i data-lucide="x" class="w-5 h-5"></i></button>
       </div>
 
-      <form onsubmit="saveUniversalDebt(event)" class="space-y-3 sm:space-y-4">
+      <form id="universalDebtForm" onsubmit="saveUniversalDebt(event)" class="space-y-3 sm:space-y-4">
         <div>
           <label class="block text-xs font-semibold text-slate-300 mb-1.5">Borç Türünü Seçin</label>
           <div class="grid grid-cols-3 gap-2">
@@ -750,7 +777,7 @@
         </div>
         <div class="flex items-center gap-2 pt-1">
           <input type="checkbox" id="mExpenseIsSub" class="rounded bg-slate-950 border-slate-800 text-indigo-600 focus:ring-0">
-          <label for="mExpenseIsSub" class="text-xs text-slate-300">Bu bir dijital abonelik / periyodik faturadır</label>
+          <label for="mExpenseIsSub" class="text-xs text-slate-300 cursor-pointer">Bu bir dijital abonelik / periyodik faturadır</label>
         </div>
         <button type="submit" class="soft-btn w-full bg-rose-600 hover:bg-rose-500 active:bg-rose-700 py-3 sm:py-2 rounded-xl text-xs font-semibold text-white transition shadow-md shadow-rose-600/20">Gideri Kaydet</button>
       </form>
@@ -784,6 +811,12 @@
       'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'
     ];
 
+    function safeCreateIcons() {
+      if (typeof lucide !== 'undefined' && typeof lucide.createIcons === 'function') {
+        try { lucide.createIcons(); } catch (e) {}
+      }
+    }
+
     function generateId() {
       if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
         return crypto.randomUUID();
@@ -791,9 +824,12 @@
       return 'id-' + Date.now().toString(36) + '-' + Math.random().toString(36).substring(2, 9);
     }
 
+    /* Saat dilimi kaymalarından ve DST geçişlerinden etkilenmeyen yerel tarih dizesi */
     function getLocalDateString(d = new Date()) {
-      const offset = d.getTimezoneOffset() * 60000;
-      return new Date(d.getTime() - offset).toISOString().split('T')[0];
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${y}-${m}-${day}`;
     }
 
     document.addEventListener('DOMContentLoaded', async () => {
@@ -804,6 +840,23 @@
       renderAll();
       updateNotifButtonUI();
       checkDueDatesAndNotify();
+
+      // Modal dışına tıklayınca ve ESC ile kapatma desteği
+      document.querySelectorAll('.modal-backdrop').forEach(modal => {
+        modal.addEventListener('click', (e) => {
+          if (e.target === modal) {
+            modal.classList.add('hidden-modal');
+          }
+        });
+      });
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          document.querySelectorAll('.modal-backdrop:not(.hidden-modal)').forEach(m => {
+            m.classList.add('hidden-modal');
+          });
+        }
+      });
     });
 
     async function loadState() {
@@ -852,13 +905,35 @@
     /* PIN GÜVENLİK SİSTEMİ & AÇILMA ANİMASYONU */
     function checkSecurityPIN() {
       const lockScreen = document.getElementById('pinLockScreen');
+      const lockBtn = document.getElementById('lockAppBtn');
+      const pinHeaderIcon = document.getElementById('pinHeaderIcon');
+
       if (userPortfolio.settings.pin && userPortfolio.settings.pin.trim() !== '') {
         lockScreen.classList.remove('hidden');
         document.getElementById('pinHeaderStatus').textContent = 'PIN Aktif';
+        if (lockBtn) lockBtn.classList.remove('hidden');
+        if (pinHeaderIcon) pinHeaderIcon.className = 'w-4 h-4 text-emerald-400';
       } else {
         lockScreen.classList.add('hidden');
+        document.documentElement.classList.remove('pin-required');
         document.getElementById('pinHeaderStatus').textContent = 'PIN Ayarla';
+        if (lockBtn) lockBtn.classList.add('hidden');
+        if (pinHeaderIcon) pinHeaderIcon.className = 'w-4 h-4 text-amber-400';
       }
+    }
+
+    function lockAppNow() {
+      if (!userPortfolio.settings.pin || userPortfolio.settings.pin.trim() === '') {
+        openPinModal();
+        return;
+      }
+      const lockScreen = document.getElementById('pinLockScreen');
+      const input = document.getElementById('pinInput');
+      input.value = '';
+      document.getElementById('pinError').classList.add('hidden');
+      lockScreen.classList.remove('hidden');
+      document.documentElement.classList.add('pin-required');
+      input.focus();
     }
 
     function verifyPIN() {
@@ -870,11 +945,12 @@
 
       if (input === userPortfolio.settings.pin) {
         err.classList.add('hidden');
+        document.documentElement.classList.remove('pin-required');
 
         // Başarılı kilit açma görseli & animasyonu
         iconBox.innerHTML = '<i data-lucide="unlock" class="w-8 h-8 text-emerald-400"></i>';
         iconBox.className = 'w-16 h-16 bg-emerald-600/30 border border-emerald-500/60 rounded-2xl flex items-center justify-center mx-auto text-emerald-400 shadow-2xl shadow-emerald-500/40 scale-110 transition-all duration-300';
-        lucide.createIcons();
+        safeCreateIcons();
 
         setTimeout(() => {
           card.style.transform = 'scale(0.92)';
@@ -889,7 +965,7 @@
             iconBox.innerHTML = '<i data-lucide="lock" class="w-8 h-8"></i>';
             iconBox.className = 'w-16 h-16 bg-indigo-600/20 border border-indigo-500/40 rounded-2xl flex items-center justify-center mx-auto text-indigo-400 shadow-xl shadow-indigo-600/20 transition-all duration-300';
             document.getElementById('pinInput').value = '';
-            lucide.createIcons();
+            safeCreateIcons();
           }, 300);
         }, 200);
 
@@ -915,12 +991,22 @@
 
     function openPinModal() {
       document.getElementById('pinSettingInput').value = userPortfolio.settings.pin || '';
+      document.getElementById('pinSettingError').classList.add('hidden');
       openModalById('pinModal');
     }
     function closePinModal() { closeModalById('pinModal'); }
 
     function savePINSetting() {
       const val = document.getElementById('pinSettingInput').value.trim();
+      const errEl = document.getElementById('pinSettingError');
+
+      if (val !== '' && !/^\d{4}$/.test(val)) {
+        errEl.textContent = 'PIN tam olarak 4 haneli sayısal rakamlardan oluşmalıdır.';
+        errEl.classList.remove('hidden');
+        return;
+      }
+
+      errEl.classList.add('hidden');
       userPortfolio.settings.pin = val;
       saveState();
       closePinModal();
@@ -933,19 +1019,52 @@
       return new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(isFinite(n) ? n : 0);
     }
 
+    /* 
+      Türkçe ve uluslararası para/sayı formatlarını kusursuz ayrıştırma:
+      - 50.000 -> 50000
+      - 1.500 -> 1500
+      - 1.000.000 -> 1000000
+      - 25.450,75 -> 25450.75
+      - 25,450.75 -> 25450.75
+      - 1500,50 -> 1500.50
+    */
     function parseTRNumber(val) {
+      if (val === null || val === undefined || val === '') return 0;
       if (typeof val === 'number') return isFinite(val) ? val : 0;
-      if (!val) return 0;
       let s = String(val).replace(/[^0-9.,-]/g, '').trim();
       if (!s) return 0;
+
       const lastDot = s.lastIndexOf('.');
       const lastComma = s.lastIndexOf(',');
+
       if (lastDot !== -1 && lastComma !== -1) {
-        if (lastDot > lastComma) s = s.replace(/,/g, '');
-        else s = s.replace(/\./g, '').replace(',', '.');
+        if (lastDot > lastComma) {
+          // 1,234.56
+          s = s.replace(/,/g, '');
+        } else {
+          // 1.234,56
+          s = s.replace(/\./g, '').replace(',', '.');
+        }
       } else if (lastComma !== -1) {
-        s = s.replace(',', '.');
+        const parts = s.split(',');
+        if (parts.length > 2) {
+          s = s.replace(/,/g, '');
+        } else {
+          s = s.replace(',', '.');
+        }
+      } else if (lastDot !== -1) {
+        const parts = s.split('.');
+        if (parts.length > 2) {
+          // 1.000.000
+          s = s.replace(/\./g, '');
+        } else if (parts.length === 2) {
+          // 50.000 gibi 3 basamaklı binlik ayracı
+          if (parts[1].length === 3) {
+            s = s.replace('.', '');
+          }
+        }
       }
+
       const n = parseFloat(s);
       return isFinite(n) ? n : 0;
     }
@@ -964,14 +1083,21 @@
     }
 
     function addMonthsClamped(year, monthIndex0, day, monthsToAdd) {
-      const targetMonthIndex = monthIndex0 + monthsToAdd;
-      const lastDay = new Date(year, targetMonthIndex + 1, 0).getDate();
-      return new Date(year, targetMonthIndex, Math.min(day, lastDay));
+      const targetDate = new Date(year, monthIndex0 + monthsToAdd, 1);
+      const targetYear = targetDate.getFullYear();
+      const targetMonth = targetDate.getMonth();
+      const lastDay = new Date(targetYear, targetMonth + 1, 0).getDate();
+      return new Date(targetYear, targetMonth, Math.min(day, lastDay));
     }
 
     function escapeHtml(str) {
       if (!str) return '';
-      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
     }
 
     function normalizeText(str) {
@@ -987,31 +1113,37 @@
         .trim();
     }
 
-    /* CHART */
+    /* GRAFİK MOTORU */
     function initCashflowChart() {
       const canvas = document.getElementById('cashflowChart');
-      if (!canvas) return;
+      if (!canvas || typeof Chart === 'undefined') return;
       const ctx = canvas.getContext('2d');
-      if (cashflowChart) cashflowChart.destroy();
-      cashflowChart = new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-          labels: ['Zorunlu Çıkış', 'Serbest Bütçe'],
-          datasets: [{
-            data: [0, 100],
-            backgroundColor: ['#f43f5e', '#10b981'],
-            borderColor: '#020617',
-            borderWidth: 2
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          animation: { duration: 600, easing: 'easeOutQuart' },
-          plugins: { legend: { display: false } },
-          cutout: '72%'
-        }
-      });
+      if (cashflowChart) {
+        try { cashflowChart.destroy(); } catch (e) {}
+      }
+      try {
+        cashflowChart = new Chart(ctx, {
+          type: 'doughnut',
+          data: {
+            labels: ['Zorunlu Çıkış', 'Serbest Bütçe'],
+            datasets: [{
+              data: [0, 100],
+              backgroundColor: ['#f43f5e', '#10b981'],
+              borderColor: '#020617',
+              borderWidth: 2
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: { duration: 500, easing: 'easeOutQuart' },
+            plugins: { legend: { display: false } },
+            cutout: '72%'
+          }
+        });
+      } catch (err) {
+        console.warn('Chart başlatılamadı:', err);
+      }
     }
 
     /* FİNANSAL HESAPLAMALAR */
@@ -1021,9 +1153,11 @@
 
       let ccTotal = 0, ccMinTotal = 0;
       userPortfolio.cards.forEach(c => {
-        if (!c.isSettled) {
-          ccTotal += Number(c.debt) || 0;
-          ccMinTotal += (Number(c.minPay) || (Number(c.debt) || 0) * 0.2);
+        const debt = Number(c.debt) || 0;
+        if (!c.isSettled && debt > 0) {
+          ccTotal += debt;
+          const minP = Number(c.minPay);
+          ccMinTotal += (!isNaN(minP) && minP > 0) ? minP : (c.limit > 25000 ? debt * 0.4 : debt * 0.2);
         }
       });
 
@@ -1032,7 +1166,8 @@
         const debt = Number(k.debt) || 0;
         if (!k.isSettled && debt > 0) {
           kmhTotal += debt;
-          kmhOutflow += (Number(k.monthlyPay) || debt * 0.05);
+          const mPay = Number(k.monthlyPay);
+          kmhOutflow += (!isNaN(mPay) && mPay > 0) ? mPay : (debt * 0.05);
         }
       });
 
@@ -1041,10 +1176,11 @@
       const currentYearMonth = todayStr.substring(0, 7);
 
       userPortfolio.loans.forEach(l => {
-        if (!l.isSettled) {
-          loansTotal += Number(l.amount) || 0;
+        const amt = Number(l.amount) || 0;
+        if (!l.isSettled && amt > 0) {
+          loansTotal += amt;
           if (l.dueDate && (l.dueDate.startsWith(currentYearMonth) || l.dueDate <= todayStr)) {
-            currentMonthLoans += Number(l.amount) || 0;
+            currentMonthLoans += amt;
           }
         }
       });
@@ -1070,7 +1206,7 @@
 
       document.getElementById('modelBadge').textContent = isSnowball ? 'Kartopu (Snowball) Modeli' : 'Avalanche (Çığ) Modeli';
       document.getElementById('modelToggleText').textContent = isSnowball ? 'Avalanche Yap' : 'Kartopu (Snowball) Yap';
-      document.getElementById('priorityListTag').textContent = isSnowball ? 'En Küçük Borçtan Başlayın' : 'En Yüksek Faizden Başlayın';
+      document.getElementById('priorityListTag').textContent = isSnowball ? 'En Küçük Bakiyeden Başlayın' : 'En Yüksek Faiz/Maliyetten Başlayın';
 
       const recommendedSavings = f.totalIncome > 0 ? Math.round(f.totalIncome * 0.15) : 0;
       document.getElementById('aiRecommendedSavings').textContent = formatTRY(recommendedSavings);
@@ -1078,41 +1214,65 @@
       const extraCashForDebt = Math.max(0, f.freeCash - recommendedSavings);
 
       const debtItems = [];
+
+      // Kredi Kartları
       userPortfolio.cards.filter(c => !c.isSettled && (Number(c.debt) || 0) > 0).forEach(c => {
-        const isOverLimit = c.limit > 0 && c.debt > c.limit;
-        const minDue = Number(c.minPay) || (Number(c.debt) || 0) * 0.2;
+        const debt = Number(c.debt) || 0;
+        const limit = Number(c.limit) || 0;
+        const isOverLimit = limit > 0 && debt > limit;
+        const minDue = Number(c.minPay) || (limit > 25000 ? debt * 0.4 : debt * 0.2);
         debtItems.push({
           name: c.bank,
-          debt: Number(c.debt) || 0,
+          debt: debt,
           minPay: minDue,
-          priority: isSnowball ? (1000000 - Number(c.debt)) : (isOverLimit ? 100 : 80),
-          reason: isSnowball ? 'Hızlı motivasyon ve kapatma' : (isOverLimit ? 'Limit aşım cezası & akdi faiz' : 'Kredi kartı akdi faizi')
+          type: 'card',
+          priority: isOverLimit ? 100 : 80,
+          reason: isSnowball ? 'Hızlı kapatma ve kartı sıfırlama' : (isOverLimit ? 'Limit aşım cezası & akdi faiz' : 'Kredi kartı akdi faizi (%4.25+)')
         });
       });
 
+      // KMH / Ek Hesap
       userPortfolio.kmh.filter(k => !k.isSettled && (Number(k.debt) || 0) > 0).forEach(k => {
-        const minDue = Number(k.monthlyPay) || (Number(k.debt) || 0) * 0.05;
+        const debt = Number(k.debt) || 0;
+        const minDue = Number(k.monthlyPay) || (debt * 0.05);
         debtItems.push({
-          name: k.bank,
-          debt: Number(k.debt) || 0,
+          name: `${k.bank} KMH`,
+          debt: debt,
           minPay: minDue,
-          priority: isSnowball ? (1000000 - Number(k.debt)) : 70,
-          reason: isSnowball ? 'Hızlı hesap kapatma' : 'Günlük KMH faiz maliyeti'
+          type: 'kmh',
+          priority: 90,
+          reason: isSnowball ? 'Hızlı hesap kapatma' : 'Günlük KMH yüksek faiz maliyeti (%5.00+)'
         });
       });
 
+      // Taksitli Krediler (Gelecekteki tüm ayları şişirmeden, kredi bazında tekil değerlendirme)
+      const loanGroups = {};
       userPortfolio.loans.filter(l => !l.isSettled && (Number(l.amount) || 0) > 0).forEach(l => {
-        const debtAmt = Number(l.amount) || 0;
+        const key = l.loanName || 'Kredi';
+        if (!loanGroups[key]) {
+          loanGroups[key] = { name: key, totalDebt: 0, nextInstAmount: Number(l.amount) || 0, instCount: 0 };
+        }
+        loanGroups[key].totalDebt += (Number(l.amount) || 0);
+        loanGroups[key].instCount++;
+      });
+
+      Object.values(loanGroups).forEach(lg => {
         debtItems.push({
-          name: `${l.loanName || 'Kredi'} (#${l.instNo})`,
-          debt: debtAmt,
-          minPay: debtAmt,
-          priority: isSnowball ? (1000000 - debtAmt) : 40,
-          reason: 'Sabit kredi taksiti'
+          name: `${lg.name} (${lg.instCount} Taksit Kalan)`,
+          debt: lg.totalDebt,
+          minPay: lg.nextInstAmount,
+          type: 'loan',
+          priority: 50,
+          reason: isSnowball ? 'Kalan kredi taksitlerini kapatma' : 'Sabit kredi taksiti (Faiz önceden kilitli)'
         });
       });
 
-      debtItems.sort((a, b) => b.priority - a.priority || (isSnowball ? a.debt - b.debt : b.debt - a.debt));
+      // Sıralama
+      if (isSnowball) {
+        debtItems.sort((a, b) => a.debt - b.debt);
+      } else {
+        debtItems.sort((a, b) => b.priority - a.priority || b.debt - a.debt);
+      }
 
       const out = document.getElementById('aiStrategyOutput');
       if (!debtItems.length) {
@@ -1128,27 +1288,47 @@
       report += `• Borç Kapatmaya Ayrılabilir Serbest Bütçe: ${formatTRY(extraCashForDebt)}\n\n`;
 
       report += `🎯 Eylem Sıralaması:\n`;
-      report += `1. Hedef: ${debtItems[0].name} (Toplam: ${formatTRY(debtItems[0].debt)} | Asgari: ${formatTRY(debtItems[0].minPay)})\n`;
+      report += `1. Öncelikli Hedef: ${debtItems[0].name} (Toplam: ${formatTRY(debtItems[0].debt)} | Asgari: ${formatTRY(debtItems[0].minPay)})\n`;
       if (extraCashForDebt > 0) {
-        report += `   👉 Asgarileri ödedikten sonra kalan ${formatTRY(extraCashForDebt)} ekstra tutarı DOĞRUDAN bu kaleme yatırın.\n`;
+        report += `   👉 Tüm asgarileri ödedikten sonra kalan ${formatTRY(extraCashForDebt)} ekstra tutarı DOĞRUDAN bu kaleme yatırın.\n`;
       } else {
-        report += `   ⚠️ Bütçe sınırda. En azından ${formatTRY(debtItems[0].minPay)} asgarisini geciktirmeyin.\n`;
+        report += `   ⚠️ Bütçe sınırda veya eksiye düşüyor. En azından ${formatTRY(debtItems[0].minPay)} asgarisini geciktirmeyin.\n`;
       }
 
       if (debtItems[1]) {
-        report += `2. Sıra: ${debtItems[1].name} -> Sadece asgari tutarını (${formatTRY(debtItems[1].minPay)}) ödeyin.`;
+        report += `2. Sıra: ${debtItems[1].name} -> Sadece asgari tutarını (${formatTRY(debtItems[1].minPay)}) ödeyip 1. hedefi bekleyin.`;
       }
 
       out.textContent = report;
     }
 
     /* KISMI / ARA ÖDEME */
-    function openPartialPay(type, id, title, debt) {
-      partialPayItem = { type, id, debt: Number(debt) || 0 };
+    function openPartialPay(type, id) {
+      let item = null;
+      let title = 'Borç';
+      let debt = 0;
+
+      if (type === 'card') {
+        item = userPortfolio.cards.find(c => c.id === id);
+        if (item) { title = item.bank; debt = Number(item.debt) || 0; }
+      } else if (type === 'kmh') {
+        item = userPortfolio.kmh.find(k => k.id === id);
+        if (item) { title = `${item.bank} KMH`; debt = Number(item.debt) || 0; }
+      } else if (type === 'loan') {
+        item = userPortfolio.loans.find(l => l.id === id);
+        if (item) { title = `${item.loanName || 'Kredi'} #${item.instNo}`; debt = Number(item.amount) || 0; }
+      }
+
+      if (!item) return;
+
+      partialPayItem = { type, id, debt };
       document.getElementById('partialPayTargetTitle').textContent = `Borç Kalemi: ${title}`;
       document.getElementById('partialPayCurrentDebt').textContent = formatTRY(debt);
-      document.getElementById('partialPayAmount').value = '';
+      const amountInput = document.getElementById('partialPayAmount');
+      amountInput.value = '';
+      amountInput.max = debt;
       openModalById('partialPayModal');
+      amountInput.focus();
     }
 
     function closePartialPayModal() {
@@ -1170,7 +1350,11 @@
           const originalDebt = item.debt;
           item.debt = Math.max(0, item.debt - pay);
           item.minPay = Math.max(0, (item.minPay || 0) - pay);
-          if (item.debt === 0) archiveItem('card', item, originalDebt);
+          if (item.debt === 0) {
+            item.isSettled = true;
+            item.minPay = 0;
+            archiveItem('card', item, originalDebt);
+          }
         }
       } else if (type === 'kmh') {
         const item = userPortfolio.kmh.find(k => k.id === id);
@@ -1189,7 +1373,10 @@
         if (item) {
           const originalDebt = item.amount;
           item.amount = Math.max(0, item.amount - pay);
-          if (item.amount === 0) archiveItem('loan', item, originalDebt);
+          if (item.amount === 0) {
+            item.isSettled = true;
+            archiveItem('loan', item, originalDebt);
+          }
         }
       }
 
@@ -1222,7 +1409,7 @@
       renderSimulator();
       renderArchive();
       runLocalAIConsultant();
-      lucide.createIcons();
+      safeCreateIcons();
     }
 
     function renderKPIs() {
@@ -1240,12 +1427,23 @@
       document.getElementById('kpiGrandTotal').textContent = formatTRY(f.grandTotal);
 
       if (cashflowChart) {
-        cashflowChart.data.datasets[0].data = [f.totalMandatoryOutflow, Math.max(0, f.freeCash)];
+        if (f.totalIncome === 0 && f.totalMandatoryOutflow === 0) {
+          cashflowChart.data.datasets[0].data = [0, 100];
+        } else {
+          cashflowChart.data.datasets[0].data = [f.totalMandatoryOutflow, Math.max(0, f.freeCash)];
+        }
         cashflowChart.update();
-        const ratio = f.totalIncome > 0 ? Math.min(100, Math.round((f.totalMandatoryOutflow / f.totalIncome) * 100)) : 0;
-        document.getElementById('chartRatioDesc').textContent = f.totalIncome > 0
-          ? `Gelirinizin %${ratio}'si zorunlu ödemelere ayrılıyor.`
-          : 'Henüz gelir girilmedi.';
+
+        if (f.totalIncome > 0) {
+          const ratio = Math.round((f.totalMandatoryOutflow / f.totalIncome) * 100);
+          if (f.freeCash < 0) {
+            document.getElementById('chartRatioDesc').innerHTML = `<span class="text-rose-400 font-bold">⚠️ Gelirinizin %${ratio}'si harcanıyor (Bütçe Eksiği!)</span>`;
+          } else {
+            document.getElementById('chartRatioDesc').textContent = `Gelirinizin %${ratio}'si zorunlu ödemelere ayrılıyor.`;
+          }
+        } else {
+          document.getElementById('chartRatioDesc').textContent = 'Henüz gelir girilmedi.';
+        }
       }
 
       document.getElementById('count-incomes').textContent = userPortfolio.incomes.length;
@@ -1262,41 +1460,56 @@
       const debtItems = [];
 
       userPortfolio.cards.filter(c => !c.isSettled && (Number(c.debt) || 0) > 0).forEach(c => {
-        const isOver = c.limit > 0 && c.debt > c.limit;
+        const debt = Number(c.debt) || 0;
+        const limit = Number(c.limit) || 0;
+        const isOver = limit > 0 && debt > limit;
         debtItems.push({
           title: c.bank,
-          amount: Number(c.debt) || 0,
-          minPay: Number(c.minPay) || (Number(c.debt) || 0) * 0.2,
+          amount: debt,
+          minPay: Number(c.minPay) || (limit > 25000 ? debt * 0.4 : debt * 0.2),
           type: 'Kart',
-          priority: isSnowball ? (1000000 - Number(c.debt)) : (isOver ? 100 : 80),
-          reason: isSnowball ? 'Kartopu Önceliği' : (isOver ? 'Limit Aşımı' : 'Akdi Faiz')
+          priority: isOver ? 100 : 80,
+          reason: isSnowball ? 'Küçük Bakiye Önceliği' : (isOver ? 'Limit Aşımı Cezası' : 'Akdi Faiz')
         });
       });
 
       userPortfolio.kmh.filter(k => !k.isSettled && (Number(k.debt) || 0) > 0).forEach(k => {
+        const debt = Number(k.debt) || 0;
         debtItems.push({
-          title: k.bank,
-          amount: Number(k.debt) || 0,
-          minPay: Number(k.monthlyPay) || (Number(k.debt) || 0) * 0.05,
+          title: `${k.bank} KMH`,
+          amount: debt,
+          minPay: Number(k.monthlyPay) || (debt * 0.05),
           type: 'KMH',
-          priority: isSnowball ? (1000000 - Number(k.debt)) : 70,
-          reason: isSnowball ? 'Kartopu Önceliği' : 'Günlük KMH Faizi'
+          priority: 90,
+          reason: isSnowball ? 'Küçük Bakiye Önceliği' : 'Günlük KMH Faizi'
         });
       });
 
+      // Taksitli kredileri tekil grup olarak ekle
+      const seenLoans = new Set();
       userPortfolio.loans.filter(l => !l.isSettled && (Number(l.amount) || 0) > 0).forEach(l => {
-        const debtAmt = Number(l.amount) || 0;
-        debtItems.push({
-          title: `${l.loanName || 'Kredi'} (#${l.instNo})`,
-          amount: debtAmt,
-          minPay: debtAmt,
-          type: 'Taksit',
-          priority: isSnowball ? (1000000 - debtAmt) : 50,
-          reason: 'Sabit Taksit'
-        });
+        const loanName = l.loanName || 'Kredi';
+        if (!seenLoans.has(loanName)) {
+          seenLoans.add(loanName);
+          const allInsts = userPortfolio.loans.filter(x => !x.isSettled && x.loanName === loanName);
+          const totalRemainingDebt = allInsts.reduce((sum, x) => sum + (Number(x.amount) || 0), 0);
+          const nextInst = Number(l.amount) || 0;
+          debtItems.push({
+            title: `${loanName} (Taksit #${l.instNo})`,
+            amount: isSnowball ? totalRemainingDebt : totalRemainingDebt,
+            minPay: nextInst,
+            type: 'Taksit',
+            priority: 50,
+            reason: 'Sabit Taksit'
+          });
+        }
       });
 
-      debtItems.sort((a, b) => b.priority - a.priority || (isSnowball ? a.amount - b.amount : b.amount - a.amount));
+      if (isSnowball) {
+        debtItems.sort((a, b) => a.amount - b.amount);
+      } else {
+        debtItems.sort((a, b) => b.priority - a.priority || b.amount - a.amount);
+      }
 
       if (!debtItems.length) {
         list.innerHTML = `<div class="text-xs text-slate-500 text-center py-4">Ödenecek açık borç bulunmuyor.</div>`;
@@ -1337,7 +1550,7 @@
           </div>
           <div class="flex justify-between items-center pt-1.5 border-t border-slate-800 text-[10px] text-slate-500">
             <span>Yatış: Her ayın ${i.day}. günü</span>
-            <button onclick="deleteIncome('${i.id}')" class="text-slate-500 hover:text-rose-400 transition"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+            <button onclick="deleteIncome('${i.id}')" class="text-slate-500 hover:text-rose-400 transition" title="Sil"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
           </div>
         </div>
       `).join('');
@@ -1363,7 +1576,7 @@
           </div>
           <div class="flex justify-between items-center pt-1.5 border-t border-slate-800 text-[10px] text-slate-500">
             <span>Ödeme: Her ayın ${e.day}. günü</span>
-            <button onclick="deleteExpense('${e.id}')" class="text-slate-500 hover:text-rose-400 transition"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+            <button onclick="deleteExpense('${e.id}')" class="text-slate-500 hover:text-rose-400 transition" title="Sil"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
           </div>
         </div>
       `).join('');
@@ -1371,25 +1584,26 @@
 
     function renderCards() {
       const grid = document.getElementById('cardsGrid');
-      const activeCards = userPortfolio.cards.filter(c => !c.isSettled);
-      if (!activeCards.length) {
-        grid.innerHTML = `<div class="col-span-full text-center py-6 text-slate-500 text-xs border border-dashed border-slate-800 rounded-xl">Açık kredi kartı borcu yok.</div>`;
+      if (!userPortfolio.cards.length) {
+        grid.innerHTML = `<div class="col-span-full text-center py-6 text-slate-500 text-xs border border-dashed border-slate-800 rounded-xl">Kayıtlı kredi kartı yok.</div>`;
         return;
       }
 
-      grid.innerHTML = activeCards.map(c => {
+      grid.innerHTML = userPortfolio.cards.map(c => {
         const limit = Number(c.limit) || 0;
         const debt = Number(c.debt) || 0;
+        const isZero = debt <= 0 || c.isSettled;
         const ratio = limit > 0 ? Math.min(999, Math.round((debt / limit) * 100)) : 0;
 
         let healthBadge = '';
-        if (ratio > 100) healthBadge = '<span class="text-[9px] bg-rose-950 text-rose-300 border border-rose-800 px-1.5 py-0.2 rounded font-bold">LİMİT AŞIMI</span>';
+        if (isZero) healthBadge = '<span class="text-[9px] bg-emerald-950 text-emerald-300 border border-emerald-800 px-1.5 py-0.2 rounded font-bold">BORÇSUZ / SIFIR</span>';
+        else if (ratio > 100) healthBadge = '<span class="text-[9px] bg-rose-950 text-rose-300 border border-rose-800 px-1.5 py-0.2 rounded font-bold">LİMİT AŞIMI</span>';
         else if (ratio >= 70) healthBadge = '<span class="text-[9px] bg-orange-950 text-orange-300 border border-orange-800 px-1.5 py-0.2 rounded font-bold">YÜKSEK RİSK</span>';
         else if (ratio >= 30) healthBadge = '<span class="text-[9px] bg-amber-950 text-amber-300 border border-amber-800 px-1.5 py-0.2 rounded font-bold">ORTA KULLANIM</span>';
         else healthBadge = '<span class="text-[9px] bg-emerald-950 text-emerald-300 border border-emerald-800 px-1.5 py-0.2 rounded font-bold">İDEAL (%<30)</span>';
 
         return `
-          <div class="soft-card bg-gradient-to-br from-slate-900 to-slate-950 border border-slate-800 hover:border-amber-500/40 p-3.5 rounded-xl space-y-2.5">
+          <div class="soft-card bg-gradient-to-br from-slate-900 to-slate-950 border ${isZero ? 'border-emerald-900/40 opacity-80' : 'border-slate-800 hover:border-amber-500/40'} p-3.5 rounded-xl space-y-2.5">
             <div class="flex justify-between items-start">
               <div class="min-w-0 pr-2">
                 <div class="flex items-center gap-1.5 flex-wrap">${healthBadge}</div>
@@ -1398,8 +1612,8 @@
               <i data-lucide="credit-card" class="w-4 h-4 text-amber-400 shrink-0"></i>
             </div>
             <div class="space-y-1 text-xs">
-              <div class="flex justify-between"><span class="text-slate-400">Dönem Borcu:</span> <span class="font-bold text-rose-400">${formatTRY(debt)}</span></div>
-              <div class="flex justify-between text-amber-400"><span>Asgari:</span> <span class="font-semibold">${formatTRY(c.minPay || (debt * 0.2))}</span></div>
+              <div class="flex justify-between"><span class="text-slate-400">Dönem Borcu:</span> <span class="font-bold ${isZero ? 'text-emerald-400' : 'text-rose-400'}">${formatTRY(debt)}</span></div>
+              <div class="flex justify-between text-amber-400"><span>Asgari:</span> <span class="font-semibold">${isZero ? '₺0,00' : formatTRY(c.minPay || (debt * 0.2))}</span></div>
               <div class="flex justify-between text-slate-500 text-[10px]"><span>Son Gün:</span> <span class="text-slate-300">${c.dueDate || '-'}</span></div>
             </div>
             <div>
@@ -1408,14 +1622,38 @@
                 <div class="${ratio > 70 ? 'bg-rose-500' : (ratio > 30 ? 'bg-amber-500' : 'bg-emerald-500')} h-full rounded-full transition-all duration-500" style="width:${Math.min(100, ratio)}%"></div>
               </div>
             </div>
-            <div class="grid grid-cols-3 gap-1.5 pt-1 border-t border-slate-800">
-              <button onclick="openPartialPay('card', '${c.id}', '${escapeHtml(c.bank)}', ${debt})" class="soft-btn bg-teal-950 hover:bg-teal-900 text-teal-300 border border-teal-800 text-[10px] py-1.5 rounded-lg">Ara Öde</button>
-              <button onclick="settleCardFully('${c.id}')" class="soft-btn bg-amber-600/20 hover:bg-amber-600/30 text-amber-300 border border-amber-500/30 text-[10px] py-1.5 rounded-lg">Kapat</button>
-              <button onclick="deleteCard('${c.id}')" class="soft-btn bg-slate-900 text-slate-400 hover:text-rose-400 border border-slate-800 text-[10px] py-1.5 rounded-lg flex items-center justify-center"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
-            </div>
+            ${isZero ? `
+              <div class="pt-1 border-t border-slate-800 flex gap-2">
+                <button onclick="reopenCard('${c.id}')" class="soft-btn flex-1 bg-indigo-950/80 hover:bg-indigo-900 text-indigo-300 border border-indigo-800 text-[10px] py-1.5 rounded-lg flex items-center justify-center gap-1">
+                  <i data-lucide="refresh-cw" class="w-3 h-3"></i> Yeni Ekstre / Borç Gir
+                </button>
+                <button onclick="deleteCard('${c.id}')" class="soft-btn p-1.5 text-slate-500 hover:text-rose-400" title="Sil"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+              </div>
+            ` : `
+              <div class="grid grid-cols-3 gap-1.5 pt-1 border-t border-slate-800">
+                <button onclick="openPartialPay('card', '${c.id}')" class="soft-btn bg-teal-950 hover:bg-teal-900 text-teal-300 border border-teal-800 text-[10px] py-1.5 rounded-lg">Ara Öde</button>
+                <button onclick="settleCardFully('${c.id}')" class="soft-btn bg-amber-600/20 hover:bg-amber-600/30 text-amber-300 border border-amber-500/30 text-[10px] py-1.5 rounded-lg">Kapat</button>
+                <button onclick="deleteCard('${c.id}')" class="soft-btn bg-slate-900 text-slate-400 hover:text-rose-400 border border-slate-800 text-[10px] py-1.5 rounded-lg flex items-center justify-center" title="Sil"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+              </div>
+            `}
           </div>
         `;
       }).join('');
+    }
+
+    function reopenCard(id) {
+      const c = userPortfolio.cards.find(item => item.id === id);
+      if (!c) return;
+      const newDebt = prompt(`"${c.bank}" kartı için güncel dönem borcu tutarını girin (₺):`, "5000");
+      if (newDebt !== null) {
+        const parsed = parseTRNumber(newDebt);
+        if (parsed >= 0) {
+          c.debt = parsed;
+          c.minPay = parsed > 0 ? (c.limit > 25000 ? Math.round(parsed * 0.4 * 100) / 100 : Math.round(parsed * 0.2 * 100) / 100) : 0;
+          c.isSettled = (parsed === 0);
+          saveState();
+        }
+      }
     }
 
     function renderKMH() {
@@ -1426,10 +1664,12 @@
       }
       grid.innerHTML = userPortfolio.kmh.map(k => {
         const debt = Number(k.debt) || 0;
+        const limit = Number(k.limit) || 0;
         const isZero = debt <= 0 || k.isSettled;
+        const ratio = limit > 0 ? Math.min(100, Math.round((debt / limit) * 100)) : 0;
 
         return `
-          <div class="soft-card bg-gradient-to-br from-slate-900 to-slate-950 border ${isZero ? 'border-emerald-900/40 opacity-75' : 'border-purple-900/40 hover:border-purple-500/40'} p-3.5 rounded-xl space-y-2.5">
+          <div class="soft-card bg-gradient-to-br from-slate-900 to-slate-950 border ${isZero ? 'border-emerald-900/40 opacity-80' : 'border-purple-900/40 hover:border-purple-500/40'} p-3.5 rounded-xl space-y-2.5">
             <div class="flex justify-between items-start">
               <div class="min-w-0 pr-2">
                 <span class="text-[9px] ${isZero ? 'bg-emerald-950 text-emerald-300 border-emerald-800' : 'bg-purple-950 text-purple-300 border-purple-800'} border px-1.5 py-0.2 rounded font-bold">
@@ -1455,18 +1695,30 @@
               </div>
             </div>
 
+            ${limit > 0 ? `
+              <div>
+                <div class="flex justify-between text-[10px] text-slate-400 mb-0.5">
+                  <span>Limit: ${formatTRY(limit)}</span>
+                  <span>Kullanılan: %${ratio}</span>
+                </div>
+                <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                  <div class="${ratio > 70 ? 'bg-rose-500' : (ratio > 30 ? 'bg-amber-500' : 'bg-emerald-500')} h-full rounded-full transition-all duration-500" style="width:${ratio}%"></div>
+                </div>
+              </div>
+            ` : ''}
+
             ${isZero ? `
               <div class="pt-1 border-t border-slate-800 flex gap-2">
                 <button onclick="reopenKMH('${k.id}')" class="soft-btn flex-1 bg-indigo-950/80 hover:bg-indigo-900 text-indigo-300 border border-indigo-800 text-[10px] py-1.5 rounded-lg flex items-center justify-center gap-1">
                   <i data-lucide="refresh-cw" class="w-3 h-3"></i> Bakiye Kullan / Düzenle
                 </button>
-                <button onclick="deleteKMH('${k.id}')" class="soft-btn p-1.5 text-slate-500 hover:text-rose-400"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+                <button onclick="deleteKMH('${k.id}')" class="soft-btn p-1.5 text-slate-500 hover:text-rose-400" title="Sil"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
               </div>
             ` : `
               <div class="grid grid-cols-3 gap-1.5 pt-1 border-t border-slate-800">
-                <button onclick="openPartialPay('kmh', '${k.id}', '${escapeHtml(k.bank)}', ${k.debt})" class="soft-btn bg-teal-950 hover:bg-teal-900 text-teal-300 border border-teal-800 text-[10px] py-1.5 rounded-lg">Ara Öde</button>
+                <button onclick="openPartialPay('kmh', '${k.id}')" class="soft-btn bg-teal-950 hover:bg-teal-900 text-teal-300 border border-teal-800 text-[10px] py-1.5 rounded-lg">Ara Öde</button>
                 <button onclick="settleKMHFully('${k.id}')" class="soft-btn bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 border border-purple-500/30 text-[10px] py-1.5 rounded-lg">Sıfırla</button>
-                <button onclick="deleteKMH('${k.id}')" class="soft-btn bg-slate-900 text-slate-400 hover:text-rose-400 border border-slate-800 text-[10px] py-1.5 rounded-lg flex items-center justify-center"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+                <button onclick="deleteKMH('${k.id}')" class="soft-btn bg-slate-900 text-slate-400 hover:text-rose-400 border border-slate-800 text-[10px] py-1.5 rounded-lg flex items-center justify-center" title="Sil"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
               </div>
             `}
           </div>
@@ -1478,11 +1730,14 @@
       const k = userPortfolio.kmh.find(item => item.id === id);
       if (!k) return;
       const newDebt = prompt(`"${k.bank}" için güncel kullanılan eksi bakiye tutarını girin (₺):`, "5000");
-      if (newDebt !== null && !isNaN(parseFloat(newDebt)) && parseFloat(newDebt) > 0) {
-        k.debt = parseFloat(newDebt);
-        k.monthlyPay = Math.round(k.debt * 0.05 * 100) / 100;
-        k.isSettled = false;
-        saveState();
+      if (newDebt !== null) {
+        const parsed = parseTRNumber(newDebt);
+        if (parsed >= 0) {
+          k.debt = parsed;
+          k.monthlyPay = Math.round(parsed * 0.05 * 100) / 100;
+          k.isSettled = (parsed === 0);
+          saveState();
+        }
       }
     }
 
@@ -1492,7 +1747,17 @@
       const mobileList = document.getElementById('installmentsMobileList');
       const today = getLocalDateString();
 
-      const filtered = userPortfolio.loans.filter(l => {
+      // Tarihe ve taksit numarasına göre sırala
+      const sortedLoans = [...userPortfolio.loans].sort((a, b) => {
+        if (a.isSettled !== b.isSettled) return a.isSettled ? 1 : -1;
+        if (a.dueDate && b.dueDate) {
+          if (a.dueDate < b.dueDate) return -1;
+          if (a.dueDate > b.dueDate) return 1;
+        }
+        return (a.instNo || 0) - (b.instNo || 0);
+      });
+
+      const filtered = sortedLoans.filter(l => {
         if (!q) return true;
         return (l.loanName || '').toLowerCase().includes(q) || (l.dueDate || '').includes(q);
       });
@@ -1504,23 +1769,33 @@
       }
 
       tbody.innerHTML = filtered.map(l => {
-        const isLate = !l.isSettled && l.dueDate && l.dueDate <= today;
+        const isPast = !l.isSettled && l.dueDate && l.dueDate < today;
+        const isToday = !l.isSettled && l.dueDate && l.dueDate === today;
+
+        let statusBadge = '';
+        if (l.isSettled) {
+          statusBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-950 text-emerald-400 border border-emerald-800">Ödendi</span>';
+        } else if (isPast) {
+          statusBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-rose-950 text-rose-300 border border-rose-800">Gecikmiş</span>';
+        } else if (isToday) {
+          statusBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-amber-950 text-amber-300 border border-amber-800">Bugün Vadesi</span>';
+        } else {
+          statusBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-800 text-slate-300">Bekliyor</span>';
+        }
+
         return `
           <tr class="hover:bg-slate-800/40 transition-colors ${l.isSettled ? 'opacity-40 line-through' : ''}">
             <td class="p-3 font-medium text-slate-200">${escapeHtml(l.loanName || 'Kredi')}</td>
             <td class="p-3 text-slate-400">Taksit #${l.instNo}</td>
-            <td class="p-3 font-medium ${isLate ? 'text-amber-400 font-bold' : 'text-slate-300'}">${l.dueDate || '-'}</td>
+            <td class="p-3 font-medium ${isPast ? 'text-rose-400 font-bold' : (isToday ? 'text-amber-400 font-bold' : 'text-slate-300')}">${l.dueDate || '-'}</td>
             <td class="p-3 font-bold text-blue-400">${formatTRY(l.amount)}</td>
-            <td class="p-3 text-slate-400">${formatTRY(l.principal || 0)}</td>
-            <td class="p-3 text-slate-500">${formatTRY(l.interest || 0)}</td>
-            <td class="p-3">
-              <span class="px-2 py-0.5 rounded text-[10px] font-semibold ${l.isSettled ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' : (isLate ? 'bg-amber-950 text-amber-300 border border-amber-800' : 'bg-slate-800 text-slate-300')}">
-                ${l.isSettled ? 'Ödendi' : (isLate ? 'Vadesi Geldi' : 'Bekliyor')}
-              </span>
-            </td>
+            <td class="p-3 text-slate-400">${formatTRY(l.principal || Math.round(l.amount * 0.6 * 100) / 100)}</td>
+            <td class="p-3 text-slate-500">${formatTRY(l.interest || Math.round(l.amount * 0.4 * 100) / 100)}</td>
+            <td class="p-3">${statusBadge}</td>
             <td class="p-3 text-right space-x-1 whitespace-nowrap">
+              <button onclick="openPartialPay('loan', '${l.id}')" class="soft-btn px-2 py-1 text-[11px] rounded border border-teal-900 text-teal-400 hover:bg-teal-950/40">Ara Öde</button>
               <button onclick="toggleLoan('${l.id}')" class="soft-btn px-2.5 py-1 text-[11px] rounded border ${l.isSettled ? 'border-emerald-800 text-emerald-400 bg-emerald-950/20' : 'border-slate-700 text-slate-300 hover:bg-slate-800'}">
-                ${l.isSettled ? 'Aç' : 'Öde'}
+                ${l.isSettled ? 'Geri Al' : 'Öde'}
               </button>
               <button onclick="deleteLoan('${l.id}')" class="soft-btn px-2 py-1 text-[11px] rounded border border-rose-900 text-rose-400 hover:bg-rose-950/40">Sil</button>
             </td>
@@ -1529,25 +1804,37 @@
       }).join('');
 
       mobileList.innerHTML = filtered.map(l => {
-        const isLate = !l.isSettled && l.dueDate && l.dueDate <= today;
+        const isPast = !l.isSettled && l.dueDate && l.dueDate < today;
+        const isToday = !l.isSettled && l.dueDate && l.dueDate === today;
+
+        let statusBadge = '';
+        if (l.isSettled) {
+          statusBadge = '<span class="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-emerald-950 text-emerald-400 border border-emerald-800">Ödendi</span>';
+        } else if (isPast) {
+          statusBadge = '<span class="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-rose-950 text-rose-300 border border-rose-800">Gecikmiş</span>';
+        } else if (isToday) {
+          statusBadge = '<span class="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-amber-950 text-amber-300 border border-amber-800">Bugün</span>';
+        } else {
+          statusBadge = '<span class="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-slate-800 text-slate-300">Bekliyor</span>';
+        }
+
         return `
           <div class="soft-card bg-slate-950/70 border border-slate-800 rounded-xl p-3 space-y-2 ${l.isSettled ? 'opacity-40 line-through' : ''}">
             <div class="flex justify-between items-start">
               <div>
                 <div class="font-bold text-white text-xs">${escapeHtml(l.loanName || 'Kredi')}</div>
-                <div class="text-[10px] text-slate-400">Taksit #${l.instNo} • Vade: <span class="${isLate ? 'text-amber-400 font-semibold' : 'text-slate-300'}">${l.dueDate || '-'}</span></div>
+                <div class="text-[10px] text-slate-400">Taksit #${l.instNo} • Vade: <span class="${isPast ? 'text-rose-400 font-semibold' : (isToday ? 'text-amber-400 font-semibold' : 'text-slate-300')}">${l.dueDate || '-'}</span></div>
               </div>
-              <span class="px-1.5 py-0.5 rounded text-[9px] font-semibold ${l.isSettled ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' : (isLate ? 'bg-amber-950 text-amber-300 border border-amber-800' : 'bg-slate-800 text-slate-300')}">
-                ${l.isSettled ? 'Ödendi' : (isLate ? 'Vadesi Geldi' : 'Bekliyor')}
-              </span>
+              ${statusBadge}
             </div>
             <div class="flex justify-between items-center text-xs">
               <span class="text-slate-400">Tutar:</span>
               <span class="font-bold text-blue-400 text-sm">${formatTRY(l.amount)}</span>
             </div>
-            <div class="flex gap-2 pt-1 border-t border-slate-800/80">
+            <div class="flex gap-1.5 pt-1 border-t border-slate-800/80">
+              <button onclick="openPartialPay('loan', '${l.id}')" class="soft-btn py-1 px-2 text-xs rounded border border-teal-900 text-teal-400">Ara Öde</button>
               <button onclick="toggleLoan('${l.id}')" class="soft-btn flex-1 py-1 text-xs rounded border ${l.isSettled ? 'border-emerald-800 text-emerald-400 bg-emerald-950/20' : 'border-slate-700 text-slate-300'}">
-                ${l.isSettled ? 'Aç' : 'Öde'}
+                ${l.isSettled ? 'Geri Al' : 'Öde'}
               </button>
               <button onclick="deleteLoan('${l.id}')" class="soft-btn px-3 py-1 text-xs rounded border border-rose-900 text-rose-400">Sil</button>
             </div>
@@ -1561,20 +1848,20 @@
       calendarDate = new Date(calendarDate.getFullYear(), calendarDate.getMonth() + delta, 1);
       selectedCalendarDay = 1;
       renderCalendarMatrix();
-      lucide.createIcons();
+      safeCreateIcons();
     }
 
     function resetCalendarToToday() {
       calendarDate = new Date();
       selectedCalendarDay = new Date().getDate();
       renderCalendarMatrix();
-      lucide.createIcons();
+      safeCreateIcons();
     }
 
     function selectCalendarDay(day) {
       selectedCalendarDay = day;
       renderCalendarMatrix();
-      lucide.createIcons();
+      safeCreateIcons();
     }
 
     function renderCalendarMatrix() {
@@ -1589,6 +1876,8 @@
       document.getElementById('calMonthTitle').textContent = `${TR_MONTHS[monthIndex]} ${year}`;
 
       const totalDaysInMonth = new Date(year, monthIndex + 1, 0).getDate();
+      selectedCalendarDay = Math.max(1, Math.min(selectedCalendarDay, totalDaysInMonth));
+
       const firstDayOfWeek = (new Date(year, monthIndex, 1).getDay() + 6) % 7;
 
       const eventsByDay = {};
@@ -1597,20 +1886,23 @@
       let monthTotalIncome = 0;
       let monthTotalOutflow = 0;
 
+      // Gelirler
       userPortfolio.incomes.forEach(i => {
         const d = Math.min(totalDaysInMonth, parseInt(i.day) || 15);
         const amt = Number(i.amount) || 0;
         monthTotalIncome += amt;
-        if (eventsByDay[d]) eventsByDay[d].push({ type: 'in', title: i.title, amount: amt });
+        if (eventsByDay[d]) eventsByDay[d].push({ type: 'in', title: i.title, amount: amt, settled: false });
       });
 
+      // Sabit Giderler
       userPortfolio.expenses.forEach(e => {
         const d = Math.min(totalDaysInMonth, parseInt(e.day) || 5);
         const amt = Number(e.amount) || 0;
         monthTotalOutflow += amt;
-        if (eventsByDay[d]) eventsByDay[d].push({ type: 'exp', title: e.title, amount: amt });
+        if (eventsByDay[d]) eventsByDay[d].push({ type: 'exp', title: e.title, amount: amt, settled: false });
       });
 
+      // Kredi Kartları
       userPortfolio.cards.filter(c => !c.isSettled && (Number(c.debt) || 0) > 0).forEach(c => {
         let dayNum = 15;
         if (c.dueDate) {
@@ -1618,11 +1910,14 @@
           dayNum = parseInt(parts[2]) || 15;
         }
         dayNum = Math.min(totalDaysInMonth, dayNum);
-        const minPay = Number(c.minPay) || (Number(c.debt) || 0) * 0.2;
+        const debt = Number(c.debt) || 0;
+        const limit = Number(c.limit) || 0;
+        const minPay = Number(c.minPay) || (limit > 25000 ? debt * 0.4 : debt * 0.2);
         monthTotalOutflow += minPay;
-        if (eventsByDay[dayNum]) eventsByDay[dayNum].push({ type: 'card', title: c.bank, amount: minPay });
+        if (eventsByDay[dayNum]) eventsByDay[dayNum].push({ type: 'card', title: `${c.bank} Kartı`, amount: minPay, settled: false });
       });
 
+      // KMH
       userPortfolio.kmh.filter(k => !k.isSettled && (Number(k.debt) || 0) > 0).forEach(k => {
         let dayNum = 15;
         if (k.dueDate) {
@@ -1630,16 +1925,28 @@
           dayNum = parseInt(parts[2]) || 15;
         }
         dayNum = Math.min(totalDaysInMonth, dayNum);
-        const pay = Number(k.monthlyPay) || (Number(k.debt) || 0) * 0.05;
+        const pay = Number(k.monthlyPay) || ((Number(k.debt) || 0) * 0.05);
         monthTotalOutflow += pay;
-        if (eventsByDay[dayNum]) eventsByDay[dayNum].push({ type: 'kmh', title: `${k.bank} KMH`, amount: pay });
+        if (eventsByDay[dayNum]) eventsByDay[dayNum].push({ type: 'kmh', title: `${k.bank} KMH`, amount: pay, settled: false });
       });
 
-      userPortfolio.loans.filter(l => !l.isSettled && l.dueDate && l.dueDate.startsWith(yearMonthStr)).forEach(l => {
-        const dayNum = Math.min(totalDaysInMonth, parseInt(l.dueDate.split('-')[2]) || 1);
-        const amt = Number(l.amount) || 0;
-        monthTotalOutflow += amt;
-        if (eventsByDay[dayNum]) eventsByDay[dayNum].push({ type: 'loan', title: `${l.loanName} #${l.instNo}`, amount: amt });
+      // Taksitler
+      userPortfolio.loans.forEach(l => {
+        if (l.dueDate && l.dueDate.startsWith(yearMonthStr)) {
+          const dayNum = Math.min(totalDaysInMonth, parseInt(l.dueDate.split('-')[2]) || 1);
+          const amt = Number(l.amount) || 0;
+          if (!l.isSettled) {
+            monthTotalOutflow += amt;
+          }
+          if (eventsByDay[dayNum]) {
+            eventsByDay[dayNum].push({
+              type: 'loan',
+              title: `${l.loanName} #${l.instNo}`,
+              amount: amt,
+              settled: !!l.isSettled
+            });
+          }
+        }
       });
 
       document.getElementById('calTotalOutflow').textContent = formatTRY(monthTotalOutflow);
@@ -1663,7 +1970,7 @@
         const isToday = isCurrentRealMonth && day === realToday.getDate();
         const isSelected = day === selectedCalendarDay;
 
-        const dayOutflow = evs.filter(x => x.type !== 'in').reduce((sum, x) => sum + x.amount, 0);
+        const dayOutflow = evs.filter(x => x.type !== 'in' && !x.settled).reduce((sum, x) => sum + x.amount, 0);
         const dayIncome = evs.filter(x => x.type === 'in').reduce((sum, x) => sum + x.amount, 0);
 
         cellsHTML += `
@@ -1686,10 +1993,11 @@
             <div class="hidden sm:block space-y-1 my-1">
               ${evs.slice(0, 2).map(ev => `
                 <div class="text-[9px] px-1.5 py-0.5 rounded truncate ${
-                  ev.type === 'in' ? 'bg-emerald-950 text-emerald-300 border border-emerald-800' :
+                  ev.settled ? 'bg-slate-800/60 text-slate-400 line-through' :
+                  (ev.type === 'in' ? 'bg-emerald-950 text-emerald-300 border border-emerald-800' :
                   (ev.type === 'card' ? 'bg-amber-950 text-amber-300 border border-amber-800' :
                   (ev.type === 'kmh' ? 'bg-purple-950 text-purple-300 border border-purple-800' :
-                  (ev.type === 'loan' ? 'bg-blue-950 text-blue-300 border border-blue-800' : 'bg-rose-950 text-rose-300 border border-rose-800')))
+                  (ev.type === 'loan' ? 'bg-blue-950 text-blue-300 border border-blue-800' : 'bg-rose-950 text-rose-300 border border-rose-800'))))
                 }">
                   ${escapeHtml(ev.title)} (${formatTRY(ev.amount)})
                 </div>
@@ -1717,11 +2025,11 @@
 
       titleEl.textContent = `${day} ${TR_MONTHS[monthIndex]} ${year} Günü Hareketleri (${dayEvents.length})`;
 
-      const totalOut = dayEvents.filter(x => x.type !== 'in').reduce((s, x) => s + x.amount, 0);
+      const totalOut = dayEvents.filter(x => x.type !== 'in' && !x.settled).reduce((s, x) => s + x.amount, 0);
       const totalIn = dayEvents.filter(x => x.type === 'in').reduce((s, x) => s + x.amount, 0);
 
       let summaryTxt = [];
-      if (totalOut > 0) summaryTxt.push(`Çıkış: -${formatTRY(totalOut)}`);
+      if (totalOut > 0) summaryTxt.push(`Açık Çıkış: -${formatTRY(totalOut)}`);
       if (totalIn > 0) summaryTxt.push(`Giriş: +${formatTRY(totalIn)}`);
       summaryEl.textContent = summaryTxt.join(' | ') || 'İşlem Yok';
 
@@ -1731,19 +2039,20 @@
       }
 
       listEl.innerHTML = dayEvents.map(ev => `
-        <div class="flex items-center justify-between p-2 rounded-lg bg-slate-900/90 border border-slate-800 soft-card">
+        <div class="flex items-center justify-between p-2 rounded-lg bg-slate-900/90 border border-slate-800 soft-card ${ev.settled ? 'opacity-50' : ''}">
           <div class="flex items-center gap-2">
             <span class="px-1.5 py-0.5 rounded text-[9px] font-bold ${
-              ev.type === 'in' ? 'bg-emerald-950 text-emerald-300 border border-emerald-800' :
+              ev.settled ? 'bg-slate-800 text-slate-400' :
+              (ev.type === 'in' ? 'bg-emerald-950 text-emerald-300 border border-emerald-800' :
               (ev.type === 'card' ? 'bg-amber-950 text-amber-300 border border-amber-800' :
               (ev.type === 'kmh' ? 'bg-purple-950 text-purple-300 border border-purple-800' :
-              (ev.type === 'loan' ? 'bg-blue-950 text-blue-300 border border-blue-800' : 'bg-rose-950 text-rose-300 border border-rose-800')))
+              (ev.type === 'loan' ? 'bg-blue-950 text-blue-300 border border-blue-800' : 'bg-rose-950 text-rose-300 border border-rose-800'))))
             }">
-              ${ev.type === 'in' ? 'GELİR' : (ev.type === 'card' ? 'KART ASGARİ' : (ev.type === 'kmh' ? 'KMH FAİZ' : (ev.type === 'loan' ? 'KREDİ TAKSİT' : 'SABİT GİDER')))}
+              ${ev.settled ? 'ÖDENDİ' : (ev.type === 'in' ? 'GELİR' : (ev.type === 'card' ? 'KART ASGARİ' : (ev.type === 'kmh' ? 'KMH FAİZ' : (ev.type === 'loan' ? 'KREDİ TAKSİT' : 'SABİT GİDER'))))}
             </span>
-            <span class="font-medium text-slate-200 text-xs">${escapeHtml(ev.title)}</span>
+            <span class="font-medium text-slate-200 text-xs ${ev.settled ? 'line-through' : ''}">${escapeHtml(ev.title)}</span>
           </div>
-          <span class="font-bold text-xs ${ev.type === 'in' ? 'text-emerald-400' : 'text-rose-400'}">
+          <span class="font-bold text-xs ${ev.settled ? 'text-slate-500 line-through' : (ev.type === 'in' ? 'text-emerald-400' : 'text-rose-400')}">
             ${ev.type === 'in' ? '+' : '-'}${formatTRY(ev.amount)}
           </span>
         </div>
@@ -1753,18 +2062,19 @@
     /* SİMÜLATÖR */
     function updateSimFromSlider(val) {
       document.getElementById('simExtraCashInput').value = val;
-      userPortfolio.settings.extraCash = Number(val) || 0;
+      userPortfolio.settings.extraCash = Number(val);
       renderSimulator();
     }
     function updateSimFromInput(val) {
       document.getElementById('simSlider').value = val;
-      userPortfolio.settings.extraCash = Number(val) || 0;
+      userPortfolio.settings.extraCash = Number(val);
       renderSimulator();
     }
 
     function renderSimulator() {
       const f = computeFinancials();
-      const extra = userPortfolio.settings.extraCash || 1000;
+      const extraVal = userPortfolio.settings.extraCash;
+      const extra = (typeof extraVal === 'number' && !isNaN(extraVal)) ? extraVal : 1000;
       const totalDebt = f.grandTotal;
 
       if (totalDebt <= 0) {
@@ -1776,18 +2086,27 @@
       }
 
       const standardMonthly = Math.max(100, f.totalMinDebt);
-      const standardMonths = Math.ceil(totalDebt / (standardMonthly * 0.7));
+      const effectiveMonthlyPrincipal = standardMonthly * 0.7; // Asgarinin yaklaşık %70'i anaparayı eritir
+      const standardMonths = Math.max(1, Math.ceil(totalDebt / effectiveMonthlyPrincipal));
 
-      const acceleratedMonthly = standardMonthly + extra;
-      const acceleratedMonths = Math.ceil(totalDebt / (acceleratedMonthly * 0.85));
+      const acceleratedMonthlyPrincipal = effectiveMonthlyPrincipal + extra;
+      const acceleratedMonths = extra > 0 ? Math.max(1, Math.ceil(totalDebt / acceleratedMonthlyPrincipal)) : standardMonths;
       const savedMonths = Math.max(0, standardMonths - acceleratedMonths);
 
       document.getElementById('simStandardMonths').textContent = `~${standardMonths} Ay`;
       document.getElementById('simAcceleratedMonths').textContent = `~${acceleratedMonths} Ay`;
-      document.getElementById('simSavedMonths').textContent = `${savedMonths} Ay Daha Erken`;
+      document.getElementById('simSavedMonths').textContent = extra > 0 ? `${savedMonths} Ay Daha Erken` : 'Ekstra Katkı Yok';
 
-      document.getElementById('simTimelineNotes').textContent =
-        `💡 Her ay asgari ödemelere ek ${formatTRY(extra)} katkı sağladığınızda toplam borcunuz yaklaşık ${acceleratedMonths} ay içinde sıfırlanacak ve tahmini ${savedMonths} aylık faiz yükünden tamamen kurtulacaksınız.`;
+      if (extra > 0 && savedMonths > 0) {
+        document.getElementById('simTimelineNotes').textContent =
+          `💡 Her ay asgari ödemelere ek ${formatTRY(extra)} katkı sağladığınızda toplam borcunuz yaklaşık ${acceleratedMonths} ay içinde sıfırlanacak ve tahmini ${savedMonths} aylık faiz yükünden tamamen kurtulacaksınız.`;
+      } else if (extra === 0) {
+        document.getElementById('simTimelineNotes').textContent =
+          `ℹ️ Ekstra ödeme yapmadan sadece asgarileri yatırdığınızda borçlarınız yaklaşık ${standardMonths} ayda bitecektir. Süreyi kısaltmak için slider'ı kaydırarak ekstra katkı tutarı belirleyin.`;
+      } else {
+        document.getElementById('simTimelineNotes').textContent =
+          `💡 Ekstra ${formatTRY(extra)} ödeme ile borcunuz yaklaşık ${acceleratedMonths} ay içinde tamamen sıfırlanacaktır.`;
+      }
     }
 
     /* ZAFER LİSTESİ */
@@ -1851,7 +2170,7 @@
       document.getElementById('section-archive').classList.toggle('hidden', cat !== 'archive');
 
       if (cat === 'calendar') renderCalendarMatrix();
-      lucide.createIcons();
+      safeCreateIcons();
     }
 
     /* DIŞA / İÇE AKTARIM */
@@ -1863,17 +2182,30 @@
       const dl = document.createElement('a');
       dl.setAttribute("href", dataStr);
       dl.setAttribute("download", `FinFlow_Yedek_${getLocalDateString()}.json`);
+      document.body.appendChild(dl);
       dl.click();
+      document.body.removeChild(dl);
     }
 
     function exportToExcel() {
+      if (typeof XLSX === 'undefined') {
+        return alert('Excel kütüphanesi henüz yüklenemedi. Lütfen internet bağlantınızı kontrol edin.');
+      }
       const wb = XLSX.utils.book_new();
 
       const incData = userPortfolio.incomes.map(i => ({ "Başlık": i.title, "Aylık Tutar": i.amount, "Yatış Günü": i.day }));
       const expData = userPortfolio.expenses.map(e => ({ "Başlık": e.title, "Aylık Tutar": e.amount, "Ödeme Günü": e.day, "Abonelik": e.isSub ? "Evet" : "Hayır" }));
       const cardData = userPortfolio.cards.map(c => ({ "Banka": c.bank, "Limit": c.limit, "Borç": c.debt, "Asgari": c.minPay, "Son Gün": c.dueDate }));
-      const kmhData = userPortfolio.kmh.map(k => ({ "Banka": k.bank, "Borç": k.debt, "Aylık Faiz": k.monthlyPay, "Vade": k.dueDate }));
-      const loanData = userPortfolio.loans.map(l => ({ "Kredi": l.loanName, "Taksit No": l.instNo, "Tutar": l.amount, "Vade": l.dueDate, "Durum": l.isSettled ? "Ödendi" : "Bekliyor" }));
+      const kmhData = userPortfolio.kmh.map(k => ({ "Banka": k.bank, "Limit": k.limit || 0, "Borç": k.debt, "Aylık Faiz": k.monthlyPay, "Vade": k.dueDate }));
+      const loanData = userPortfolio.loans.map(l => ({
+        "Kredi": l.loanName,
+        "Taksit No": l.instNo,
+        "Tutar": l.amount,
+        "Anapara": l.principal || Math.round(l.amount * 0.6 * 100) / 100,
+        "Faiz": l.interest || Math.round(l.amount * 0.4 * 100) / 100,
+        "Vade": l.dueDate,
+        "Durum": l.isSettled ? "Ödendi" : "Bekliyor"
+      }));
 
       XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(incData), "Gelirler");
       XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(expData), "Giderler");
@@ -1892,13 +2224,24 @@
         try {
           const parsed = JSON.parse(evt.target.result);
           if (parsed && typeof parsed === 'object') {
-            userPortfolio = Object.assign(userPortfolio, parsed);
+            userPortfolio = {
+              incomes: Array.isArray(parsed.incomes) ? parsed.incomes : [],
+              expenses: Array.isArray(parsed.expenses) ? parsed.expenses : [],
+              cards: Array.isArray(parsed.cards) ? parsed.cards : [],
+              kmh: Array.isArray(parsed.kmh) ? parsed.kmh : [],
+              loans: Array.isArray(parsed.loans) ? parsed.loans : [],
+              archive: Array.isArray(parsed.archive) ? parsed.archive : [],
+              settings: Object.assign({ strategy: 'avalanche', pin: '', extraCash: 1000 }, parsed.settings || {})
+            };
             saveState();
             closeExportModal();
+            checkSecurityPIN();
             alert('Yedek başarıyla geri yüklendi.');
           }
         } catch (err) {
           alert('Geçersiz JSON dosyası: ' + err.message);
+        } finally {
+          e.target.value = '';
         }
       };
       reader.readAsText(file);
@@ -1948,6 +2291,8 @@
     function openUniversalDebtModal() {
       document.getElementById('uDueDate').value = getLocalDateString();
       document.getElementById('uFormError').classList.add('hidden');
+      const radioCard = document.querySelector('input[name="debtCategoryType"][value="card"]');
+      if (radioCard) radioCard.checked = true;
       toggleDebtFields('card');
       openModalById('universalDebtModal');
     }
@@ -1982,7 +2327,8 @@
       const errorEl = document.getElementById('uFormError');
       errorEl.classList.add('hidden');
 
-      const type = document.querySelector('input[name="debtCategoryType"]:checked').value;
+      const checkedRadio = document.querySelector('input[name="debtCategoryType"]:checked');
+      const type = checkedRadio ? checkedRadio.value : 'card';
       const title = document.getElementById('uDebtTitle').value.trim();
       const debtVal = parseFloat(document.getElementById('uDebtVal').value) || 0;
       const limitVal = parseFloat(document.getElementById('uLimitVal').value) || 0;
@@ -1997,6 +2343,7 @@
       if (type === 'card') {
         let minVal = parseFloat(document.getElementById('uMinVal').value);
         if (isNaN(minVal) || minVal <= 0) minVal = limitVal > 25000 ? debtVal * 0.4 : debtVal * 0.2;
+        minVal = Math.min(debtVal, minVal);
         userPortfolio.cards.unshift({
           id: generateId(),
           bank: title,
@@ -2009,6 +2356,7 @@
       } else if (type === 'kmh') {
         let minVal = parseFloat(document.getElementById('uMinVal').value);
         if (isNaN(minVal) || minVal <= 0) minVal = debtVal * 0.05;
+        minVal = Math.min(debtVal, minVal);
         userPortfolio.kmh.unshift({
           id: generateId(),
           bank: title,
@@ -2020,7 +2368,11 @@
         });
       } else {
         const count = Math.max(1, Math.min(120, parseInt(document.getElementById('uInstCount').value) || 1));
-        const [year, month, day] = dueDate.split('-').map(Number);
+        const parts = dueDate.split('-').map(Number);
+        const year = parts[0] || new Date().getFullYear();
+        const month = parts[1] || (new Date().getMonth() + 1);
+        const day = parts[2] || new Date().getDate();
+
         for (let i = 1; i <= count; i++) {
           const instDate = addMonthsClamped(year, month - 1, day, i - 1);
           userPortfolio.loans.push({
@@ -2043,8 +2395,16 @@
 
     function settleCardFully(id) {
       const card = userPortfolio.cards.find(c => c.id === id);
-      if (card) archiveItem('card', card, card.debt);
-      saveState();
+      if (card) {
+        const origDebt = Number(card.debt) || 0;
+        if (origDebt > 0) {
+          archiveItem('card', card, origDebt);
+        }
+        card.debt = 0;
+        card.minPay = 0;
+        card.isSettled = true;
+        saveState();
+      }
     }
 
     function settleKMHFully(id) {
@@ -2055,24 +2415,49 @@
         k.debt = 0;
         k.monthlyPay = 0;
         archiveItem('kmh', k, orig);
+        saveState();
       }
-      saveState();
     }
 
     function deleteCard(id) { userPortfolio.cards = userPortfolio.cards.filter(c => c.id !== id); saveState(); }
     function deleteKMH(id) { userPortfolio.kmh = userPortfolio.kmh.filter(k => k.id !== id); saveState(); }
-    function toggleLoan(id) { userPortfolio.loans = userPortfolio.loans.map(l => l.id === id ? { ...l, isSettled: !l.isSettled } : l); saveState(); }
+    
+    function toggleLoan(id) {
+      const l = userPortfolio.loans.find(item => item.id === id);
+      if (!l) return;
+      l.isSettled = !l.isSettled;
+      if (l.isSettled) {
+        const sameLoan = userPortfolio.loans.filter(x => x.loanName === l.loanName);
+        const allSettled = sameLoan.length > 0 && sameLoan.every(x => x.isSettled);
+        if (allSettled) {
+          const totalLoanAmount = sameLoan.reduce((sum, x) => sum + (Number(x.amount) || 0), 0);
+          userPortfolio.archive.unshift({
+            id: generateId(),
+            title: `${l.loanName} (Tüm Taksitler)`,
+            type: 'Kredi (Tamamlandı)',
+            settledDate: getLocalDateString(),
+            originalAmount: totalLoanAmount
+          });
+        }
+      }
+      saveState();
+    }
+
     function deleteLoan(id) { userPortfolio.loans = userPortfolio.loans.filter(l => l.id !== id); saveState(); }
 
     /* BİLDİRİMLER */
     async function toggleNotifications() {
-      if (!('Notification' in window)) return alert('Tarayıcınız bildirim özelliğini desteklemiyor.');
+      if (!('Notification' in window)) {
+        return alert('Tarayıcınız bildirim özelliğini desteklemiyor.');
+      }
       if (Notification.permission === 'granted') {
         checkDueDatesAndNotify(true);
-      } else if (Notification.permission !== 'denied') {
+      } else if (Notification.permission === 'denied') {
+        alert('Bildirim izni tarayıcı ayarlarınızdan engellenmiş. Lütfen adres çubuğundaki site izinlerinden bildirimleri aktif hale getirin.');
+      } else {
         const p = await Notification.requestPermission();
         updateNotifButtonUI();
-        if (p === 'granted') checkDueDatesAndNotify();
+        if (p === 'granted') checkDueDatesAndNotify(true);
       }
     }
 
@@ -2113,16 +2498,16 @@
       if (dueItems.length > 0) {
         new Notification('⚠️ Bugün Son Ödeme Günü!', { body: `Ödenmesi gereken ${dueItems.length} borcunuz var: ${dueItems.join(', ')}`, icon: './icon-192.png' });
       } else if (manualTrigger) {
-        new Notification('FinFlow', { body: 'Bugün için vadesi dolan borcunuz bulunmuyor.', icon: './icon-192.png' });
+        new Notification('FinFlow Pro', { body: 'Bugün için vadesi dolan açık borcunuz bulunmuyor.', icon: './icon-192.png' });
       }
     }
 
     /* EXCEL İÇE AKTARIM MOTORU */
     const HEADER_ALIASES = {
-      title: ['baslik', 'isim', 'banka', 'kurum', 'kalem', 'adi', 'urun', 'aciklama', 'borc adi', 'borclu', 'kart adi', 'hesap adi'],
+      title: ['baslik', 'isim', 'banka', 'kurum', 'kalem', 'adi', 'urun', 'aciklama', 'borc adi', 'borclu', 'kart adi', 'hesap adi', 'kredi'],
       amount: ['donem borcu', 'guncel borc', 'kart borcu', 'borc tutari', 'toplam borc', 'borc', 'tutar', 'miktar', 'taksit tutari', 'aylik tutar', 'bakiye', 'kullanilan'],
       limit: ['kart limiti', 'toplam limit', 'limit', 'kredi limiti', 'hesap limiti', 'kullanilabilir'],
-      minPay: ['asgari', 'asgari odeme', 'asgari tutar', 'aylik asgari', 'aylik odeme', 'minimum', 'faiz', 'aylik faiz'],
+      minPay: ['asgari', 'asgari odeme', 'asgari tutar', 'aylik asgari', 'aylik odeme', 'minimum', 'aylik faiz'],
       day: ['yatis gunu', 'odeme gunu', 'gun', 'kesim gunu', 'hesap kesim'],
       dueDate: ['son gun', 'son odeme', 'vade tarihi', 'hesap kesim tarihi', 'odeme tarihi', 'vade', 'tarih'],
       instNo: ['taksit no', 'taksit sayisi', 'taksit', 'donem'],
@@ -2178,6 +2563,12 @@
       const file = e.target.files[0];
       if (!file) return;
 
+      if (typeof XLSX === 'undefined') {
+        alert('Excel kütüphanesi henüz yüklenemedi. Lütfen internet bağlantınızı kontrol edin.');
+        e.target.value = '';
+        return;
+      }
+
       const reader = new FileReader();
       reader.onload = (evt) => {
         try {
@@ -2216,7 +2607,7 @@
 
             const isIncomeSheet = sNameNorm.includes('gelir') || sNameNorm.includes('maas') || sNameNorm.includes('income');
             const isExpenseSheet = sNameNorm.includes('gider') || sNameNorm.includes('harcama') || sNameNorm.includes('fatura') || sNameNorm.includes('expense') || sNameNorm.includes('abonelik');
-            const isScheduleSheet = cols.instNo >= 0 && (cols.principal >= 0 || cols.interest >= 0) && (sNameNorm.includes('taksit') || sNameNorm.includes('plan'));
+            const isScheduleSheet = (cols.instNo >= 0 || cols.principal >= 0 || cols.interest >= 0) && (sNameNorm.includes('taksit') || sNameNorm.includes('plan') || sNameNorm.includes('kredi'));
 
             dataRows.forEach((row, i) => {
               if (!row || !row.length) return;
@@ -2227,6 +2618,8 @@
               const dueDate = parseExcelDate(getCell(row, cols.dueDate)) || getLocalDateString();
               const categoryStr = String(getCell(row, cols.category) || '').trim();
               const day = cols.day >= 0 ? (parseInt(parseTRNumber(getCell(row, cols.day))) || 15) : 15;
+              const statusRaw = normalizeText(String(getCell(row, cols.status) || ''));
+              const isSettled = statusRaw.includes('odendi') || statusRaw === 'true' || statusRaw === '1' || statusRaw === 'kapali';
 
               if (!name || amount <= 0) return;
 
@@ -2248,7 +2641,7 @@
                   amount,
                   principal,
                   interest,
-                  isSettled: false
+                  isSettled
                 });
                 loanCount++;
               } else if (isIncomeSheet || catNorm.includes('gelir') || catNorm.includes('maas')) {
@@ -2265,19 +2658,21 @@
                   debt: amount,
                   monthlyPay: minPay || (amount * 0.05),
                   dueDate,
-                  isSettled: false
+                  isSettled
                 });
                 kmhCount++;
               } else if (!testStr.includes('kart') && LOAN_IDENTIFIERS.some(kw => testStr.includes(kw))) {
+                const instNo = cols.instNo >= 0 ? (parseInt(parseTRNumber(getCell(row, cols.instNo))) || 1) : 1;
+                const instAmount = minPay > 0 ? minPay : amount;
                 userPortfolio.loans.push({
                   id: generateId(),
                   loanName: name,
-                  instNo: 1,
+                  instNo,
                   dueDate,
-                  amount: minPay > 0 ? minPay : amount,
-                  principal: Math.round((minPay > 0 ? minPay : amount) * 0.6 * 100) / 100,
-                  interest: Math.round((minPay > 0 ? minPay : amount) * 0.4 * 100) / 100,
-                  isSettled: false
+                  amount: instAmount,
+                  principal: Math.round(instAmount * 0.6 * 100) / 100,
+                  interest: Math.round(instAmount * 0.4 * 100) / 100,
+                  isSettled
                 });
                 loanCount++;
               } else {
@@ -2286,9 +2681,9 @@
                   bank: name,
                   limit: limit || 0,
                   debt: amount,
-                  minPay: minPay || (amount * 0.2),
+                  minPay: minPay || (limit > 25000 ? amount * 0.4 : amount * 0.2),
                   dueDate,
-                  isSettled: false
+                  isSettled
                 });
                 cardCount++;
               }
@@ -2310,6 +2705,7 @@
       if (confirm('Tüm portföy ve ayarlar sıfırlanacak. Onaylıyor musunuz?')) {
         userPortfolio = { incomes: [], expenses: [], cards: [], kmh: [], loans: [], archive: [], settings: { strategy: 'avalanche', pin: '', extraCash: 1000 } };
         saveState();
+        checkSecurityPIN();
       }
     }
   </script>
