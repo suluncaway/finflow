@@ -1338,9 +1338,23 @@
         return !isNaN(d.getTime()) ? getLocalDateString(d) : "";
       }
       const s = String(val).trim();
-      if (s.match(/^\d{4}-\d{2}-\d{2}$/)) return s;
-      const dotMatch = s.match(/^(\d{1,2})[./](\d{1,2})[./](\d{4})$/);
-      if (dotMatch) return `${dotMatch[3]}-${dotMatch[2].padStart(2,'0')}-${dotMatch[1].padStart(2,'0')}`;
+      // 1. DD/MM/YYYY or DD.MM.YYYY anywhere in string
+      const dotMatch = s.match(/(\d{1,2})[./](\d{1,2})[./](\d{4})/);
+      if (dotMatch) {
+        return `${dotMatch[3]}-${dotMatch[2].padStart(2,'0')}-${dotMatch[1].padStart(2,'0')}`;
+      }
+      // 2. ISO YYYY-MM-DD
+      const isoMatch = s.match(/(\d{4})-(\d{2})-(\d{2})/);
+      if (isoMatch) return isoMatch[0];
+      // 3. Day of month e.g. "Her ayın 28'i" or "21-22'si"
+      const dayMatch = s.match(/(?:her\s+ay[iı]n|ay[iı]n)?\s*(\d{1,2})/i);
+      if (dayMatch) {
+        const day = Math.max(1, Math.min(31, parseInt(dayMatch[1])));
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = now.getMonth() + 1;
+        return `${year}-${String(month).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+      }
       return "";
     }
 
@@ -2766,16 +2780,16 @@
 
     /* EXCEL İÇE AKTARIM MOTORU */
     const HEADER_ALIASES = {
-      title: ['baslik', 'isim', 'banka', 'kurum', 'kalem', 'adi', 'urun', 'aciklama', 'borc adi', 'borclu', 'kart adi', 'hesap adi', 'kredi'],
-      amount: ['donem borcu', 'guncel borc', 'kart borcu', 'borc tutari', 'toplam borc', 'borc', 'tutar', 'miktar', 'taksit tutari', 'aylik tutar', 'bakiye', 'kullanilan'],
+      category: ['borc kategorisi', 'kategori', 'borc turu', 'borc tipi', 'kalem turu', 'tur', 'tip'],
+      title: ['kurum / kalem', 'kurum', 'kalem', 'banka', 'kart adi', 'hesap adi', 'kredi adi', 'borc adi', 'urun', 'aciklama', 'baslik', 'isim', 'adi'],
+      amount: ['kalan tutar', 'donem borcu', 'guncel borc', 'kart borcu', 'borc tutari', 'toplam borc', 'taksit tutari', 'aylik tutar', 'bakiye', 'kullanilan', 'tutar', 'miktar', 'borc'],
       limit: ['kart limiti', 'toplam limit', 'limit', 'kredi limiti', 'hesap limiti', 'kullanilabilir'],
       minPay: ['asgari', 'asgari odeme', 'asgari tutar', 'aylik asgari', 'aylik odeme', 'minimum', 'aylik faiz'],
       day: ['yatis gunu', 'odeme gunu', 'gun', 'kesim gunu', 'hesap kesim'],
-      dueDate: ['son gun', 'son odeme', 'vade tarihi', 'hesap kesim tarihi', 'odeme tarihi', 'vade', 'tarih'],
-      instNo: ['taksit no', 'taksit sayisi', 'taksit', 'donem'],
+      dueDate: ['vade gunu / not', 'vade gunu', 'son gun', 'son odeme', 'vade tarihi', 'hesap kesim tarihi', 'odeme tarihi', 'vade', 'tarih'],
+      instNo: ['taksit / durum bilgisi', 'taksit no', 'taksit sayisi', 'taksit', 'donem'],
       principal: ['anapara', 'ana para'],
       interest: ['faiz', 'faiz+vergi', 'faiz tutari'],
-      category: ['kategori', 'tur', 'tip', 'borc turu', 'turu'],
       status: ['durum', 'odendi mi', 'statu']
     };
 
@@ -2787,31 +2801,67 @@
     ];
 
     const LOAN_IDENTIFIERS = [
-      'ihtiyac', 'konut', 'tasit', 'arac', 'tuketici', 'kredisi', 'taksit',
-      'finansman', 'borc kapatma', 'nakit avans', 'taksitli'
+      'ihtiyac', 'konut', 'tasit', 'arac', 'tuketici', 'kredisi', 'kredi', 'taksit',
+      'finansman', 'borc kapatma', 'nakit avans', 'taksitli', 'alisveris'
     ];
 
-    function findColumnIndex(headerRow, aliasKey) {
+    function findColumnIndexDisambiguated(headerRow, aliasKey, assignedIndices = new Set()) {
       const aliases = HEADER_ALIASES[aliasKey] || [];
+      // 1. Birebir tam eşleşme (en yüksek öncelik)
       for (let idx = 0; idx < headerRow.length; idx++) {
+        if (assignedIndices.has(idx)) continue;
         const cell = normalizeText(headerRow[idx]);
         if (!cell) continue;
-        if (aliases.some(a => cell === a || cell.includes(a))) return idx;
+        if (aliases.some(a => cell === a)) return idx;
+      }
+      // 2. Yanlış eşleşmeleri önleyen kontrollü alt dize eşleşmesi
+      for (let idx = 0; idx < headerRow.length; idx++) {
+        if (assignedIndices.has(idx)) continue;
+        const cell = normalizeText(headerRow[idx]);
+        if (!cell) continue;
+        if (aliasKey === 'amount' && (cell.includes('kategori') || cell.includes('tur') || cell.includes('tip'))) continue;
+        if (aliasKey === 'title' && (cell.includes('kategori') || cell.includes('tutar') || cell.includes('bakiye'))) continue;
+        if (aliasKey === 'status' && cell.includes('taksit')) continue;
+        if (aliases.some(a => cell.includes(a))) return idx;
       }
       return -1;
     }
 
+    function detectColumnsInHeader(headerRow) {
+      const assigned = new Set();
+      const cols = {};
+      const priorityOrder = ['category', 'title', 'amount', 'instNo', 'dueDate', 'limit', 'minPay', 'day', 'principal', 'interest', 'status'];
+      priorityOrder.forEach(key => {
+        const idx = findColumnIndexDisambiguated(headerRow, key, assigned);
+        cols[key] = idx;
+        if (idx !== -1) assigned.add(idx);
+      });
+      if (cols.title === -1) {
+        for (let i = 0; i < headerRow.length; i++) {
+          if (!assigned.has(i)) { cols.title = i; assigned.add(i); break; }
+        }
+        if (cols.title === -1) cols.title = 0;
+      }
+      if (cols.amount === -1) {
+        for (let i = 0; i < headerRow.length; i++) {
+          if (!assigned.has(i)) { cols.amount = i; assigned.add(i); break; }
+        }
+        if (cols.amount === -1) cols.amount = (cols.limit === 1) ? 2 : 1;
+      }
+      return cols;
+    }
+
     function detectHeaderRowIndex(rows) {
-      const allAliasKeys = Object.keys(HEADER_ALIASES);
-      let bestIdx = -1;
+      let bestIdx = 0;
       let bestScore = 0;
       const scanLimit = Math.min(15, rows.length);
       for (let r = 0; r < scanLimit; r++) {
         const row = rows[r];
         if (!row || !row.length) continue;
+        const assigned = new Set();
         let score = 0;
-        allAliasKeys.forEach(key => {
-          if (findColumnIndex(row, key) >= 0) score++;
+        ['category', 'title', 'amount', 'instNo', 'dueDate', 'limit', 'minPay'].forEach(key => {
+          if (findColumnIndexDisambiguated(row, key, assigned) >= 0) score++;
         });
         if (score > bestScore) {
           bestScore = score;
@@ -2835,7 +2885,7 @@
       reader.onload = (evt) => {
         try {
           const data = new Uint8Array(evt.target.result);
-          const wb = XLSX.read(data, { type: 'array', cellDates: true });
+          const wb = XLSX.read(data, { type: 'array', cellDates: true, codepage: 65001 });
 
           let incCount = 0, expCount = 0, cardCount = 0, kmhCount = 0, loanCount = 0;
           const getCell = (row, idx) => (idx >= 0 && row && idx < row.length) ? row[idx] : undefined;
@@ -2850,43 +2900,36 @@
             const dataRows = rawRows.slice(headerIdx + 1);
             const sNameNorm = normalizeText(sheetName);
 
-            const cols = {
-              title: findColumnIndex(headerRow, 'title'),
-              amount: findColumnIndex(headerRow, 'amount'),
-              limit: findColumnIndex(headerRow, 'limit'),
-              minPay: findColumnIndex(headerRow, 'minPay'),
-              day: findColumnIndex(headerRow, 'day'),
-              dueDate: findColumnIndex(headerRow, 'dueDate'),
-              instNo: findColumnIndex(headerRow, 'instNo'),
-              principal: findColumnIndex(headerRow, 'principal'),
-              interest: findColumnIndex(headerRow, 'interest'),
-              category: findColumnIndex(headerRow, 'category'),
-              status: findColumnIndex(headerRow, 'status')
-            };
-
-            if (cols.title === -1) cols.title = 0;
-            if (cols.amount === -1) cols.amount = (cols.limit === 1) ? 2 : 1;
+            const cols = detectColumnsInHeader(headerRow);
 
             const isIncomeSheet = sNameNorm.includes('gelir') || sNameNorm.includes('maas') || sNameNorm.includes('income');
             const isExpenseSheet = sNameNorm.includes('gider') || sNameNorm.includes('harcama') || sNameNorm.includes('fatura') || sNameNorm.includes('expense') || sNameNorm.includes('abonelik');
             const isScheduleSheet = (cols.instNo >= 0 || cols.principal >= 0 || cols.interest >= 0) && (sNameNorm.includes('taksit') || sNameNorm.includes('plan') || sNameNorm.includes('kredi'));
 
-            dataRows.forEach((row, i) => {
-              if (!row || !row.length) return;
+            for (let i = 0; i < dataRows.length; i++) {
+              const row = dataRows[i];
+              if (!row || !row.length) continue;
               const name = String(getCell(row, cols.title) || '').trim();
               const amount = parseTRNumber(getCell(row, cols.amount));
               const limit = parseTRNumber(getCell(row, cols.limit));
               const minPay = parseTRNumber(getCell(row, cols.minPay));
               const dueDate = parseExcelDate(getCell(row, cols.dueDate)) || getLocalDateString();
               const categoryStr = String(getCell(row, cols.category) || '').trim();
+              const instStr = String(getCell(row, cols.instNo) || '').trim();
               const day = cols.day >= 0 ? (parseInt(parseTRNumber(getCell(row, cols.day))) || 15) : 15;
               const statusRaw = normalizeText(String(getCell(row, cols.status) || ''));
               const isSettled = statusRaw.includes('odendi') || statusRaw === 'true' || statusRaw === '1' || statusRaw === 'kapali';
 
-              if (!name || amount <= 0) return;
-
               const nameNorm = normalizeText(name);
               const catNorm = normalizeText(categoryStr);
+
+              // Tablo sonu toplam satırları veya takvim alt tablolarında dur
+              if (nameNorm.includes('alt toplam') || catNorm.includes('alt toplam') || nameNorm.includes('genel toplam') || catNorm.includes('genel toplam') || /^\d{4}-\d{2}-\d{2}$/.test(catNorm)) {
+                break;
+              }
+
+              if (!name || amount <= 0) continue;
+
               const combined = `${nameNorm} ${catNorm} ${sNameNorm}`;
               const testStr = combined.replace(/yapi kredi/g, 'ykb').replace(/ykb/g, '');
 
@@ -2916,44 +2959,78 @@
                 userPortfolio.kmh.push({
                   id: generateId(),
                   bank: name,
-                  limit: limit || 0,
+                  limit: limit > 0 ? limit : amount,
                   debt: amount,
-                  monthlyPay: minPay || (amount * 0.05),
+                  monthlyPay: minPay > 0 ? minPay : Math.round(amount * 0.05 * 100) / 100,
                   dueDate,
                   isSettled
                 });
                 kmhCount++;
-              } else if (!testStr.includes('kart') && LOAN_IDENTIFIERS.some(kw => testStr.includes(kw))) {
-                const instNo = cols.instNo >= 0 ? (parseInt(parseTRNumber(getCell(row, cols.instNo))) || 1) : 1;
-                const instAmount = minPay > 0 ? minPay : amount;
-                userPortfolio.loans.push({
+              } else if (testStr.includes('kart')) {
+                const cardLimit = limit > 0 ? limit : (amount > 25000 ? amount : 25000);
+                const cardMin = minPay > 0 ? minPay : Math.round((cardLimit > 25000 ? amount * 0.4 : amount * 0.2) * 100) / 100;
+                userPortfolio.cards.push({
                   id: generateId(),
-                  loanName: name,
-                  instNo,
+                  bank: name,
+                  limit: cardLimit,
+                  debt: amount,
+                  minPay: cardMin,
                   dueDate,
-                  amount: instAmount,
-                  principal: Math.round(instAmount * 0.6 * 100) / 100,
-                  interest: Math.round(instAmount * 0.4 * 100) / 100,
                   isSettled
                 });
+                cardCount++;
+              } else if (LOAN_IDENTIFIERS.some(kw => testStr.includes(kw))) {
+                let instCount = 1;
+                const mCount = instStr.match(/(\d+)\s*taksit/i);
+                if (mCount) {
+                  instCount = parseInt(mCount[1]);
+                } else if (cols.instNo >= 0) {
+                  instCount = parseInt(parseTRNumber(instStr)) || 1;
+                }
+
+                let monthlyPay = minPay;
+                const mPay = instStr.match(/\(([\d.,]+)\s*(?:tl|₺)?\)/i);
+                if (mPay) {
+                  monthlyPay = parseTRNumber(mPay[1]);
+                }
+
+                const instAmount = monthlyPay > 0 ? monthlyPay : Math.round((amount / instCount) * 100) / 100;
+                const parts = dueDate.split('-').map(Number);
+                const year = parts[0] || new Date().getFullYear();
+                const month = parts[1] || (new Date().getMonth() + 1);
+                const dayVal = parts[2] || 15;
+
+                for (let k = 1; k <= instCount; k++) {
+                  const instDate = addMonthsClamped(year, month - 1, dayVal, k - 1);
+                  userPortfolio.loans.push({
+                    id: generateId(),
+                    loanName: name,
+                    instNo: k,
+                    dueDate: getLocalDateString(instDate),
+                    amount: instAmount,
+                    principal: Math.round(instAmount * 0.6 * 100) / 100,
+                    interest: Math.round(instAmount * 0.4 * 100) / 100,
+                    isSettled
+                  });
+                }
                 loanCount++;
               } else {
                 userPortfolio.cards.push({
                   id: generateId(),
                   bank: name,
-                  limit: limit || 0,
+                  limit: limit > 0 ? limit : (amount > 25000 ? amount : 25000),
                   debt: amount,
-                  minPay: minPay || (limit > 25000 ? amount * 0.4 : amount * 0.2),
+                  minPay: minPay > 0 ? minPay : Math.round(amount * 0.2 * 100) / 100,
                   dueDate,
                   isSettled
                 });
                 cardCount++;
               }
-            });
+            }
           });
 
           saveState();
-          alert(`Excel başarıyla aktarıldı:\n• ${incCount} Gelir\n• ${expCount} Sabit Gider\n• ${cardCount} Kredi Kartı\n• ${kmhCount} KMH\n• ${loanCount} Kredi/Taksit`);
+          alert(`Excel başarıyla aktarıldı:\n• ${incCount} Gelir\n• ${expCount} Sabit Gider\n• ${cardCount} Kredi Kartı\n• ${kmhCount} KMH\n• ${loanCount} Kredi`);
         } catch (err) {
           alert("Excel aktarım hatası: " + err.message);
         } finally {
@@ -3818,7 +3895,7 @@ SADECE ve SADECE aşağıdaki JSON formatında geçerli bir JSON çıktısı ür
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js?v=5').catch(err => console.log('SW Hata:', err));
+        navigator.serviceWorker.register('./sw.js?v=6').catch(err => console.log('SW Hata:', err));
       });
     }
   

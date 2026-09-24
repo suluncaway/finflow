@@ -1,4 +1,4 @@
-const CACHE_NAME = 'finflow-pro-cache-v5';
+const CACHE_NAME = 'finflow-pro-cache-v6';
 const STATIC_ASSETS = [
   './',
   './index.html',
