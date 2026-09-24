@@ -1,23 +1,18 @@
-const CACHE_NAME = 'finflow-pro-cache-v2';
+const CACHE_NAME = 'finflow-pro-cache-v3';
 const STATIC_ASSETS = [
   './',
   './index.html',
   './manifest.json',
   './icon-192.png',
-  './icon-512.png',
-  'https://cdn.tailwindcss.com',
-  'https://unpkg.com/lucide@latest',
-  'https://cdn.jsdelivr.net/npm/chart.js',
-  'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js'
+  './icon-512.png'
 ];
 
 self.addEventListener('install', (e) => {
+  self.skipWaiting();
   e.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(STATIC_ASSETS).catch((err) => {
-        console.warn('FinFlow Cache addAll Uyarısı:', err);
-      });
-    }).then(() => self.skipWaiting())
+      return cache.addAll(STATIC_ASSETS).catch((err) => console.warn('Cache warning:', err));
+    })
   );
 });
 
@@ -32,21 +27,32 @@ self.addEventListener('activate', (e) => {
 self.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET') return;
 
+  // HTML sayfa geçişlerinde Network-First (Önce Canlı Ağ): Güncellemeler anında görünür!
+  if (e.request.mode === 'navigate') {
+    e.respondWith(
+      fetch(e.request).then((networkResponse) => {
+        if (networkResponse && networkResponse.status === 200) {
+          const clone = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(e.request, clone));
+        }
+        return networkResponse;
+      }).catch(async () => {
+        return (await caches.match(e.request)) || (await caches.match('./index.html')) || (await caches.match('./'));
+      })
+    );
+    return;
+  }
+
+  // Diğer statik kaynaklarda Stale-while-revalidate
   e.respondWith(
     caches.match(e.request).then((cachedResponse) => {
       const fetchPromise = fetch(e.request).then((networkResponse) => {
         if (networkResponse && networkResponse.status === 200 && networkResponse.type !== 'opaque') {
-          const responseToCache = networkResponse.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(e.request, responseToCache));
+          const clone = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(e.request, clone));
         }
         return networkResponse;
-      }).catch(() => {
-        if (cachedResponse) return cachedResponse;
-        if (e.request.mode === 'navigate') {
-          return caches.match('./index.html') || caches.match('./');
-        }
-        return new Response('Offline', { status: 503, statusText: 'Offline' });
-      });
+      }).catch(() => cachedResponse);
 
       return cachedResponse || fetchPromise;
     })

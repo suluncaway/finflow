@@ -155,7 +155,7 @@
           </div>
           <div>
             <h1 class="text-lg sm:text-xl font-bold text-white leading-tight">FinFlow Pro</h1>
-            <p class="text-[11px] sm:text-xs text-slate-400">Akıllı Finansal Strateji, Simülasyon & Borç Yönetim Merkezi</p>
+            <p class="text-[11px] sm:text-xs text-slate-400">Akıllı Finansal Strateji, Simülasyon & Borç Yönetim Merkezi <span class="text-[9px] bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold px-1.5 py-0.5 rounded-full ml-1">v2.0 AI</span></p>
           </div>
         </div>
 
@@ -181,6 +181,7 @@
             <i data-lucide="bell" id="notifIcon" class="w-4 h-4 text-amber-400"></i>
             <span class="hidden sm:inline" id="notifText">Bildirimler</span>
           </button>
+          <button onclick="forceAppRefresh()" class="soft-btn p-2 bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-300 rounded-xl text-xs flex items-center transition" title="Önbelleği Temizle ve Canlı Güncelle"><i data-lucide="rotate-cw" class="w-4 h-4 text-cyan-400"></i></button>
           <button onclick="clearAllData()" class="soft-btn p-2 bg-rose-950/40 border border-rose-900/80 hover:bg-rose-900 text-rose-300 rounded-xl text-xs flex items-center transition" title="Sıfırla">
             <i data-lucide="trash-2" class="w-4 h-4"></i>
           </button>
@@ -2927,7 +2928,11 @@
 
     function clearAllData() {
       if (confirm('Tüm portföy ve ayarlar sıfırlanacak. Onaylıyor musunuz?')) {
-        userPortfolio = { incomes: [], expenses: [], cards: [], kmh: [], loans: [], archive: [], settings: { strategy: 'avalanche', pin: '', extraCash: 1000 }
+        userPortfolio = { incomes: [], expenses: [], cards: [], kmh: [], loans: [], archive: [], settings: { strategy: 'avalanche', pin: '', extraCash: 1000 } };
+        saveState();
+        checkSecurityPIN();
+      }
+    }
 
 
     /* ==========================================================================
@@ -3480,20 +3485,25 @@ SADECE ve SADECE aşağıdaki JSON formatında geçerli bir JSON çıktısı ür
 
       chatContainer.scrollTop = chatContainer.scrollHeight;
     }
-
- };
-        saveState();
-        checkSecurityPIN();
-      }
-    }
   </script>
 
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW Hata:', err));
+        navigator.serviceWorker.register('./sw.js?v=3').catch(err => console.log('SW Hata:', err));
       });
     }
+  
+    function forceAppRefresh() {
+      if ('caches' in window) {
+        caches.keys().then(keys => Promise.all(keys.map(k => caches.delete(k)))).then(() => {
+          window.location.href = window.location.pathname + '?reload=' + Date.now();
+        });
+      } else {
+        window.location.href = window.location.pathname + '?reload=' + Date.now();
+      }
+    }
+
   </script>
 </body>
 </html>
