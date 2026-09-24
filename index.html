@@ -3448,9 +3448,7 @@ SADECE ve SADECE aşağıdaki JSON formatında geçerli bir JSON çıktısı ür
         }
 
       } catch (err) {
-        alert('Yapay Zeka Analiz Hatası: ' + err.message + '
-
-Not: Google AI Studio üzerinden aldığınız ücretsiz API anahtarını "Ayarlar & Kredi" sekmesine kaydederek direkt canlı bağlantı kurabilirsiniz.');
+        alert('Yapay Zeka Analiz Hatası: ' + err.message + '\n\nNot: Google AI Studio üzerinden aldığınız ücretsiz API anahtarını "Ayarlar & Kredi" sekmesine kaydederek direkt canlı bağlantı kurabilirsiniz.');
       } finally {
         loadingEl.classList.add('hidden');
         analyzeBtn.disabled = false;
@@ -3820,7 +3818,7 @@ Not: Google AI Studio üzerinden aldığınız ücretsiz API anahtarını "Ayarl
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js?v=4').catch(err => console.log('SW Hata:', err));
+        navigator.serviceWorker.register('./sw.js?v=5').catch(err => console.log('SW Hata:', err));
       });
     }
   
