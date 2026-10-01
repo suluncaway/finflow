@@ -108,6 +108,48 @@
       transform: scale(0.96);
     }
 
+    /* === Görsel & Akıcı Animasyon İyileştirmeleri === */
+
+    /* Katmanlı "aurora" arka plan ışıkları */
+    body {
+      background-color: #020617;
+      background-image:
+        radial-gradient(1100px 650px at 12% -10%, rgba(99,102,241,0.20), transparent 60%),
+        radial-gradient(900px 620px at 105% 5%, rgba(16,185,129,0.15), transparent 60%),
+        radial-gradient(850px 550px at 50% 115%, rgba(139,92,246,0.16), transparent 60%);
+      background-attachment: fixed;
+      background-repeat: no-repeat;
+    }
+
+    /* Kart giriş animasyonu (kademeli) */
+    @keyframes cardIn {
+      from { opacity: 0; transform: translateY(10px) scale(0.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    #incomesGrid > *, #expensesGrid > *, #cardsGrid > *, #kmhGrid > *, #archiveListGrid > *, #avalancheList > * {
+      animation: cardIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+    #incomesGrid > *:nth-child(1), #expensesGrid > *:nth-child(1), #cardsGrid > *:nth-child(1), #kmhGrid > *:nth-child(1), #archiveListGrid > *:nth-child(1) { animation-delay: .03s; }
+    #incomesGrid > *:nth-child(2), #expensesGrid > *:nth-child(2), #cardsGrid > *:nth-child(2), #kmhGrid > *:nth-child(2), #archiveListGrid > *:nth-child(2) { animation-delay: .07s; }
+    #incomesGrid > *:nth-child(3), #expensesGrid > *:nth-child(3), #cardsGrid > *:nth-child(3), #kmhGrid > *:nth-child(3), #archiveListGrid > *:nth-child(3) { animation-delay: .11s; }
+    #incomesGrid > *:nth-child(4), #expensesGrid > *:nth-child(4), #cardsGrid > *:nth-child(4), #kmhGrid > *:nth-child(4), #archiveListGrid > *:nth-child(4) { animation-delay: .15s; }
+    #incomesGrid > *:nth-child(n+5), #expensesGrid > *:nth-child(n+5), #cardsGrid > *:nth-child(n+5), #kmhGrid > *:nth-child(n+5), #archiveListGrid > *:nth-child(n+5) { animation-delay: .18s; }
+
+    /* Kart hover: parlama kenarlığı */
+    .soft-card:hover {
+      border-color: rgba(129,140,248,0.35);
+      box-shadow: 0 12px 30px -12px rgba(99,102,241,0.28);
+    }
+
+    /* Azaltılmış hareket tercihi */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.001s !important;
+        animation-delay: 0s !important;
+        transition-duration: 0.001s !important;
+      }
+    }
+
     html.pin-required #mainAppContainer {
       display: none;
     }
@@ -1251,6 +1293,14 @@
       if (el) el.classList.add('hidden-modal');
     }
 
+    /* Bölüm fade animasyonunu yeniden tetikle (sekme geçişlerinde akıcılık) */
+    function replayFade(el) {
+      if (!el) return;
+      el.classList.remove('animate-fade-in');
+      void el.offsetWidth;
+      el.classList.add('animate-fade-in');
+    }
+
     function openPinModal() {
       document.getElementById('pinSettingInput').value = userPortfolio.settings.pin || '';
       document.getElementById('pinSettingError').classList.add('hidden');
@@ -1688,19 +1738,37 @@
       safeCreateIcons();
     }
 
+    /* Sayı yumuşak sayaç animasyonu (count-up) */
+    function animateNumber(el, value) {
+      if (!el) return;
+      const target = Number(value) || 0;
+      const start = (el._animVal != null) ? el._animVal : 0;
+      el._animVal = target;
+      const dur = 450;
+      const t0 = performance.now();
+      if (el._animFrame) cancelAnimationFrame(el._animFrame);
+      const step = (t) => {
+        const p = Math.min(1, (t - t0) / dur);
+        const eased = 1 - Math.pow(1 - p, 3);
+        el.textContent = formatTRY(start + (target - start) * eased);
+        if (p < 1) el._animFrame = requestAnimationFrame(step);
+      };
+      el._animFrame = requestAnimationFrame(step);
+    }
+
     function renderKPIs() {
       const f = computeFinancials();
-      document.getElementById('kpiIncome').textContent = formatTRY(f.totalIncome);
+      animateNumber(document.getElementById('kpiIncome'), f.totalIncome);
       document.getElementById('kpiIncomeCount').textContent = `${userPortfolio.incomes.length} kaynak`;
-      document.getElementById('kpiTotalMinDebt').textContent = formatTRY(f.totalMinDebt);
-      document.getElementById('kpiMonthlyOutflow').textContent = formatTRY(f.totalMandatoryOutflow);
+      animateNumber(document.getElementById('kpiTotalMinDebt'), f.totalMinDebt);
+      animateNumber(document.getElementById('kpiMonthlyOutflow'), f.totalMandatoryOutflow);
       document.getElementById('kpiOutflowDetail').textContent = `Gider (${formatTRY(f.totalExpense)}) + Asgari (${formatTRY(f.totalMinDebt)})`;
 
       const freeEl = document.getElementById('kpiFreeCash');
-      freeEl.textContent = formatTRY(f.freeCash);
+      animateNumber(freeEl, f.freeCash);
       freeEl.className = `text-base sm:text-xl font-bold mt-1.5 truncate ${f.freeCash >= 0 ? 'text-emerald-400' : 'text-rose-400'}`;
       document.getElementById('kpiFreeCashStatus').textContent = f.freeCash >= 0 ? 'Pozitif Bakiye' : 'Bütçe Eksiği';
-      document.getElementById('kpiGrandTotal').textContent = formatTRY(f.grandTotal);
+      animateNumber(document.getElementById('kpiGrandTotal'), f.grandTotal);
 
       if (cashflowChart) {
         if (f.totalIncome === 0 && f.totalMandatoryOutflow === 0) {
@@ -1772,7 +1840,7 @@
           const nextInst = Number(l.amount) || 0;
           debtItems.push({
             title: `${loanName} (Taksit #${l.instNo})`,
-            amount: isSnowball ? totalRemainingDebt : totalRemainingDebt,
+            amount: totalRemainingDebt,
             minPay: nextInst,
             type: 'Taksit',
             priority: 50,
@@ -1890,7 +1958,7 @@
             <div class="space-y-1 text-xs">
               <div class="flex justify-between"><span class="text-slate-400">Dönem Borcu:</span> <span class="font-bold ${isZero ? 'text-emerald-400' : 'text-rose-400'}">${formatTRY(debt)}</span></div>
               <div class="flex justify-between text-amber-400"><span>Asgari:</span> <span class="font-semibold">${isZero ? '₺0,00' : formatTRY(c.minPay || (debt * 0.2))}</span></div>
-              <div class="flex justify-between text-slate-500 text-[10px]"><span>Son Gün:</span> <span class="text-slate-300">${c.dueDate || '-'}</span></div>
+              <div class="flex justify-between text-slate-500 text-[10px]"><span>Son Gün:</span> <span class="text-slate-300">${escapeHtml(c.dueDate || '-')}</span></div>
             </div>
             <div>
               <div class="flex justify-between text-[10px] text-slate-400 mb-0.5"><span>Limit: ${formatTRY(limit)}</span> <span>%${ratio}</span></div>
@@ -1967,7 +2035,7 @@
               </div>
               <div class="flex justify-between text-slate-500 text-[10px]">
                 <span>Kesim / Vade:</span> 
-                <span class="text-slate-300">${k.dueDate || '-'}</span>
+                <span class="text-slate-300">${escapeHtml(k.dueDate || '-')}</span>
               </div>
             </div>
 
@@ -2063,7 +2131,7 @@
           <tr class="hover:bg-slate-800/40 transition-colors ${l.isSettled ? 'opacity-40 line-through' : ''}">
             <td class="p-3 font-medium text-slate-200">${escapeHtml(l.loanName || 'Kredi')}</td>
             <td class="p-3 text-slate-400">Taksit #${l.instNo}</td>
-            <td class="p-3 font-medium ${isPast ? 'text-rose-400 font-bold' : (isToday ? 'text-amber-400 font-bold' : 'text-slate-300')}">${l.dueDate || '-'}</td>
+            <td class="p-3 font-medium ${isPast ? 'text-rose-400 font-bold' : (isToday ? 'text-amber-400 font-bold' : 'text-slate-300')}">${escapeHtml(l.dueDate || '-')}</td>
             <td class="p-3 font-bold text-blue-400">${formatTRY(l.amount)}</td>
             <td class="p-3 text-slate-400">${formatTRY(l.principal || Math.round(l.amount * 0.6 * 100) / 100)}</td>
             <td class="p-3 text-slate-500">${formatTRY(l.interest || Math.round(l.amount * 0.4 * 100) / 100)}</td>
@@ -2099,7 +2167,7 @@
             <div class="flex justify-between items-start">
               <div>
                 <div class="font-bold text-white text-xs">${escapeHtml(l.loanName || 'Kredi')}</div>
-                <div class="text-[10px] text-slate-400">Taksit #${l.instNo} • Vade: <span class="${isPast ? 'text-rose-400 font-semibold' : (isToday ? 'text-amber-400 font-semibold' : 'text-slate-300')}">${l.dueDate || '-'}</span></div>
+                <div class="text-[10px] text-slate-400">Taksit #${l.instNo} • Vade: <span class="${isPast ? 'text-rose-400 font-semibold' : (isToday ? 'text-amber-400 font-semibold' : 'text-slate-300')}">${escapeHtml(l.dueDate || '-')}</span></div>
               </div>
               ${statusBadge}
             </div>
@@ -2446,6 +2514,11 @@
       document.getElementById('section-archive').classList.toggle('hidden', cat !== 'archive');
 
       if (cat === 'calendar') renderCalendarMatrix();
+
+      ['section-incomes','section-expenses','section-cards','section-kmh','section-installments','section-calendar','section-simulator','section-archive'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el && !el.classList.contains('hidden')) replayFade(el);
+      });
       safeCreateIcons();
     }
 
@@ -2567,6 +2640,11 @@
     function openUniversalDebtModal() {
       document.getElementById('uDueDate').value = getLocalDateString();
       document.getElementById('uFormError').classList.add('hidden');
+      document.getElementById('uDebtTitle').value = '';
+      document.getElementById('uDebtVal').value = '';
+      document.getElementById('uLimitVal').value = '';
+      document.getElementById('uMinVal').value = '';
+      document.getElementById('uInstCount').value = '9';
       const radioCard = document.querySelector('input[name="debtCategoryType"][value="card"]');
       if (radioCard) radioCard.checked = true;
       toggleDebtFields('card');
@@ -2702,19 +2780,24 @@
       const l = userPortfolio.loans.find(item => item.id === id);
       if (!l) return;
       l.isSettled = !l.isSettled;
+      const archiveKey = `${l.loanName} (Tüm Taksitler)`;
       if (l.isSettled) {
         const sameLoan = userPortfolio.loans.filter(x => x.loanName === l.loanName);
         const allSettled = sameLoan.length > 0 && sameLoan.every(x => x.isSettled);
-        if (allSettled) {
+        const alreadyArchived = userPortfolio.archive.some(a => a.title === archiveKey && a.type === 'Kredi (Tamamlandı)');
+        if (allSettled && !alreadyArchived) {
           const totalLoanAmount = sameLoan.reduce((sum, x) => sum + (Number(x.amount) || 0), 0);
           userPortfolio.archive.unshift({
             id: generateId(),
-            title: `${l.loanName} (Tüm Taksitler)`,
+            title: archiveKey,
             type: 'Kredi (Tamamlandı)',
             settledDate: getLocalDateString(),
             originalAmount: totalLoanAmount
           });
         }
+      } else {
+        // Taksit geri alındıysa o krediye ait otomatik zafer kaydını kaldır
+        userPortfolio.archive = userPortfolio.archive.filter(a => !(a.title === archiveKey && a.type === 'Kredi (Tamamlandı)'));
       }
       saveState();
     }
@@ -3587,7 +3670,7 @@ SADECE ve SADECE aşağıdaki JSON formatında geçerli bir JSON çıktısı ür
             </div>
             <div class="text-right shrink-0">
               <div class="text-xs font-bold text-rose-400">${formatTRY(debt.debt || 0)}</div>
-              <div class="text-[10px] text-slate-500">Vade: ${debt.dueDate || '-'}</div>
+              <div class="text-[10px] text-slate-500">Vade: ${escapeHtml(debt.dueDate || '-')}</div>
             </div>
           </div>
         `;
