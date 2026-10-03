@@ -241,7 +241,10 @@
     }
 
     /* ============ MOBİL UYUMLULUK ============ */
-    html, body { max-width: 100%; overflow-x: hidden; }
+    /* Not: overflow-x yalnızca body'de olmalı. html'e de verilirse body ayrı kaydırma kabı olur ve
+       overscroll-behavior ile birleşince mobilde dokunmatik kaydırma tamamen kilitlenir. */
+    body { max-width: 100%; }
+    @media (max-width: 767px) { #mainAppWrapper { max-width: 100%; overflow-x: clip; } }
     img, svg, canvas { max-width: 100%; }
     #appContent canvas { max-width: 100% !important; }
 
@@ -267,7 +270,8 @@
     }
     @media (max-width: 767px) {
 
-      main { min-height: 0 !important; border-radius: 18px !important; overflow: visible !important; }
+      /* backdrop-filter, position:fixed alt menü için yeni bir kapsayıcı oluşturur; mobilde kapatılır */
+      main { min-height: 0 !important; border-radius: 18px !important; overflow: visible !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; transform: none !important; filter: none !important; }
 
       /* Kenar çubuğu -> sabit alt gezinme çubuğu */
       #appSidebar {
