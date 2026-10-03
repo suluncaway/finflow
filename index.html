@@ -239,6 +239,76 @@
     html.pin-required #mainAppWrapper {
       display: none;
     }
+
+    /* ============ MOBİL UYUMLULUK ============ */
+    html, body { max-width: 100%; overflow-x: hidden; }
+    img, svg, canvas { max-width: 100%; }
+    #appContent canvas { max-width: 100% !important; }
+
+    @media (max-width: 767px) {
+      body {
+        padding: max(8px, env(safe-area-inset-top)) 8px calc(84px + env(safe-area-inset-bottom)) 8px !important;
+        -webkit-text-size-adjust: 100%;
+      }
+      #appHeader { padding-left: 2px; padding-right: 2px; flex-wrap: wrap; row-gap: 10px; }
+      #appHeader > div:first-child { flex-shrink: 0; }
+      #kpiGrid > div { padding: 12px !important; min-width: 0; }
+      #kpiGrid [id^="kpi"]:not([id$="Count"]) { font-size: clamp(14px, 4.6vw, 20px) !important; }
+      #appHeader > div:first-child { gap: 6px; min-width: 0; }
+      #appHeader > div:first-child > div:first-child { width: 30px; height: 30px; }
+      #appHeader > div:first-child svg { width: 30px; height: 30px; }
+      #appHeader h1 { font-size: 1.35rem; white-space: nowrap; }
+      #appHeader > div:last-child { gap: 6px; flex-shrink: 0; }
+      #appHeader .cyber-btn { padding: 8px; min-width: 36px; min-height: 36px; justify-content: center; }
+    }
+    @media (max-width: 440px) {
+      #appHeader > div:last-child { width: 100%; justify-content: space-between; }
+      #appHeader > div:last-child > .cyber-btn:not(.hidden) { flex: 1 1 0; }
+    }
+    @media (max-width: 767px) {
+
+      main { min-height: 0 !important; border-radius: 18px !important; overflow: visible !important; }
+
+      /* Kenar çubuğu -> sabit alt gezinme çubuğu */
+      #appSidebar {
+        position: fixed; left: 0; right: 0; bottom: 0; z-index: 45;
+        width: 100%; padding: 6px 6px calc(6px + env(safe-area-inset-bottom)) !important;
+        background: rgba(7, 11, 22, 0.97); border-top: 1px solid rgba(255,255,255,0.08); border-bottom: 0;
+        backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+        box-shadow: 0 -10px 30px rgba(0,0,0,0.6);
+      }
+      #appSidebar > div:first-child { margin: 0 !important; }
+      #appSidebar > div:first-child > * + * { margin-top: 0 !important; }
+      #appSidebar .sidebar-logo, #appSidebar .sidebar-profile { display: none !important; }
+      #appNav { display: flex; flex-direction: row; justify-content: space-between; gap: 4px; padding: 0 !important; overflow: visible; }
+      #appNav > * + * { margin-top: 0 !important; }
+      #appNav .sidebar-btn {
+        flex: 1 1 0; width: auto !important; min-width: 0;
+        flex-direction: column; justify-content: center; gap: 3px;
+        padding: 7px 2px !important; font-size: 10px !important; line-height: 1.1; border-radius: 12px;
+      }
+      #appNav .sidebar-btn span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+      #appNav .sidebar-btn i, #appNav .sidebar-btn svg { width: 18px; height: 18px; }
+
+      /* İçerik: iç içe kaydırma yerine sayfa kaydırması */
+      #appContent { max-height: none !important; overflow: visible !important; padding: 14px 12px 20px !important; }
+
+      /* Modallar: ekrana sığsın, içerik kaydırılabilsin */
+      .modal-backdrop { align-items: flex-end !important; padding: 0 !important; }
+      .modal-backdrop .modal-card, .modal-backdrop > div {
+        max-width: 100% !important; width: 100% !important;
+        max-height: calc(100dvh - 24px) !important; overflow-y: auto !important;
+        border-radius: 20px 20px 0 0 !important;
+        padding-bottom: calc(20px + env(safe-area-inset-bottom)) !important;
+      }
+
+      /* iOS'ta odaklanınca otomatik yakınlaştırmayı engelle */
+      input, select, textarea { font-size: 16px !important; }
+      #pinInput { font-size: 24px !important; }
+
+      /* Geniş tablolar yatay kaydırılsın */
+      table { display: block; max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    }
   </style>
 </head>
 <body class="min-h-screen bg-[#040711] text-slate-100 p-2 sm:p-4 md:p-6 lg:p-8 flex flex-col justify-start relative overflow-x-hidden selection:bg-cyan-500 selection:text-black">
@@ -298,7 +368,7 @@
   <div id="mainAppWrapper" class="relative z-10 max-w-[1380px] w-full mx-auto flex flex-col gap-4">
 
     <!-- TOP HEADER BRANDING (OUTSIDE / ABOVE DASHBOARD WINDOW) -->
-    <header class="flex items-center justify-between px-2 pt-1 pb-1">
+    <header id="appHeader" class="flex items-center justify-between gap-2 px-2 pt-1 pb-1">
       <div class="flex items-center gap-3.5">
         <div class="w-10 h-10 flex items-center justify-center">
           <svg width="42" height="42" viewBox="0 0 40 40" fill="none">
@@ -306,7 +376,7 @@
             <path d="M26 10 H34 V18" stroke="url(#arrowGrad)" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0 0 8px #00f0ff);"/>
           </svg>
         </div>
-        <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white flex items-center gap-2">
+        <h1 class="text-2xl sm:text-4xl font-extrabold tracking-tight text-white flex items-center gap-2">
           FinFlow <span class="text-cyan-400" style="text-shadow: 0 0 16px rgba(0,240,255,0.7);">Pro</span>
         </h1>
       </div>
@@ -327,9 +397,9 @@
         <input type="file" id="excelHeaderInput" class="hidden" accept=".xlsx, .xls, .csv" onchange="handleExcelImport(event)">
         <button onclick="document.getElementById('excelHeaderInput').click()" class="cyber-btn bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-400/40 text-emerald-300 px-3.5 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition shadow-sm" title="Excel veya CSV Dosyası Yükle">
           <i data-lucide="file-spreadsheet" class="w-4 h-4 text-emerald-400"></i>
-          <span>Excel İçe Aktar</span>
+          <span class="hidden sm:inline">Excel İçe Aktar</span>
         </button>
-        <button onclick="downloadExcelTemplate()" class="cyber-btn bg-[#0d1424] hover:bg-white/10 border border-white/10 text-slate-300 px-3 py-1.5 rounded-xl text-xs font-medium flex items-center gap-1.5 transition" title="Örnek Şablon Excel Dosyasını İndir">
+        <button onclick="downloadExcelTemplate()" class="hidden sm:flex cyber-btn bg-[#0d1424] hover:bg-white/10 border border-white/10 text-slate-300 px-3 py-1.5 rounded-xl text-xs font-medium items-center gap-1.5 transition" title="Örnek Şablon Excel Dosyasını İndir">
           <i data-lucide="download" class="w-3.5 h-3.5 text-cyan-400"></i>
           <span class="hidden md:inline">Örnek Şablon</span>
         </button>
@@ -337,6 +407,11 @@
         <button onclick="openUniversalDebtModal()" class="cyber-btn bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold px-3.5 py-1.5 rounded-xl text-xs flex items-center gap-1.5 transition shadow-lg shadow-cyan-500/20">
           <i data-lucide="plus" class="w-3.5 h-3.5"></i>
           <span class="hidden sm:inline">+ Borç / Kart / Gelir</span>
+        </button>
+
+        <!-- Mobil profil butonu (kenar çubuğu mobilde alt menüye dönüşür) -->
+        <button onclick="openProfileModal()" class="md:hidden cyber-btn p-2 bg-[#0d1424] border border-white/10 hover:border-cyan-400 text-slate-300 rounded-xl text-xs flex items-center transition" title="Profil">
+          <i data-lucide="user" class="w-4 h-4 text-cyan-400"></i>
         </button>
 
         <!-- PIN Settings / Lock -->
@@ -361,10 +436,10 @@
     <main class="w-full rounded-[24px] sm:rounded-[28px] bg-[#090e1a]/95 border border-white/10 shadow-[0_25px_70px_rgba(0,0,0,0.8),0_0_50px_rgba(0,240,255,0.06)] backdrop-blur-2xl flex flex-col md:flex-row overflow-hidden min-h-[720px]">
 
       <!-- LEFT SIDEBAR -->
-      <aside class="w-full md:w-[220px] bg-[#070b16]/95 border-b md:border-b-0 md:border-r border-white/5 p-4 sm:p-5 flex flex-col justify-between shrink-0">
+      <aside id="appSidebar" class="w-full md:w-[220px] bg-[#070b16]/95 border-b md:border-b-0 md:border-r border-white/5 p-4 sm:p-5 flex flex-col justify-between shrink-0">
         <div class="space-y-6">
           <!-- Logo inside sidebar -->
-          <div class="flex items-center gap-2.5 px-2 py-1">
+          <div class="sidebar-logo flex items-center gap-2.5 px-2 py-1">
             <svg width="24" height="24" viewBox="0 0 40 40" fill="none">
               <path d="M6 26 L16 16 L24 24 L34 10" stroke="url(#arrowGrad)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0 0 6px #00f0ff);"/>
               <path d="M26 10 H34 V18" stroke="url(#arrowGrad)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0 0 6px #00f0ff);"/>
@@ -373,32 +448,32 @@
           </div>
 
           <!-- Navigation Links -->
-          <nav class="space-y-1.5 flex md:flex-col overflow-x-auto md:overflow-visible no-scrollbar pb-1 md:pb-0">
+          <nav id="appNav" class="space-y-1.5 flex md:flex-col overflow-x-auto md:overflow-visible no-scrollbar pb-1 md:pb-0">
             <button onclick="switchSidebarTab('dashboard')" id="nav-dashboard" class="sidebar-btn active w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all shrink-0">
               <i data-lucide="layout-grid" class="w-4 h-4 text-cyan-400"></i>
-              <span>Dashboard</span>
+              <span class="hidden md:inline">Dashboard</span><span class="md:hidden">Panel</span>
             </button>
             <button onclick="switchSidebarTab('investments')" id="nav-investments" class="sidebar-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-medium transition-all shrink-0">
               <i data-lucide="pie-chart" class="w-4 h-4"></i>
-              <span>Investments</span>
+              <span class="hidden md:inline">Investments</span><span class="md:hidden">Portföy</span>
             </button>
             <button onclick="switchSidebarTab('analytics')" id="nav-analytics" class="sidebar-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-medium transition-all shrink-0">
               <i data-lucide="bar-chart-2" class="w-4 h-4"></i>
-              <span>Analytics</span>
+              <span class="hidden md:inline">Analytics</span><span class="md:hidden">Analiz</span>
             </button>
             <button onclick="switchSidebarTab('reports')" id="nav-reports" class="sidebar-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-medium transition-all shrink-0">
               <i data-lucide="file-text" class="w-4 h-4"></i>
-              <span>Reports</span>
+              <span class="hidden md:inline">Reports</span><span class="md:hidden">Rapor</span>
             </button>
             <button onclick="switchSidebarTab('settings')" id="nav-settings" class="sidebar-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-medium transition-all shrink-0">
               <i data-lucide="settings" class="w-4 h-4"></i>
-              <span>Settings</span>
+              <span class="hidden md:inline">Settings</span><span class="md:hidden">Ayarlar</span>
             </button>
           </nav>
         </div>
 
         <!-- Clean Generic User Profile Widget at Bottom (No Alex Carter, No Photo) -->
-        <div class="mt-4 pt-4 border-t border-white/5 flex items-center justify-between px-2 cursor-pointer hover:bg-white/5 rounded-xl p-2 transition" onclick="openProfileModal()">
+        <div class="sidebar-profile mt-4 pt-4 border-t border-white/5 flex items-center justify-between px-2 cursor-pointer hover:bg-white/5 rounded-xl p-2 transition" onclick="openProfileModal()">
           <div class="flex items-center gap-2.5">
             <div class="w-8 h-8 rounded-xl bg-cyan-500/15 border border-cyan-400/40 flex items-center justify-center text-cyan-400 shadow-[0_0_8px_rgba(0,240,255,0.25)]">
               <i data-lucide="user" class="w-4 h-4"></i>
@@ -413,7 +488,7 @@
       </aside>
 
       <!-- RIGHT MAIN CONTENT WORKSPACE -->
-      <section class="flex-1 p-4 sm:p-6 lg:p-7 overflow-y-auto max-h-[88vh] space-y-5">
+      <section id="appContent" class="flex-1 min-w-0 p-4 sm:p-6 lg:p-7 overflow-y-auto max-h-[88vh] space-y-5">
 
         <!-- ========================================== -->
         <!-- TAB 1: MASTER DASHBOARD -->
@@ -890,7 +965,7 @@
           </div>
 
           <!-- Financial Health Metrics Grid -->
-          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
+          <div id="kpiGrid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
             <div class="cyber-card p-4 sm:p-5 border border-emerald-500/20 hover:border-emerald-400/50 hover:shadow-[0_0_20px_rgba(16,185,129,0.15)]">
               <span class="text-xs text-emerald-400 font-bold uppercase tracking-wider">Aylık Gelir</span>
               <div id="kpiIncome" class="text-xl sm:text-2xl font-black text-emerald-400 mt-1.5 truncate">₺0,00</div>
