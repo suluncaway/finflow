@@ -5,25 +5,25 @@
   <br/><br/>
 
   # ⚡ FinFlow Pro
-  ### Yeni Nesil Borç Kapatma, Nakit Akışı ve Yapay Zeka Finans Asistanı
+  ### Yeni Nesil Siber-Neon Borç Kapatma, Nakit Akışı ve Portföy Yönetim Paneli
 
   <p align="center">
-    <strong>%100 Gizlilik Odaklı (Local-First) • Sıfır Sunucu • Banka API Gerektirmez • PWA Uyumlu</strong>
+    <strong>%100 Gizlilik Odaklı (Local-First) • Sıfır Sunucu • Gelişmiş Excel İçe Aktarma • PWA Uyumlu</strong>
   </p>
 
   <p align="center">
-    <a href="https://github.com/suluncaway/finflow/stargazers"><img src="https://img.shields.io/github/stars/suluncaway/finflow?style=for-the-badge&color=6366f1" alt="Stars"></a>
-    <a href="https://github.com/suluncaway/finflow/network/members"><img src="https://img.shields.io/github/forks/suluncaway/finflow?style=for-the-badge&color=8b5cf6" alt="Forks"></a>
-    <a href="https://github.com/suluncaway/finflow/blob/main/LICENSE"><img src="https://img.shields.io/badge/Lisans-MIT-emerald?style=for-the-badge" alt="License"></a>
+    <a href="https://github.com/suluncaway/finflow/stargazers"><img src="https://img.shields.io/github/stars/suluncaway/finflow?style=for-the-badge&color=00f2fe" alt="Stars"></a>
+    <a href="https://github.com/suluncaway/finflow/network/members"><img src="https://img.shields.io/github/forks/suluncaway/finflow?style=for-the-badge&color=4facfe" alt="Forks"></a>
+    <a href="https://github.com/suluncaway/finflow/blob/main/LICENSE"><img src="https://img.shields.io/badge/Lisans-MIT-10b981?style=for-the-badge" alt="License"></a>
     <img src="https://img.shields.io/badge/PWA-Destekli-0ea5e9?style=for-the-badge&logo=pwa&logoColor=white" alt="PWA">
-    <img src="https://img.shields.io/badge/Gemini_AI-2.5_Flash-a855f7?style=for-the-badge&logo=googlegemini&logoColor=white" alt="Gemini">
-    <img src="https://img.shields.io/badge/Veri_G%C3%BCvenli%C4%9Fi-%25100_Cihazda-10b981?style=for-the-badge" alt="Privacy">
+    <img src="https://img.shields.io/badge/Excel-Geli%C5%9Fmi%C5%9F_Motor-107c41?style=for-the-badge&logo=microsoftexcel&logoColor=white" alt="Excel Engine">
+    <img src="https://img.shields.io/badge/Veri_G%C3%BCvenli%C4%9Fi-%25100_Cihazda-00f2fe?style=for-the-badge" alt="Privacy">
   </p>
 
   <p align="center">
     <a href="#-canlı-demo">🌐 Canlı Demo</a> •
     <a href="#-öne-çıkan-özellikler">✨ Özellikler</a> •
-    <a href="#-yapay-zeka-ve-ocr-motoru">🤖 Yapay Zeka & OCR</a> •
+    <a href="#-akıllı-excel-içe-aktarma-motoru">📊 Akıllı Excel Motoru</a> •
     <a href="#-çığ-avalanche-borç-kapatma-motoru">🏔️ Çığ Simülatörü</a> •
     <a href="#-kurulum-ve-kullanım">🚀 Kurulum</a> •
     <a href="#-güvenlik-ve-gizlilik">🔐 Gizlilik</a>
@@ -71,10 +71,10 @@ FinFlow Pro'yu herhangi bir kurulum yapmadan doğrudan tarayıcınızda deneyiml
 * 📝 **Taksitli Krediler:** Anapara ve faiz ayrıştırması, kalan taksit sayısı ve vade günleri.
 * 💸 **Kısmi Ödeme (Partial Pay) Modu:** Borcun tamamını kapatamasanız bile yaptığınız ara ödemeleri tek tıkla düşebilme imkanı.
 
-### 3. 🤖 Yapay Zeka ve OCR Motoru (Google Gemini Destekli)
-* 📄 **Findeks & Banka Raporu Ayrıştırma:** Findeks PDF raporu veya banka ekstresi görüntüsü yükleyin; yapay zeka kart, kredi ve KMH borçlarını tespit edip tek tıkla portföyünüze eklesin.
-* 💬 **Kişiselleştirilmiş Finansal Sohbet Asistanı:** Portföyünüzün anlık finansal durumunu (gelir, borç, faiz maliyetleri) bağlam olarak alarak size en karlı borç kapatma stratejisini öneren akıllı asistan.
-* 🆓 **Ücretsiz API Desteği:** Google AI Studio'dan aldığınız ücretsiz API anahtarını Ayarlar bölümünden ekleyerek sınırsız analiz yapabilirsiniz.
+### 3. 📊 Akıllı Excel & CSV İçe Aktarma Motoru
+* 📑 **Bütüncül Hata Denetimi:** Sayı, tarih ve tutar sütunlarındaki boşluk, virgül/nokta karışıklıkları (`1.250,50 TL`), `₺` simgeleri ve tırnak işaretlerini otomatik temizleyerek sıfır hatayla içe aktarır.
+* 🔍 **Esnek Kolon Eşleme (Fuzzy Matcher):** Farklı bankaların (Garanti, İş Bankası, Yapı Kredi, Akbank vb.) farklı sütun isimlerini (`Tutar`, `Bakiye`, `İşlem Tutarı`, `Borç`, `Son Ödeme`, `Vade`) otomatik eşler.
+* 🗂️ **Çoklu Tablo & Taksit Şeması Desteği:** Tek bir Excel sayfasındaki alt tabloları, vadeleri ve taksit dağılımlarını (`9 taksit`, `12 ay`) algılayarak portföye eksiksiz dağıtır.
 
 ### 4. 🏔️ Çığ (Avalanche) ve Kartopu Simülatörü
 * **Matematiksel Olarak En Kârlı Strateji:** Faiz oranı en yüksek borcu önce kapatarak toplam faiz ve vergi kaybını sıfırlama simülasyonu.
@@ -110,7 +110,7 @@ FinFlow Pro, gereksiz framework yüklerinden arındırılmış, hafif ve son der
 | **Grafikler** | [Chart.js](https://www.chartjs.org/) | Nakit akışı ve borç karşılama oranları için reaktif grafikler |
 | **İkonlar** | [Lucide Icons](https://lucide.dev/) | Minimalist ve tutarlı vektörel arayüz simgeleri |
 | **Excel Motoru** | [SheetJS (xlsx.full.min.js)](https://sheetjs.com/) | Tarayıcı içinde doğrudan istemci taraflı Excel okuma & yazma |
-| **Yapay Zeka** | Google Gemini 2.5 Flash API | Multimodal görme (vision OCR) ve finansal sohbet motoru |
+| **Algoritma Motoru** | FinFlow Avalanche & Snowball Engine | Yerel, anlık borç kapatma ve optimizasyon simülasyonu |
 | **PWA & Önbellek** | Service Worker (v7) & Manifest | Çevrimdışı (offline) kullanım ve tam PWA deneyimi |
 
 ---
@@ -136,17 +136,13 @@ Tarayıcınızda `http://localhost:3000` adresine gidin.
 
 ---
 
-## 🤖 Gemini API Anahtarı Nasıl Eklenir?
+## 📊 Excel ile Veri Nasıl Yüklenir?
 
-FinFlow Pro, varsayılan olarak dahili akıllı finansal kural motoruyla çalışır. Gerçek zamanlı Gemini 2.5 Flash yapay zeka modelini tam kapasite kullanmak için:
+FinFlow Pro, banka ekstrelerinizi ve borç tablolarınızı tek tıkla içeri aktarır:
 
-1. [Google AI Studio](https://aistudio.google.com/) adresine gidin ve Google hesabınızla ücretsiz giriş yapın.
-2. **"Get API Key"** butonuna tıklayarak ücretsiz bir API anahtarı üretin.
-3. FinFlow Pro arayüzünde üst menüdeki **"Ayarlar & Kredi"** sekmesine tıklayın.
-4. API anahtarınızı yapıştırıp **"Anahtarı Kaydet"** butonuna basın.
-
-> [!NOTE]
-> API anahtarınız yalnızca sizin tarayıcınızın yerel belleğinde şifreli biçimde saklanır ve doğrudan Google Gemini uç noktasına istek atmak dışında hiçbir yere iletilmez.
+1. Üst menüdeki veya Ayarlar'daki **"Örnek Şablon"** butonuna basarak örnek `.xlsx` dosyasını indirin.
+2. Gelir, gider, kart ve kredi verilerinizi şablona girin ya da bankanızın verdiği tabloyu doğrudan yükleyin.
+3. **"Excel İçe Aktar"** butonuna basarak dosyanızı seçin; FinFlow akıllı doğrulama motoru verileri otomatik olarak ayrıştırıp portföyünüze ekleyecektir.
 
 ---
 
@@ -158,9 +154,7 @@ FinFlow Pro kullanıcı mahremiyetini birinci öncelik olarak kabul eder:
 [Kullanıcı Cihazı / Tarayıcı]
        │
        ├──► localStorage (Gelir, Gider, Borç Verileri - Sadece cihazınızda)
-       ├──► Service Worker (İnternetsiz çalışma ve statik önbellek)
-       │
-       └──► (Opsiyonel) Google Gemini API (Sadece OCR analizi talep edildiğinde doğrudan istek)
+       └──► Service Worker (İnternetsiz çalışma ve statik önbellek)
        
 [Dış Sunucu / Veritabanı / Telemetri] ──► YOK (0 Sunucu)
 ```
