@@ -998,7 +998,7 @@
                   <span class="text-[11px] text-slate-400">Manuel Tutar:</span>
                   <div class="relative flex-1">
                     <input type="number" id="simExtraCashInput" min="0" step="100" value="1000" oninput="updateSimFromInput(this.value)" class="w-full bg-slate-950 border border-slate-800 focus:border-cyan-400 rounded-xl px-3 py-1.5 text-xs text-white font-bold focus:outline-none transition">
-                    <span class="absolute right-3 top-2 text-[10px] text-slate-500 font-bold">₺</span>
+                    <span class="cur-sym absolute right-3 top-2 text-[10px] text-slate-500 font-bold">₺</span>
                   </div>
                 </div>
               </div>
@@ -1157,7 +1157,7 @@
           <div class="text-xs text-slate-400 mt-0.5">Mevcut Bakiye: <span id="partialPayCurrentDebt" class="text-rose-400 font-bold">₺0,00</span></div>
         </div>
         <div>
-          <label class="block text-xs text-slate-300 mb-1">Yatırılacak Ödeme Tutarı (₺) *</label>
+          <label class="block text-xs text-slate-300 mb-1">Yatırılacak Ödeme Tutarı (<span class="cur-sym">₺</span>) *</label>
           <input type="number" id="partialPayAmount" step="0.01" min="0.01" required placeholder="500" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-teal-500 transition">
         </div>
         <button type="submit" class="soft-btn w-full bg-teal-600 hover:bg-teal-500 active:bg-teal-700 py-2.5 rounded-xl text-xs font-bold text-white transition shadow-md shadow-teal-600/20">Ödemeyi Düş</button>
@@ -1248,17 +1248,17 @@
 
         <div class="grid grid-cols-2 gap-2.5">
           <div id="uFieldLimit">
-            <label class="block text-[11px] text-slate-400 mb-1">Toplam Limit (₺)</label>
+            <label class="block text-[11px] text-slate-400 mb-1">Toplam Limit (<span class="cur-sym">₺</span>)</label>
             <input type="number" id="uLimitVal" step="0.01" min="0" placeholder="50000" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 transition">
           </div>
 
           <div id="uFieldDebt">
-            <label id="uDebtLabel" class="block text-[11px] text-slate-400 mb-1">Dönem Borcu (₺) *</label>
+            <label id="uDebtLabel" class="block text-[11px] text-slate-400 mb-1">Dönem Borcu (<span class="cur-sym">₺</span>) *</label>
             <input type="number" id="uDebtVal" step="0.01" min="0.01" required placeholder="14500" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 transition">
           </div>
 
           <div id="uFieldMin">
-            <label class="block text-[11px] text-slate-400 mb-1">Asgari / Aylık Ödeme (₺)</label>
+            <label class="block text-[11px] text-slate-400 mb-1">Asgari / Aylık Ödeme (<span class="cur-sym">₺</span>)</label>
             <input type="number" id="uMinVal" step="0.01" min="0" placeholder="Boşsa oto hesaplanır" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 transition">
           </div>
 
@@ -1299,7 +1299,7 @@
         </div>
         <div class="grid grid-cols-2 gap-2">
           <div>
-            <label class="block text-[11px] text-slate-400 mb-1">Aylık Tutar (₺) *</label>
+            <label class="block text-[11px] text-slate-400 mb-1">Aylık Tutar (<span class="cur-sym">₺</span>) *</label>
             <input type="number" id="mIncomeAmount" step="0.01" min="0.01" required placeholder="28000" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500 transition">
           </div>
           <div>
@@ -1326,7 +1326,7 @@
         </div>
         <div class="grid grid-cols-2 gap-2">
           <div>
-            <label class="block text-[11px] text-slate-400 mb-1">Aylık Tutar (₺) *</label>
+            <label class="block text-[11px] text-slate-400 mb-1">Aylık Tutar (<span class="cur-sym">₺</span>) *</label>
             <input type="number" id="mExpenseAmount" step="0.01" min="0.01" required placeholder="12000" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-rose-500 transition">
           </div>
           <div>
@@ -1518,7 +1518,7 @@
     /* Format Currency function supporting USD, TRY, EUR */
     function formatCurrency(v, forceDecimals = null) {
       const n = Number(v);
-      const cur = (userPortfolio && userPortfolio.settings && userPortfolio.settings.currency) || 'TRY';
+      const cur = getCurrencyCode();
       const minDec = forceDecimals !== null ? forceDecimals : (n % 1 !== 0 ? 2 : 0);
       const maxDec = forceDecimals !== null ? forceDecimals : 2;
 
@@ -1532,12 +1532,30 @@
       return new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(isFinite(n) ? n : 0);
     }
 
+    function getCurrencyCode() {
+      const c = (userPortfolio && userPortfolio.settings && userPortfolio.settings.currency) || 'TRY';
+      return ['TRY', 'USD', 'EUR'].includes(c) ? c : 'TRY';
+    }
+
+    function getCurrencySymbol() {
+      return { TRY: '₺', USD: '$', EUR: '€' }[getCurrencyCode()];
+    }
+
+    /* Para birimi seçiciyi, etiketleri ve sembolleri seçili birime eşitler */
+    function syncCurrencyUI() {
+      const sym = getCurrencySymbol();
+      const sel = document.getElementById('currencySelect');
+      if (sel && sel.value !== getCurrencyCode()) sel.value = getCurrencyCode();
+      document.querySelectorAll('.cur-sym').forEach(el => { if (el.textContent !== sym) el.textContent = sym; });
+    }
+
     /* Currency change */
     function changeCurrency(curr) {
+      if (!['TRY', 'USD', 'EUR'].includes(curr)) curr = 'TRY';
       userPortfolio.settings.currency = curr;
-      document.getElementById('currencySelect').value = curr;
+      syncCurrencyUI();
       saveState();
-      renderAll();
+      updateSettingsUI();
     }
 
     function toggleSummaryDropdown() {
@@ -2336,9 +2354,9 @@ const STORAGE_KEY = 'finflow_portfolio_v18';
     }
 
     /* FORMAT & DÖNÜŞÜMLER */
+    /* Geriye dönük uyumluluk: tüm tutarlar seçili para birimiyle (TRY/USD/EUR) gösterilir */
     function formatTRY(v) {
-      const n = Number(v);
-      return new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(isFinite(n) ? n : 0);
+      return formatCurrency(v, 2);
     }
 
     /* 
@@ -3105,7 +3123,7 @@ const STORAGE_KEY = 'finflow_portfolio_v18';
             </div>
             <div class="space-y-1.5 text-xs bg-[#080d19] p-3 rounded-xl border border-white/5">
               <div class="flex justify-between"><span class="text-slate-400">Dönem Borcu:</span> <span class="font-black ${isZero ? 'text-emerald-400' : 'text-rose-400'}">${formatTRY(debt)}</span></div>
-              <div class="flex justify-between text-amber-400"><span>Asgari:</span> <span class="font-bold">${isZero ? '₺0,00' : formatTRY(c.minPay || (debt * 0.2))}</span></div>
+              <div class="flex justify-between text-amber-400"><span>Asgari:</span> <span class="font-bold">${isZero ? formatTRY(0) : formatTRY(c.minPay || (debt * 0.2))}</span></div>
               <div class="flex justify-between text-slate-500 text-[10px]"><span>Son Ödeme:</span> <span class="text-slate-300 font-medium">${escapeHtml(c.dueDate || '-')}</span></div>
             </div>
             <div>
@@ -3136,7 +3154,7 @@ const STORAGE_KEY = 'finflow_portfolio_v18';
     function reopenCard(id) {
       const c = userPortfolio.cards.find(item => item.id === id);
       if (!c) return;
-      const newDebt = prompt(`"${c.bank}" kartı için güncel dönem borcu tutarını girin (₺):`, "5000");
+      const newDebt = prompt(`"${c.bank}" kartı için güncel dönem borcu tutarını girin (${getCurrencySymbol()}):`, "5000");
       if (newDebt !== null) {
         if (!/\d/.test(newDebt)) {
           return alert('Lütfen geçerli bir tutar girin.');
@@ -3202,7 +3220,7 @@ const STORAGE_KEY = 'finflow_portfolio_v18';
               </div>
               <div class="flex justify-between items-center text-purple-300">
                 <span class="text-[11px]">Aylık Faiz Yükü:</span>
-                <span class="font-semibold font-mono text-xs">${isZero ? '₺0,00' : formatTRY(k.monthlyPay || (debt * 0.05))}</span>
+                <span class="font-semibold font-mono text-xs">${isZero ? formatTRY(0) : formatTRY(k.monthlyPay || (debt * 0.05))}</span>
               </div>
               <div class="flex justify-between items-center text-slate-500 text-[10px]">
                 <span>Kesim / Vade:</span>
@@ -3248,7 +3266,7 @@ const STORAGE_KEY = 'finflow_portfolio_v18';
     function reopenKMH(id) {
       const k = userPortfolio.kmh.find(item => item.id === id);
       if (!k) return;
-      const newDebt = prompt(`"${k.bank}" için güncel kullanılan eksi bakiye tutarını girin (₺):`, "5000");
+      const newDebt = prompt(`"${k.bank}" için güncel kullanılan eksi bakiye tutarını girin (${getCurrencySymbol()}):`, "5000");
       if (newDebt !== null) {
         if (!/\d/.test(newDebt)) {
           return alert('Lütfen geçerli bir tutar girin.');
@@ -3885,17 +3903,17 @@ const STORAGE_KEY = 'finflow_portfolio_v18';
         fieldLimit.classList.remove('hidden');
         fieldMin.classList.remove('hidden');
         fieldInstCount.classList.add('hidden');
-        debtLabel.textContent = "Dönem Borcu (₺) *";
+        debtLabel.textContent = `Dönem Borcu (${getCurrencySymbol()}) *`;
       } else if (type === 'kmh') {
         fieldLimit.classList.remove('hidden');
         fieldMin.classList.remove('hidden');
         fieldInstCount.classList.add('hidden');
-        debtLabel.textContent = "Kullanılan Borç (₺) *";
+        debtLabel.textContent = `Kullanılan Borç (${getCurrencySymbol()}) *`;
       } else {
         fieldLimit.classList.add('hidden');
         fieldMin.classList.add('hidden');
         fieldInstCount.classList.remove('hidden');
-        debtLabel.textContent = "Aylık Taksit Tutarı (₺) *";
+        debtLabel.textContent = `Aylık Taksit Tutarı (${getCurrencySymbol()}) *`;
       }
     }
 
@@ -4505,6 +4523,7 @@ const STORAGE_KEY = 'finflow_portfolio_v18';
     renderAll = function() {
       _origRenderAll();
       renderProDashboard();
+      syncCurrencyUI();
       safeCreateIcons();
     };
 
