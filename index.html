@@ -1102,6 +1102,8 @@
     };
 
     let isLoaded = false;
+    let isAppUnlocked = false;
+    let isPinVerifying = false;
     let activeCategory = 'all';
     let cashflowChart = null;
     let partialPayItem = null;
@@ -1163,6 +1165,12 @@
       });
     });
 
+    window.addEventListener('load', () => {
+      safeCreateIcons();
+      if (!cashflowChart) initCashflowChart();
+      if (isLoaded) renderKPIs();
+    });
+
     async function loadState() {
       try {
         let raw = null;
@@ -1195,10 +1203,9 @@
     async function saveState() {
       try {
         const val = JSON.stringify(userPortfolio);
+        localStorage.setItem(STORAGE_KEY, val);
         if (window.storage && typeof window.storage.set === 'function') {
           await window.storage.set(STORAGE_KEY, val, false);
-        } else {
-          localStorage.setItem(STORAGE_KEY, val);
         }
       } catch (err) {
         console.error('Kayıt hatası:', err);
@@ -1207,17 +1214,23 @@
     }
 
     /* PIN GÜVENLİK SİSTEMİ & AÇILMA ANİMASYONU */
-    function checkSecurityPIN() {
+    function checkSecurityPIN(forceShow = false) {
       const lockScreen = document.getElementById('pinLockScreen');
       const lockBtn = document.getElementById('lockAppBtn');
       const pinHeaderIcon = document.getElementById('pinHeaderIcon');
 
-      if (userPortfolio.settings.pin && userPortfolio.settings.pin.trim() !== '') {
-        lockScreen.classList.remove('hidden');
+      const hasPin = userPortfolio.settings.pin && userPortfolio.settings.pin.trim() !== '';
+
+      if (hasPin) {
+        if (!isAppUnlocked || forceShow) {
+          lockScreen.classList.remove('hidden');
+          document.documentElement.classList.add('pin-required');
+        }
         document.getElementById('pinHeaderStatus').textContent = 'PIN Aktif';
         if (lockBtn) lockBtn.classList.remove('hidden');
         if (pinHeaderIcon) pinHeaderIcon.className = 'w-4 h-4 text-emerald-400';
       } else {
+        isAppUnlocked = true;
         lockScreen.classList.add('hidden');
         document.documentElement.classList.remove('pin-required');
         document.getElementById('pinHeaderStatus').textContent = 'PIN Ayarla';
@@ -1231,6 +1244,7 @@
         openPinModal();
         return;
       }
+      isAppUnlocked = false;
       const lockScreen = document.getElementById('pinLockScreen');
       const input = document.getElementById('pinInput');
       input.value = '';
@@ -1241,6 +1255,7 @@
     }
 
     function verifyPIN() {
+      if (isPinVerifying) return;
       const input = document.getElementById('pinInput').value.trim();
       const err = document.getElementById('pinError');
       const card = document.getElementById('pinCard');
@@ -1248,6 +1263,8 @@
       const screen = document.getElementById('pinLockScreen');
 
       if (input === userPortfolio.settings.pin) {
+        isPinVerifying = true;
+        isAppUnlocked = true;
         err.classList.add('hidden');
         document.documentElement.classList.remove('pin-required');
 
@@ -1270,6 +1287,11 @@
             iconBox.className = 'w-16 h-16 bg-indigo-600/20 border border-indigo-500/40 rounded-2xl flex items-center justify-center mx-auto text-indigo-400 shadow-xl shadow-indigo-600/20 transition-all duration-300';
             document.getElementById('pinInput').value = '';
             safeCreateIcons();
+            if (cashflowChart) {
+              try { cashflowChart.resize(); } catch(e) {}
+            }
+            renderAll();
+            isPinVerifying = false;
           }, 300);
         }, 200);
 
@@ -1320,9 +1342,10 @@
 
       errEl.classList.add('hidden');
       userPortfolio.settings.pin = val;
+      isAppUnlocked = true;
       saveState();
       closePinModal();
-      checkSecurityPIN();
+      checkSecurityPIN(false);
     }
 
     /* FORMAT & DÖNÜŞÜMLER */
@@ -1388,16 +1411,20 @@
         return !isNaN(d.getTime()) ? getLocalDateString(d) : "";
       }
       const s = String(val).trim();
-      // 1. DD/MM/YYYY or DD.MM.YYYY anywhere in string
-      const dotMatch = s.match(/(\d{1,2})[./](\d{1,2})[./](\d{4})/);
-      if (dotMatch) {
-        return `${dotMatch[3]}-${dotMatch[2].padStart(2,'0')}-${dotMatch[1].padStart(2,'0')}`;
+      // 1. ISO YYYY-MM-DD, YYYY.MM.DD, YYYY/MM/DD
+      const isoMatch = s.match(/^(\d{4})[./-](\d{1,2})[./-](\d{1,2})/);
+      if (isoMatch) {
+        return `${isoMatch[1]}-${isoMatch[2].padStart(2,'0')}-${isoMatch[3].padStart(2,'0')}`;
       }
-      // 2. ISO YYYY-MM-DD
-      const isoMatch = s.match(/(\d{4})-(\d{2})-(\d{2})/);
-      if (isoMatch) return isoMatch[0];
-      // 3. Day of month e.g. "Her ayın 28'i" or "21-22'si"
-      const dayMatch = s.match(/(?:her\s+ay[iı]n|ay[iı]n)?\s*(\d{1,2})/i);
+      // 2. DD.MM.YYYY, DD/MM/YYYY, DD-MM-YYYY, or 2-digit year DD.MM.YY
+      const dmyMatch = s.match(/^(\d{1,2})[./-](\d{1,2})[./-](\d{2,4})/);
+      if (dmyMatch) {
+        let yr = dmyMatch[3];
+        if (yr.length === 2) yr = '20' + yr;
+        return `${yr}-${dmyMatch[2].padStart(2,'0')}-${dmyMatch[1].padStart(2,'0')}`;
+      }
+      // 3. Day of month e.g. "Her ayın 28'i" or standalone day "28"
+      const dayMatch = s.match(/(?:her\s+ay[iı]n\s+|ay[iı]n\s+)?(\d{1,2})/i);
       if (dayMatch) {
         const day = Math.max(1, Math.min(31, parseInt(dayMatch[1])));
         const now = new Date();
@@ -1417,7 +1444,7 @@
     }
 
     function escapeHtml(str) {
-      if (!str) return '';
+      if (str === null || str === undefined) return '';
       return String(str)
         .replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')
@@ -1429,6 +1456,8 @@
     function normalizeText(str) {
       if (!str) return '';
       return String(str)
+        .replace(/İ/g, 'i')
+        .replace(/I/g, 'i')
         .toLowerCase()
         .replace(/ğ/g, 'g')
         .replace(/ü/g, 'u')
@@ -1674,9 +1703,10 @@
         const item = userPortfolio.cards.find(c => c.id === id);
         if (item) {
           const originalDebt = item.debt;
-          item.debt = Math.max(0, item.debt - pay);
-          item.minPay = Math.max(0, (item.minPay || 0) - pay);
-          if (item.debt === 0) {
+          item.debt = Math.max(0, Math.round((item.debt - pay) * 100) / 100);
+          item.minPay = Math.max(0, Math.round(((item.minPay || 0) - pay) * 100) / 100);
+          if (item.debt <= 0.009) {
+            item.debt = 0;
             item.isSettled = true;
             item.minPay = 0;
             archiveItem('card', item, originalDebt);
@@ -1686,9 +1716,10 @@
         const item = userPortfolio.kmh.find(k => k.id === id);
         if (item) {
           const originalDebt = item.debt;
-          item.debt = Math.max(0, item.debt - pay);
+          item.debt = Math.max(0, Math.round((item.debt - pay) * 100) / 100);
           item.monthlyPay = Math.round(item.debt * 0.05 * 100) / 100;
-          if (item.debt === 0) {
+          if (item.debt <= 0.009) {
+            item.debt = 0;
             item.isSettled = true;
             item.monthlyPay = 0;
             archiveItem('kmh', item, originalDebt);
@@ -1698,10 +1729,24 @@
         const item = userPortfolio.loans.find(l => l.id === id);
         if (item) {
           const originalDebt = item.amount;
-          item.amount = Math.max(0, item.amount - pay);
-          if (item.amount === 0) {
+          item.amount = Math.max(0, Math.round((item.amount - pay) * 100) / 100);
+          if (item.amount <= 0.009) {
+            item.amount = 0;
             item.isSettled = true;
-            archiveItem('loan', item, originalDebt);
+            const archiveKey = `${item.loanName} (Tüm Taksitler)`;
+            const sameLoan = userPortfolio.loans.filter(x => x.loanName === item.loanName);
+            const allSettled = sameLoan.length > 0 && sameLoan.every(x => x.isSettled);
+            const alreadyArchived = userPortfolio.archive.some(a => a.title === archiveKey && a.type === 'Kredi (Tamamlandı)');
+            if (allSettled && !alreadyArchived) {
+              const totalLoanAmount = sameLoan.reduce((sum, x) => sum + (Number(x.amount) || 0), 0);
+              userPortfolio.archive.unshift({
+                id: generateId(),
+                title: archiveKey,
+                type: 'Kredi (Tamamlandı)',
+                settledDate: getLocalDateString(),
+                originalAmount: totalLoanAmount || originalDebt
+              });
+            }
           }
         }
       }
@@ -1770,10 +1815,16 @@
       document.getElementById('kpiFreeCashStatus').textContent = f.freeCash >= 0 ? 'Pozitif Bakiye' : 'Bütçe Eksiği';
       animateNumber(document.getElementById('kpiGrandTotal'), f.grandTotal);
 
+      if (!cashflowChart && typeof Chart !== 'undefined') {
+        initCashflowChart();
+      }
+
       if (cashflowChart) {
         if (f.totalIncome === 0 && f.totalMandatoryOutflow === 0) {
-          cashflowChart.data.datasets[0].data = [0, 100];
+          cashflowChart.data.datasets[0].backgroundColor = ['#334155', '#1e293b'];
+          cashflowChart.data.datasets[0].data = [0, 1];
         } else {
+          cashflowChart.data.datasets[0].backgroundColor = ['#f43f5e', '#10b981'];
           cashflowChart.data.datasets[0].data = [f.totalMandatoryOutflow, Math.max(0, f.freeCash)];
         }
         cashflowChart.update();
@@ -1990,10 +2041,14 @@
       if (!c) return;
       const newDebt = prompt(`"${c.bank}" kartı için güncel dönem borcu tutarını girin (₺):`, "5000");
       if (newDebt !== null) {
+        if (!/\d/.test(newDebt)) {
+          return alert('Lütfen geçerli bir tutar girin.');
+        }
         const parsed = parseTRNumber(newDebt);
         if (parsed >= 0) {
           c.debt = parsed;
-          c.minPay = parsed > 0 ? (c.limit > 25000 ? Math.round(parsed * 0.4 * 100) / 100 : Math.round(parsed * 0.2 * 100) / 100) : 0;
+          const limitVal = Number(c.limit) || 0;
+          c.minPay = parsed > 0 ? (limitVal > 25000 ? Math.round(parsed * 0.4 * 100) / 100 : Math.round(parsed * 0.2 * 100) / 100) : 0;
           c.isSettled = (parsed === 0);
           saveState();
         }
@@ -2075,6 +2130,9 @@
       if (!k) return;
       const newDebt = prompt(`"${k.bank}" için güncel kullanılan eksi bakiye tutarını girin (₺):`, "5000");
       if (newDebt !== null) {
+        if (!/\d/.test(newDebt)) {
+          return alert('Lütfen geçerli bir tutar girin.');
+        }
         const parsed = parseTRNumber(newDebt);
         if (parsed >= 0) {
           k.debt = parsed;
@@ -2421,6 +2479,11 @@
       const extra = (typeof extraVal === 'number' && !isNaN(extraVal)) ? extraVal : 1000;
       const totalDebt = f.grandTotal;
 
+      const sliderEl = document.getElementById('simSlider');
+      const inputEl = document.getElementById('simExtraCashInput');
+      if (sliderEl && document.activeElement !== sliderEl) sliderEl.value = extra;
+      if (inputEl && document.activeElement !== inputEl) inputEl.value = extra;
+
       if (totalDebt <= 0) {
         document.getElementById('simStandardMonths').textContent = '0 Ay';
         document.getElementById('simAcceleratedMonths').textContent = '0 Ay';
@@ -2454,6 +2517,12 @@
     }
 
     /* ZAFER LİSTESİ */
+    function deleteArchiveItem(id) {
+      if (!confirm('Bu zafer kaydını arşivden silmek istediğinize emin misiniz?')) return;
+      userPortfolio.archive = userPortfolio.archive.filter(a => a.id !== id);
+      saveState();
+    }
+
     function renderArchive() {
       const grid = document.getElementById('archiveListGrid');
       const totalSavedEl = document.getElementById('archiveTotalSaved');
@@ -2470,8 +2539,11 @@
       grid.innerHTML = userPortfolio.archive.map(a => `
         <div class="soft-card bg-slate-950 border border-slate-800 hover:border-amber-500/40 p-3.5 rounded-xl space-y-2">
           <div class="flex justify-between items-start">
-            <span class="text-[9px] bg-emerald-950 text-emerald-300 border border-emerald-800 px-1.5 py-0.2 rounded font-bold">${a.type}</span>
-            <span class="text-[10px] text-slate-500">${a.settledDate}</span>
+            <span class="text-[9px] bg-emerald-950 text-emerald-300 border border-emerald-800 px-1.5 py-0.2 rounded font-bold">${escapeHtml(a.type)}</span>
+            <div class="flex items-center gap-2">
+              <span class="text-[10px] text-slate-500">${escapeHtml(a.settledDate)}</span>
+              <button onclick="deleteArchiveItem('${a.id}')" class="soft-btn text-slate-500 hover:text-rose-400 p-0.5 transition" title="Arşivden Sil"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+            </div>
           </div>
           <div class="font-bold text-white text-xs">${escapeHtml(a.title)}</div>
           <div class="flex justify-between text-xs pt-1 border-t border-slate-800">
@@ -2527,13 +2599,16 @@
     function closeExportModal() { closeModalById('exportModal'); }
 
     function exportToJSON() {
-      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(userPortfolio, null, 2));
+      const jsonStr = JSON.stringify(userPortfolio, null, 2);
+      const blob = new Blob([jsonStr], { type: 'application/json;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
       const dl = document.createElement('a');
-      dl.setAttribute("href", dataStr);
-      dl.setAttribute("download", `FinFlow_Yedek_${getLocalDateString()}.json`);
+      dl.href = url;
+      dl.download = `FinFlow_Yedek_${getLocalDateString()}.json`;
       document.body.appendChild(dl);
       dl.click();
       document.body.removeChild(dl);
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
     }
 
     function exportToExcel() {
@@ -2555,12 +2630,21 @@
         "Vade": l.dueDate,
         "Durum": l.isSettled ? "Ödendi" : "Bekliyor"
       }));
+      const archiveData = (userPortfolio.archive || []).map(a => ({
+        "Başlık": a.title,
+        "Tür": a.type,
+        "Sıfırlanan Bakiye": a.originalAmount,
+        "Kapatılma Tarihi": a.settledDate
+      }));
 
       XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(incData), "Gelirler");
       XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(expData), "Giderler");
       XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(cardData), "Kartlar");
       XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(kmhData), "KMH");
       XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(loanData), "Taksitler");
+      if (archiveData.length > 0) {
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(archiveData), "Kapatılanlar");
+      }
 
       XLSX.writeFile(wb, `FinFlow_Portfoy_${getLocalDateString()}.xlsx`);
     }
@@ -2600,7 +2684,7 @@
     function openIncomeModal() { openModalById('incomeModal'); }
     function closeIncomeModal() { closeModalById('incomeModal'); }
     function saveIncome(e) {
-      e.preventDefault();
+      if (e && e.preventDefault) e.preventDefault();
       const amount = parseFloat(document.getElementById('mIncomeAmount').value) || 0;
       const title = document.getElementById('mIncomeTitle').value.trim();
       if (!title || amount <= 0) return;
@@ -2612,14 +2696,18 @@
       });
       saveState();
       closeIncomeModal();
-      e.target.reset();
+      if (e?.target?.reset) e.target.reset();
     }
-    function deleteIncome(id) { userPortfolio.incomes = userPortfolio.incomes.filter(i => i.id !== id); saveState(); }
+    function deleteIncome(id) {
+      if (!confirm('Bu geliri silmek istediğinize emin misiniz?')) return;
+      userPortfolio.incomes = userPortfolio.incomes.filter(i => i.id !== id);
+      saveState();
+    }
 
     function openExpenseModal() { openModalById('expenseModal'); }
     function closeExpenseModal() { closeModalById('expenseModal'); }
     function saveExpense(e) {
-      e.preventDefault();
+      if (e && e.preventDefault) e.preventDefault();
       const amount = parseFloat(document.getElementById('mExpenseAmount').value) || 0;
       const title = document.getElementById('mExpenseTitle').value.trim();
       const isSub = document.getElementById('mExpenseIsSub').checked;
@@ -2633,9 +2721,13 @@
       });
       saveState();
       closeExpenseModal();
-      e.target.reset();
+      if (e?.target?.reset) e.target.reset();
     }
-    function deleteExpense(id) { userPortfolio.expenses = userPortfolio.expenses.filter(x => x.id !== id); saveState(); }
+    function deleteExpense(id) {
+      if (!confirm('Bu gideri silmek istediğinize emin misiniz?')) return;
+      userPortfolio.expenses = userPortfolio.expenses.filter(x => x.id !== id);
+      saveState();
+    }
 
     function openUniversalDebtModal() {
       document.getElementById('uDueDate').value = getLocalDateString();
@@ -2677,7 +2769,7 @@
     }
 
     function saveUniversalDebt(e) {
-      e.preventDefault();
+      if (e && e.preventDefault) e.preventDefault();
       const errorEl = document.getElementById('uFormError');
       errorEl.classList.add('hidden');
 
@@ -2744,7 +2836,7 @@
 
       saveState();
       closeUniversalDebtModal();
-      e.target.reset();
+      if (e?.target?.reset) e.target.reset();
     }
 
     function settleCardFully(id) {
@@ -2773,8 +2865,16 @@
       }
     }
 
-    function deleteCard(id) { userPortfolio.cards = userPortfolio.cards.filter(c => c.id !== id); saveState(); }
-    function deleteKMH(id) { userPortfolio.kmh = userPortfolio.kmh.filter(k => k.id !== id); saveState(); }
+    function deleteCard(id) {
+      if (!confirm('Bu kartı ve tüm borç kaydını silmek istediğinize emin misiniz?')) return;
+      userPortfolio.cards = userPortfolio.cards.filter(c => c.id !== id);
+      saveState();
+    }
+    function deleteKMH(id) {
+      if (!confirm('Bu KMH hesabını silmek istediğinize emin misiniz?')) return;
+      userPortfolio.kmh = userPortfolio.kmh.filter(k => k.id !== id);
+      saveState();
+    }
     
     function toggleLoan(id) {
       const l = userPortfolio.loans.find(item => item.id === id);
@@ -2802,7 +2902,11 @@
       saveState();
     }
 
-    function deleteLoan(id) { userPortfolio.loans = userPortfolio.loans.filter(l => l.id !== id); saveState(); }
+    function deleteLoan(id) {
+      if (!confirm('Bu taksiti silmek istediğinize emin misiniz?')) return;
+      userPortfolio.loans = userPortfolio.loans.filter(l => l.id !== id);
+      saveState();
+    }
 
     /* BİLDİRİMLER */
     async function toggleNotifications() {
@@ -2836,28 +2940,35 @@
     function checkDueDatesAndNotify(manualTrigger = false) {
       if (!('Notification' in window) || Notification.permission !== 'granted') return;
       const today = getLocalDateString();
-      const dueItems = [];
+      const dueToday = [];
+      const overdue = [];
 
       userPortfolio.cards.forEach(c => {
-        if (!c.isSettled && (Number(c.debt) || 0) > 0 && c.dueDate === today) {
-          dueItems.push(`${c.bank} Kartı (${formatTRY(c.minPay || c.debt * 0.2)})`);
+        if (!c.isSettled && (Number(c.debt) || 0) > 0) {
+          if (c.dueDate === today) dueToday.push(`${c.bank} Kartı (${formatTRY(c.minPay || c.debt * 0.2)})`);
+          else if (c.dueDate < today) overdue.push(`${c.bank} Kartı`);
         }
       });
       userPortfolio.kmh.forEach(k => {
-        if (!k.isSettled && (Number(k.debt) || 0) > 0 && k.dueDate === today) {
-          dueItems.push(`${k.bank} KMH (${formatTRY(k.monthlyPay || k.debt * 0.05)})`);
+        if (!k.isSettled && (Number(k.debt) || 0) > 0) {
+          if (k.dueDate === today) dueToday.push(`${k.bank} KMH (${formatTRY(k.monthlyPay || k.debt * 0.05)})`);
+          else if (k.dueDate < today) overdue.push(`${k.bank} KMH`);
         }
       });
       userPortfolio.loans.forEach(l => {
-        if (!l.isSettled && (Number(l.amount) || 0) > 0 && l.dueDate === today) {
-          dueItems.push(`${l.loanName || 'Kredi'} #${l.instNo} (${formatTRY(l.amount)})`);
+        if (!l.isSettled && (Number(l.amount) || 0) > 0) {
+          if (l.dueDate === today) dueToday.push(`${l.loanName || 'Kredi'} #${l.instNo} (${formatTRY(l.amount)})`);
+          else if (l.dueDate < today) overdue.push(`${l.loanName || 'Kredi'} #${l.instNo}`);
         }
       });
 
-      if (dueItems.length > 0) {
-        new Notification('⚠️ Bugün Son Ödeme Günü!', { body: `Ödenmesi gereken ${dueItems.length} borcunuz var: ${dueItems.join(', ')}`, icon: './icon-192.png' });
+      if (dueToday.length > 0 || overdue.length > 0) {
+        let msg = '';
+        if (dueToday.length > 0) msg += `Bugün son gün: ${dueToday.join(', ')}. `;
+        if (overdue.length > 0) msg += `Gecikmiş (${overdue.length} adet): ${overdue.join(', ')}.`;
+        new Notification('⚠️ FinFlow: Ödeme Hatırlatması!', { body: msg.trim(), icon: './icon-192.png' });
       } else if (manualTrigger) {
-        new Notification('FinFlow Pro', { body: 'Bugün için vadesi dolan açık borcunuz bulunmuyor.', icon: './icon-192.png' });
+        new Notification('FinFlow Pro', { body: 'Bugün için vadesi dolan veya gecikmiş açık borcunuz bulunmuyor.', icon: './icon-192.png' });
       }
     }
 
@@ -3491,7 +3602,12 @@ SADECE ve SADECE aşağıdaki JSON formatında geçerli bir JSON çıktısı ür
           const resJson = await res.json();
           const rawText = resJson.candidates?.[0]?.content?.parts?.[0]?.text;
           if (rawText) {
-            extractedData = JSON.parse(rawText.replace(/```json/g, '').replace(/```/g, '').trim());
+            const jsonMatch = rawText.match(/\{[\s\S]*\}/);
+            if (jsonMatch) {
+              extractedData = JSON.parse(jsonMatch[0]);
+            } else {
+              extractedData = JSON.parse(rawText.replace(/```json/g, '').replace(/```/g, '').trim());
+            }
           }
         } else {
           // Özel API anahtarı henüz girilmemişse: Gerçekçi Akıllı Demo Ayrıştırıcı
@@ -3806,6 +3922,7 @@ SADECE ve SADECE aşağıdaki JSON formatında geçerli bir JSON çıktısı ür
         const year = parts[0] || new Date().getFullYear();
         const month = parts[1] || (new Date().getMonth() + 1);
         const day = parts[2] || new Date().getDate();
+        const monthlyInst = minVal > 0 ? minVal : Math.round((debtVal / instCount) * 100) / 100;
 
         for (let i = 1; i <= instCount; i++) {
           const instDate = addMonthsClamped(year, month - 1, day, i - 1);
@@ -3814,9 +3931,9 @@ SADECE ve SADECE aşağıdaki JSON formatında geçerli bir JSON çıktısı ür
             loanName: title,
             instNo: i,
             dueDate: getLocalDateString(instDate),
-            amount: debtVal,
-            principal: Math.round(debtVal * 0.6 * 100) / 100,
-            interest: Math.round(debtVal * 0.4 * 100) / 100,
+            amount: monthlyInst,
+            principal: Math.round(monthlyInst * 0.6 * 100) / 100,
+            interest: Math.round(monthlyInst * 0.4 * 100) / 100,
             isSettled: false
           });
         }
@@ -3905,7 +4022,8 @@ SADECE ve SADECE aşağıdaki JSON formatında geçerli bir JSON çıktısı ür
 
         if (apiKey) {
           const contextPrompt = `${buildPortfolioFinancialContext()}\nKullanıcı Sorusu: ${question}`;
-          aiChatHistory.push({ role: 'user', parts: [{ text: contextPrompt }] });
+          const userMessage = { role: 'user', parts: [{ text: contextPrompt }] };
+          const requestHistory = [...aiChatHistory, userMessage];
 
           const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${AI_CONFIG.model}:generateContent?key=${apiKey}`;
           const res = await fetch(endpoint, {
@@ -3913,7 +4031,7 @@ SADECE ve SADECE aşağıdaki JSON formatında geçerli bir JSON çıktısı ür
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               system_instruction: { parts: [{ text: FIN_AI_SYSTEM_PROMPT }] },
-              contents: aiChatHistory,
+              contents: requestHistory,
               generationConfig: { temperature: 0.2 }
             })
           });
@@ -3925,6 +4043,7 @@ SADECE ve SADECE aşağıdaki JSON formatında geçerli bir JSON çıktısı ür
 
           const resJson = await res.json();
           answer = resJson.candidates?.[0]?.content?.parts?.[0]?.text || 'Yanıt üretilemedi.';
+          aiChatHistory.push(userMessage);
           aiChatHistory.push({ role: 'model', parts: [{ text: answer }] });
         } else {
           // Demo / Yerel Akıllı Finansal Kural Motoru Yanıtı
@@ -3978,7 +4097,7 @@ SADECE ve SADECE aşağıdaki JSON formatında geçerli bir JSON çıktısı ür
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js?v=6').catch(err => console.log('SW Hata:', err));
+        navigator.serviceWorker.register('./sw.js?v=7').catch(err => console.log('SW Hata:', err));
       });
     }
   

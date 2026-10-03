@@ -1,4 +1,4 @@
-const CACHE_NAME = 'finflow-pro-cache-v6';
+const CACHE_NAME = 'finflow-pro-cache-v7';
 const STATIC_ASSETS = [
   './',
   './index.html',
@@ -26,6 +26,7 @@ self.addEventListener('activate', (e) => {
 
 self.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET') return;
+  if (!e.request.url.startsWith('http')) return;
 
   // HTML sayfa geçişlerinde Network-First (Önce Canlı Ağ): Güncellemeler anında görünür!
   if (e.request.mode === 'navigate') {
