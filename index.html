@@ -1237,7 +1237,7 @@
         </div>
         <div>
           <label class="block text-xs text-slate-300 mb-1">Yatırılacak Ödeme Tutarı (<span class="cur-sym">₺</span>) *</label>
-          <input type="number" id="partialPayAmount" step="0.01" min="0.01" required placeholder="500" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-teal-500 transition">
+          <input type="text" inputmode="decimal" autocomplete="off" id="partialPayAmount" required placeholder="500" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-teal-500 transition">
         </div>
         <button type="submit" class="soft-btn w-full bg-teal-600 hover:bg-teal-500 active:bg-teal-700 py-2.5 rounded-xl text-xs font-bold text-white transition shadow-md shadow-teal-600/20">Ödemeyi Düş</button>
       </form>
@@ -1328,17 +1328,17 @@
         <div class="grid grid-cols-2 gap-2.5">
           <div id="uFieldLimit">
             <label class="block text-[11px] text-slate-400 mb-1">Toplam Limit (<span class="cur-sym">₺</span>)</label>
-            <input type="number" id="uLimitVal" step="0.01" min="0" placeholder="50000" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 transition">
+            <input type="text" inputmode="decimal" autocomplete="off" id="uLimitVal" placeholder="50000" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 transition">
           </div>
 
           <div id="uFieldDebt">
             <label id="uDebtLabel" class="block text-[11px] text-slate-400 mb-1">Dönem Borcu (<span class="cur-sym">₺</span>) *</label>
-            <input type="number" id="uDebtVal" step="0.01" min="0.01" required placeholder="14500" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 transition">
+            <input type="text" inputmode="decimal" autocomplete="off" id="uDebtVal" required placeholder="14500" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 transition">
           </div>
 
           <div id="uFieldMin">
             <label class="block text-[11px] text-slate-400 mb-1">Asgari / Aylık Ödeme (<span class="cur-sym">₺</span>)</label>
-            <input type="number" id="uMinVal" step="0.01" min="0" placeholder="Boşsa oto hesaplanır" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 transition">
+            <input type="text" inputmode="decimal" autocomplete="off" id="uMinVal" placeholder="Boşsa oto hesaplanır" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 transition">
           </div>
 
           <div id="uFieldInstallmentCount" class="hidden">
@@ -1379,7 +1379,7 @@
         <div class="grid grid-cols-2 gap-2">
           <div>
             <label class="block text-[11px] text-slate-400 mb-1">Aylık Tutar (<span class="cur-sym">₺</span>) *</label>
-            <input type="number" id="mIncomeAmount" step="0.01" min="0.01" required placeholder="28000" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500 transition">
+            <input type="text" inputmode="decimal" autocomplete="off" id="mIncomeAmount" required placeholder="28000" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500 transition">
           </div>
           <div>
             <label class="block text-[11px] text-slate-400 mb-1">Yatış Günü (1-31)</label>
@@ -1406,7 +1406,7 @@
         <div class="grid grid-cols-2 gap-2">
           <div>
             <label class="block text-[11px] text-slate-400 mb-1">Aylık Tutar (<span class="cur-sym">₺</span>) *</label>
-            <input type="number" id="mExpenseAmount" step="0.01" min="0.01" required placeholder="12000" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-rose-500 transition">
+            <input type="text" inputmode="decimal" autocomplete="off" id="mExpenseAmount" required placeholder="12000" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-rose-500 transition">
           </div>
           <div>
             <label class="block text-[11px] text-slate-400 mb-1">Ödeme Günü (1-31)</label>
@@ -1664,8 +1664,8 @@
         cashValue = f.freeCash;
         // Toplam Portföy Değeri = Net pozisyon (Gelir - Zorunlu Çıkışlar veya Varlıklar - Borçlar)
         portValue = Math.max(0, investValue - f.grandTotal + Math.max(0, f.freeCash));
-        if (f.totalIncome > 0 && f.totalMandatoryOutflow > 0) {
-          const ratio = Math.round((Math.max(0, f.freeCash) / f.totalIncome) * 100);
+        if (f.totalIncome > 0) {
+          const ratio = Math.round((f.freeCash / f.totalIncome) * 100);
           growthText = `${ratio >= 0 ? '+' : ''}${ratio}%`;
         }
       }
@@ -1673,6 +1673,7 @@
       // Set Display Values
       document.getElementById('heroPortfolioValue').textContent = formatCurrency(portValue);
       document.getElementById('heroPortfolioGrowth').textContent = growthText;
+      document.getElementById('heroPortfolioGrowth').style.color = growthText.startsWith('-') ? '#fb7185' : '';
       document.getElementById('heroPortfolioDesc').textContent = hasData ? 'Aylık Net Finansal Portföy' : 'Henüz veri girilmedi (Gelir veya borç ekleyin)';
       document.getElementById('statTotalInvestments').textContent = formatCurrency(investValue);
       document.getElementById('statCashBalance').textContent = formatCurrency(cashValue);
@@ -1854,7 +1855,8 @@
         const plan = computeAvalanchePlan();
         if (plan && plan.months > 0) {
           const futureDate = new Date();
-          futureDate.setMonth(futureDate.getMonth() + plan.months);
+          futureDate.setDate(1);
+          futureDate.setMonth(futureDate.getMonth() + plan.months - 1); // son ödemenin yapılacağı ay
           targetLabel = `${TR_MONTHS[futureDate.getMonth()]} ${futureDate.getFullYear()}`;
           
           // Generate realistic step progression
@@ -2488,24 +2490,54 @@ const STORAGE_KEY = 'finflow_portfolio_v18';
       return isFinite(n) ? n : 0;
     }
 
+    function isValidYMD(y, m, d) {
+      if (!(y >= 1900 && y <= 2200 && m >= 1 && m <= 12 && d >= 1)) return false;
+      return d <= new Date(y, m, 0).getDate();
+    }
+
+    function ymdStr(y, m, d) {
+      return `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+    }
+
     function parseExcelDate(val) {
-      if (!val) return "";
-      if (typeof val === 'number' && val > 20000 && val < 60000) {
-        const d = new Date(Math.round((val - 25569) * 86400 * 1000));
-        return !isNaN(d.getTime()) ? getLocalDateString(d) : "";
+      if (val === null || val === undefined || val === '') return "";
+      if (val instanceof Date) {
+        if (isNaN(val.getTime())) return "";
+        // SheetJS tarihleri UTC gece yarısına yakın üretir; saat dilimi kaymasını önlemek için yuvarla
+        const r = new Date(val.getTime() + 12 * 3600 * 1000);
+        return ymdStr(r.getUTCFullYear(), r.getUTCMonth() + 1, r.getUTCDate());
+      }
+      if (typeof val === 'number') {
+        if (val > 20000 && val < 80000) {
+          const d = new Date(Math.round((val - 25569) * 86400 * 1000));
+          return ymdStr(d.getUTCFullYear(), d.getUTCMonth() + 1, d.getUTCDate());
+        }
+        if (val >= 1 && val <= 31) {
+          const now = new Date();
+          return ymdStr(now.getFullYear(), now.getMonth() + 1, Math.floor(val));
+        }
+        return "";
       }
       const s = String(val).trim();
+      // Excel seri numarası metin olarak gelmişse
+      if (/^\d{5}(\.\d+)?$/.test(s)) return parseExcelDate(Number(s));
       // 1. ISO YYYY-MM-DD, YYYY.MM.DD, YYYY/MM/DD
       const isoMatch = s.match(/^(\d{4})[./-](\d{1,2})[./-](\d{1,2})/);
       if (isoMatch) {
-        return `${isoMatch[1]}-${isoMatch[2].padStart(2,'0')}-${isoMatch[3].padStart(2,'0')}`;
+        const y = +isoMatch[1], m = +isoMatch[2], d = +isoMatch[3];
+        if (isValidYMD(y, m, d)) return ymdStr(y, m, d);
       }
       // 2. DD.MM.YYYY, DD/MM/YYYY, DD-MM-YYYY, or 2-digit year DD.MM.YY
       const dmyMatch = s.match(/^(\d{1,2})[./-](\d{1,2})[./-](\d{2,4})/);
       if (dmyMatch) {
         let yr = dmyMatch[3];
         if (yr.length === 2) yr = '20' + yr;
-        return `${yr}-${dmyMatch[2].padStart(2,'0')}-${dmyMatch[1].padStart(2,'0')}`;
+        let a = +dmyMatch[1], b = +dmyMatch[2];
+        const y = +yr;
+        // Türkçe GG.AA.YYYY varsayılır; ay > 12 ise (AA/GG/YYYY) yer değiştirilir
+        if (b > 12 && a <= 12) { const t = a; a = b; b = t; }
+        if (isValidYMD(y, b, a)) return ymdStr(y, b, a);
+        return "";
       }
       // 3. Day of month e.g. "Her ayın 28'i" or standalone day "28"
       const dayMatch = s.match(/(?:her\s+ay[iı]n\s+|ay[iı]n\s+)?(\d{1,2})/i);
@@ -2648,14 +2680,102 @@ const STORAGE_KEY = 'finflow_portfolio_v18';
       return Math.round(d * ((Number(limit) || 0) > 25000 ? 0.4 : 0.2) * 100) / 100;
     }
 
-    /* Borç kapatma süresi tahmini (simülatör ve gösterge paneli aynı formülü kullanır) */
+    /* Borç kapatma simülasyonu (ay ay):
+       - Kredi taksitleri ödeme planına göre ödenir
+       - Kart ve KMH bakiyelerine aylık faiz işler (tahmini akdi faiz)
+       - Her ay en az asgari ödenir; ekstra tutar ve kapanan borçlardan boşalan ödeme
+         stratejiye göre (Avalanche: en pahalı, Kartopu: en küçük) sıradaki borca aktarılır */
+    const SIM_CARD_MONTHLY_RATE = 0.0425;
+    const SIM_KMH_MONTHLY_RATE = 0.0425;
+
+    function simulateDebtPayoff(extra, rollover) {
+      const strategy = (userPortfolio.settings && userPortfolio.settings.strategy) || 'avalanche';
+      const revolving = [];
+      userPortfolio.cards.forEach(c => {
+        const bal = Number(c.debt) || 0;
+        if (c.isSettled || bal <= 0) return;
+        const minPay = computeCardMinPayment(bal, c.limit, c.minPay);
+        revolving.push({ bal, rate: SIM_CARD_MONTHLY_RATE, minPct: Math.max(0.05, minPay / bal), floor: 100, prio: (Number(c.limit) > 0 && bal > Number(c.limit)) ? 100 : 80 });
+      });
+      userPortfolio.kmh.forEach(k => {
+        const bal = Number(k.debt) || 0;
+        if (k.isSettled || bal <= 0) return;
+        const mp = Number(k.monthlyPay) > 0 ? Number(k.monthlyPay) : bal * 0.05;
+        // KMH'de aylık ödeme genelde faiz kadardır; anaparayı azaltmak için en az %5 kabul edilir
+        revolving.push({ bal, rate: SIM_KMH_MONTHLY_RATE, minPct: Math.max(0.05, mp / bal), floor: 100, prio: 90 });
+      });
+      // Kredi: kalan (ödenmemiş) taksitler ay sırasına göre
+      const todayYM = getLocalDateString().substring(0, 7);
+      const loanMonths = {};
+      let maxLoanMonth = 0;
+      let loanTotal = 0;
+      userPortfolio.loans.forEach(l => {
+        const amt = Number(l.amount) || 0;
+        if (l.isSettled || amt <= 0) return;
+        loanTotal += amt;
+        let idx = 0;
+        if (l.dueDate && l.dueDate.length >= 7) {
+          const [y, m] = l.dueDate.substring(0, 7).split('-').map(Number);
+          const [ty, tm] = todayYM.split('-').map(Number);
+          idx = Math.max(0, (y - ty) * 12 + (m - tm));
+        }
+        loanMonths[idx] = (loanMonths[idx] || 0) + amt;
+        maxLoanMonth = Math.max(maxLoanMonth, idx + 1);
+      });
+
+      const revTotal0 = revolving.reduce((a, r) => a + r.bal, 0);
+      if (revTotal0 <= 0 && loanTotal <= 0) return { months: 0, interest: 0, finished: true };
+
+      // Başlangıçtaki toplam aylık ödeme gücü (asgari) -> rollover modunda sabit tutulur
+      const initialMinBudget = revolving.reduce((a, r) => a + Math.min(r.bal, Math.max(r.floor, r.bal * r.minPct)), 0);
+      let interestPaid = 0;
+      let month = 0;
+      const MAX_MONTHS = 600;
+      let revLeft = revTotal0;
+      let lastPayoffMonth = 0;
+
+      while (month < MAX_MONTHS) {
+        const loanDue = loanMonths[month] || 0;
+        if (revLeft <= 0.5 && month >= maxLoanMonth) break;
+        // faiz
+        revolving.forEach(r => { if (r.bal > 0) { const i = r.bal * r.rate; r.bal += i; interestPaid += i; } });
+        // asgari ödemeler
+        let spent = 0;
+        revolving.forEach(r => {
+          if (r.bal <= 0) return;
+          const pay = Math.min(r.bal, Math.max(r.floor, r.bal * r.minPct));
+          r.bal -= pay; spent += pay;
+        });
+        let pool = extra + (rollover ? Math.max(0, initialMinBudget - spent) : 0);
+        // ekstra / boşalan bütçe -> stratejiye göre hedef
+        const order = revolving.filter(r => r.bal > 0).sort((a, b) =>
+          strategy === 'snowball' ? a.bal - b.bal : (b.prio - a.prio) || (b.rate - a.rate) || (b.bal - a.bal));
+        for (const r of order) {
+          if (pool <= 0) break;
+          const pay = Math.min(r.bal, pool);
+          r.bal -= pay; pool -= pay;
+        }
+        revolving.forEach(r => { if (r.bal < 0.5) r.bal = 0; });
+        revLeft = revolving.reduce((a, r) => a + r.bal, 0);
+        month++;
+        if (revLeft <= 0.5 || loanDue > 0) lastPayoffMonth = month;
+      }
+      const months = Math.max(month, maxLoanMonth);
+      return { months, interest: Math.round(interestPaid * 100) / 100, finished: month < MAX_MONTHS };
+    }
+
     function computePayoffMonths(f, extra) {
-      const totalDebt = f.grandTotal;
-      if (totalDebt <= 0) return { standardMonths: 0, acceleratedMonths: 0 };
-      const effectiveMonthlyPrincipal = Math.max(100, f.totalMinDebt) * 0.7;
-      const standardMonths = Math.max(1, Math.ceil(totalDebt / effectiveMonthlyPrincipal));
-      const acceleratedMonths = extra > 0 ? Math.max(1, Math.ceil(totalDebt / (effectiveMonthlyPrincipal + extra))) : standardMonths;
-      return { standardMonths, acceleratedMonths };
+      if (f.grandTotal <= 0) return { standardMonths: 0, acceleratedMonths: 0, standardInterest: 0, acceleratedInterest: 0 };
+      // Standart: bugünkü aylık ödeme tutarını korumak (kapanan borcun ödemesi sıradakine aktarılır); hızlandırılmış: + ekstra katkı
+      const std = simulateDebtPayoff(0, true);
+      const acc = simulateDebtPayoff(Math.max(0, extra || 0), true);
+      return {
+        standardMonths: Math.max(1, std.months),
+        acceleratedMonths: Math.max(1, Math.min(std.months, acc.months)),
+        standardInterest: std.interest,
+        acceleratedInterest: Math.min(std.interest, acc.interest),
+        standardFinished: std.finished
+      };
     }
 
     function computeAvalanchePlan() {
@@ -2682,7 +2802,8 @@ const STORAGE_KEY = 'finflow_portfolio_v18';
       const tag = document.getElementById('priorityListTag');
       if (tag) tag.textContent = isSnowball ? 'En Küçük Bakiyeden Başlayın' : 'En Yüksek Faiz/Maliyetten Başlayın';
 
-      const recommendedSavings = f.totalIncome > 0 ? Math.round(f.totalIncome * 0.15) : 0;
+      // Bütçe açığı varken birikim önerilmez; önerilen tutar serbest nakdi aşamaz
+      const recommendedSavings = (f.totalIncome > 0 && f.freeCash > 0) ? Math.round(Math.min(f.totalIncome * 0.15, f.freeCash * 0.5)) : 0;
       const savEl = document.getElementById('aiRecommendedSavings');
       if (savEl) savEl.textContent = formatTRY(recommendedSavings);
 
@@ -2768,7 +2889,9 @@ const STORAGE_KEY = 'finflow_portfolio_v18';
             <p class="text-[11px] text-slate-300 leading-relaxed">
               👉 ${extraCashForDebt > 0 
                 ? `Tüm zorunlu asgarileri yatırdıktan sonra elinizde kalan <b>${formatTRY(extraCashForDebt)}</b> serbest bütçeyi DOĞRUDAN bu kaleme yönlendirerek en hızlı kapatmayı sağlayın.`
-                : `Bütçeniz şu an başabaş veya sınırda. En azından <b>${formatTRY(debtItems[0].minPay)}</b> asgari tutarını aksatmadan yatırın.`}
+                : (f.freeCash < 0
+                  ? `⚠️ Bütçeniz aylık <b>${formatTRY(Math.abs(f.freeCash))}</b> açık veriyor: zorunlu ödemeler gelirinizi aşıyor. Öncelikle gecikme faizi doğmaması için <b>${formatTRY(debtItems[0].minPay)}</b> asgari tutarını aksatmayın; giderleri kısmayı veya yüksek faizli borçları daha düşük faizli bir krediyle yapılandırmayı değerlendirin.`
+                  : `Bütçeniz şu an başabaş veya sınırda. En azından <b>${formatTRY(debtItems[0].minPay)}</b> asgari tutarını aksatmadan yatırın.`)}
             </p>
           </div>
       `;
@@ -2822,7 +2945,6 @@ const STORAGE_KEY = 'finflow_portfolio_v18';
       document.getElementById('partialPayCurrentDebt').textContent = formatTRY(debt);
       const amountInput = document.getElementById('partialPayAmount');
       amountInput.value = '';
-      amountInput.max = debt;
       openModalById('partialPayModal');
       amountInput.focus();
     }
@@ -2835,7 +2957,7 @@ const STORAGE_KEY = 'finflow_portfolio_v18';
     function executePartialPay(e) {
       e.preventDefault();
       if (!partialPayItem) return;
-      const pay = parseFloat(document.getElementById('partialPayAmount').value) || 0;
+      const pay = parseTRNumber(document.getElementById('partialPayAmount').value) || 0;
       if (pay <= 0) return;
 
       const { type, id } = partialPayItem;
@@ -2857,8 +2979,13 @@ const STORAGE_KEY = 'finflow_portfolio_v18';
         const item = userPortfolio.kmh.find(k => k.id === id);
         if (item) {
           const originalDebt = item.debt;
-          item.debt = Math.max(0, Math.round((item.debt - pay) * 100) / 100);
-          item.monthlyPay = Math.round(item.debt * 0.05 * 100) / 100;
+          const oldDebt = Number(item.debt) || 0;
+          const oldMonthly = Number(item.monthlyPay) || 0;
+          item.debt = Math.max(0, Math.round((oldDebt - pay) * 100) / 100);
+          // Aylık faiz yükü kalan borçla orantılı azalır (kullanıcının girdiği oran korunur)
+          item.monthlyPay = oldDebt > 0 && oldMonthly > 0
+            ? Math.round(oldMonthly * (item.debt / oldDebt) * 100) / 100
+            : Math.round(item.debt * 0.05 * 100) / 100;
           if (item.debt <= 0.009) {
             item.debt = 0;
             item.isSettled = true;
@@ -2870,9 +2997,11 @@ const STORAGE_KEY = 'finflow_portfolio_v18';
         const item = userPortfolio.loans.find(l => l.id === id);
         if (item) {
           const originalDebt = item.amount;
+          if (!(Number(item.originalAmount) > 0)) item.originalAmount = Number(item.amount) || 0;
           item.amount = Math.max(0, Math.round((item.amount - pay) * 100) / 100);
           if (item.amount <= 0.009) {
-            item.amount = 0;
+            // Taksit tamamen ödendi: tutar, ödeme planında ve arşivde doğru görünmesi için orijinal haline döner
+            item.amount = item.originalAmount;
             item.isSettled = true;
             const archiveKey = `${item.loanName} (Tüm Taksitler)`;
             const sameLoan = userPortfolio.loans.filter(x => x.loanName === item.loanName);
@@ -2973,9 +3102,9 @@ const STORAGE_KEY = 'finflow_portfolio_v18';
         if (f.totalIncome > 0) {
           const ratio = Math.round((f.totalMandatoryOutflow / f.totalIncome) * 100);
           if (f.freeCash < 0) {
-            document.getElementById('chartRatioDesc').innerHTML = `<span class="text-rose-400 font-bold">⚠️ Gelirinizin %${ratio}'si harcanıyor (Bütçe Eksiği!)</span>`;
+            document.getElementById('chartRatioDesc').innerHTML = `<span class="text-rose-400 font-bold">⚠️ Zorunlu ödemeler gelirin %${ratio} oranında (Bütçe Eksiği!)</span>`;
           } else {
-            document.getElementById('chartRatioDesc').textContent = `Gelirinizin %${ratio}'si zorunlu ödemelere ayrılıyor.`;
+            document.getElementById('chartRatioDesc').textContent = `Zorunlu ödemeler gelirin %${ratio} oranında.`;
           }
         } else {
           document.getElementById('chartRatioDesc').textContent = 'Henüz gelir girilmedi.';
@@ -3360,6 +3489,14 @@ const STORAGE_KEY = 'finflow_portfolio_v18';
       }
     }
 
+    let showAllInstallments = false;
+    const INSTALLMENT_PAGE_SIZE = 12;
+    function toggleShowAllInstallments() {
+      showAllInstallments = !showAllInstallments;
+      renderInstallmentsTable();
+      safeCreateIcons();
+    }
+
     function renderInstallmentsTable() {
       const q = (document.getElementById('loanSearch')?.value || '').toLowerCase();
       const tbody = document.getElementById('installmentsTableBody');
@@ -3387,7 +3524,15 @@ const STORAGE_KEY = 'finflow_portfolio_v18';
         return;
       }
 
-      tbody.innerHTML = filtered.map(l => {
+      // Uzun ödeme planlarında (ör. 96 aylık konut kredisi) sayfa kilometrelerce uzamasın
+      const limited = !q && !showAllInstallments && filtered.length > INSTALLMENT_PAGE_SIZE;
+      const visible = limited ? filtered.slice(0, INSTALLMENT_PAGE_SIZE) : filtered;
+      const moreLabel = limited
+        ? `Tüm taksitleri göster (${filtered.length - INSTALLMENT_PAGE_SIZE} taksit daha)`
+        : (filtered.length > INSTALLMENT_PAGE_SIZE && !q ? 'Daha az göster' : '');
+      const moreBtn = moreLabel ? `<button onclick="toggleShowAllInstallments()" class="cyber-btn w-full py-2.5 rounded-xl border border-cyan-500/30 text-cyan-300 text-xs font-semibold hover:bg-cyan-500/10 transition">${moreLabel}</button>` : '';
+
+      tbody.innerHTML = visible.map(l => {
         const isPast = !l.isSettled && l.dueDate && l.dueDate < today;
         const isToday = !l.isSettled && l.dueDate && l.dueDate === today;
 
@@ -3420,24 +3565,30 @@ const STORAGE_KEY = 'finflow_portfolio_v18';
             </td>
           </tr>
         `;
-      }).join('');
+      }).join('') + (moreBtn ? `<tr><td colspan="8" class="p-3">${moreBtn}</td></tr>` : '');
 
       if (mobileList) {
-        mobileList.innerHTML = filtered.map(l => `
-          <div class="cyber-item-card p-3 space-y-2 text-xs">
-            <div class="flex justify-between items-start">
-              <div>
+        mobileList.innerHTML = visible.map(l => {
+          const isPast = !l.isSettled && l.dueDate && l.dueDate < today;
+          const isToday = !l.isSettled && l.dueDate && l.dueDate === today;
+          const st = l.isSettled ? '<span class="text-emerald-400 font-bold">Ödendi</span>'
+            : (isPast ? '<span class="text-rose-400 font-bold">Gecikmiş</span>' : (isToday ? '<span class="text-amber-400 font-bold">Bugün</span>' : ''));
+          return `
+          <div class="cyber-item-card p-3 space-y-2 text-xs ${l.isSettled ? 'opacity-50' : ''}">
+            <div class="flex justify-between items-start gap-2">
+              <div class="min-w-0">
                 <span class="font-bold text-white">${escapeHtml(l.loanName || 'Kredi')}</span>
-                <span class="text-[10px] text-slate-400 block">Taksit #${l.instNo} | Vade: ${escapeHtml(l.dueDate || '-')}</span>
+                <span class="text-[10px] text-slate-400 block">Taksit #${l.instNo} | Vade: ${escapeHtml(l.dueDate || '-')} ${st ? '| ' + st : ''}</span>
               </div>
               <span class="font-black text-cyan-400">${formatTRY(l.amount)}</span>
             </div>
             <div class="flex justify-end gap-1.5 pt-1 border-t border-white/5">
               <button onclick="openPartialPay('loan', '${l.id}')" class="cyber-btn px-2 py-1 rounded border border-teal-800 text-teal-300 text-[10px]">Ara Öde</button>
               <button onclick="toggleLoan('${l.id}')" class="cyber-btn px-2.5 py-1 rounded border border-white/10 text-slate-300 text-[10px]">${l.isSettled ? 'Geri Al' : 'Öde'}</button>
+              <button onclick="deleteLoan('${l.id}')" class="cyber-btn px-2 py-1 rounded border border-rose-900/60 text-rose-400 text-[10px]">Sil</button>
             </div>
           </div>
-        `).join('');
+        `; }).join('') + (moreBtn ? `<div class="pt-1">${moreBtn}</div>` : '');
       }
     }
 
@@ -3716,7 +3867,8 @@ const STORAGE_KEY = 'finflow_portfolio_v18';
         return;
       }
 
-      const { standardMonths, acceleratedMonths } = computePayoffMonths(f, extra);
+      const { standardMonths, acceleratedMonths, standardInterest, acceleratedInterest } = computePayoffMonths(f, extra);
+      const savedInterest = Math.max(0, standardInterest - acceleratedInterest);
       const savedMonths = Math.max(0, standardMonths - acceleratedMonths);
 
       if (stdEl) stdEl.textContent = `~${standardMonths} Ay`;
@@ -3725,11 +3877,11 @@ const STORAGE_KEY = 'finflow_portfolio_v18';
 
       if (notesEl) {
         if (extra > 0 && savedMonths > 0) {
-          notesEl.innerHTML = `💡 Asgari ödemelere ek olarak her ay <b>${formatTRY(extra)}</b> katkı yaptığınızda toplam borcunuz yaklaşık <b>${acceleratedMonths} ay</b> içinde sıfırlanacak ve tahmini <b>${savedMonths} aylık faiz yükünden</b> tamamen kurtulacaksınız.`;
+          notesEl.innerHTML = `💡 Asgari ödemelere ek olarak her ay <b>${formatTRY(extra)}</b> katkı yaptığınızda toplam borcunuz yaklaşık <b>${acceleratedMonths} ay</b> içinde sıfırlanır; kart/KMH faizinden tahmini <b>${formatTRY(savedInterest)}</b> tasarruf edersiniz.`;
         } else if (extra === 0) {
           notesEl.innerHTML = `ℹ️ Ekstra ödeme yapmadan sadece asgarileri yatırdığınızda borçlarınız yaklaşık <b>${standardMonths} ayda</b> bitecektir. Süreyi kısaltmak için ekstra katkı tutarı belirleyin.`;
         } else {
-          notesEl.innerHTML = `💡 Ekstra <b>${formatTRY(extra)}</b> ödeme ile borcunuz yaklaşık <b>${acceleratedMonths} ay</b> içinde tamamen sıfırlanacaktır.`;
+          notesEl.innerHTML = `💡 Ekstra <b>${formatTRY(extra)}</b> ödeme süreyi kısaltmıyor; çünkü en uzun süren kalem sabit taksitli krediniz (<b>${acceleratedMonths} ay</b>). Kart/KMH faizinden tahmini <b>${formatTRY(savedInterest)}</b> tasarruf edersiniz.`;
         }
       }
     }
@@ -3845,10 +3997,10 @@ const STORAGE_KEY = 'finflow_portfolio_v18';
       }
       const wb = XLSX.utils.book_new();
 
-      const incData = userPortfolio.incomes.map(i => ({ "Başlık": i.title, "Aylık Tutar": i.amount, "Yatış Günü": i.day }));
-      const expData = userPortfolio.expenses.map(e => ({ "Başlık": e.title, "Aylık Tutar": e.amount, "Ödeme Günü": e.day, "Abonelik": e.isSub ? "Evet" : "Hayır" }));
-      const cardData = userPortfolio.cards.map(c => ({ "Banka": c.bank, "Limit": c.limit, "Borç": c.debt, "Asgari": c.minPay, "Son Gün": c.dueDate }));
-      const kmhData = userPortfolio.kmh.map(k => ({ "Banka": k.bank, "Limit": k.limit || 0, "Borç": k.debt, "Aylık Faiz": k.monthlyPay, "Vade": k.dueDate }));
+      const incData = userPortfolio.incomes.map(i => ({ "Kalem": i.title, "Kategori": "Gelir", "Aylık Tutar": i.amount, "Yatış Günü": i.day }));
+      const expData = userPortfolio.expenses.map(e => ({ "Kalem": e.title, "Kategori": e.isSub ? "Abonelik" : "Gider", "Aylık Tutar": e.amount, "Ödeme Günü": e.day }));
+      const cardData = userPortfolio.cards.map(c => ({ "Kart Adı": c.bank, "Kategori": "Kredi Kartı", "Limit": c.limit, "Dönem Borcu": c.debt, "Asgari": c.minPay, "Son Ödeme": c.dueDate, "Durum": c.isSettled ? "Ödendi" : "Açık" }));
+      const kmhData = userPortfolio.kmh.map(k => ({ "Hesap Adı": k.bank, "Kategori": "KMH", "Limit": k.limit || 0, "Kullanılan": k.debt, "Aylık Faiz": k.monthlyPay, "Vade Tarihi": k.dueDate, "Durum": k.isSettled ? "Ödendi" : "Açık" }));
       const loanData = userPortfolio.loans.map(l => ({
         "Kredi": l.loanName,
         "Taksit No": l.instNo,
@@ -3913,7 +4065,7 @@ const STORAGE_KEY = 'finflow_portfolio_v18';
     function closeIncomeModal() { closeModalById('incomeModal'); }
     function saveIncome(e) {
       if (e && e.preventDefault) e.preventDefault();
-      const amount = parseFloat(document.getElementById('mIncomeAmount').value) || 0;
+      const amount = parseTRNumber(document.getElementById('mIncomeAmount').value) || 0;
       const title = document.getElementById('mIncomeTitle').value.trim();
       if (!title || amount <= 0) return;
       userPortfolio.incomes.unshift({
@@ -3936,7 +4088,7 @@ const STORAGE_KEY = 'finflow_portfolio_v18';
     function closeExpenseModal() { closeModalById('expenseModal'); }
     function saveExpense(e) {
       if (e && e.preventDefault) e.preventDefault();
-      const amount = parseFloat(document.getElementById('mExpenseAmount').value) || 0;
+      const amount = parseTRNumber(document.getElementById('mExpenseAmount').value) || 0;
       const title = document.getElementById('mExpenseTitle').value.trim();
       const isSub = document.getElementById('mExpenseIsSub').checked;
       if (!title || amount <= 0) return;
@@ -4004,8 +4156,8 @@ const STORAGE_KEY = 'finflow_portfolio_v18';
       const checkedRadio = document.querySelector('input[name="debtCategoryType"]:checked');
       const type = checkedRadio ? checkedRadio.value : 'card';
       const title = document.getElementById('uDebtTitle').value.trim();
-      const debtVal = parseFloat(document.getElementById('uDebtVal').value) || 0;
-      const limitVal = parseFloat(document.getElementById('uLimitVal').value) || 0;
+      const debtVal = parseTRNumber(document.getElementById('uDebtVal').value) || 0;
+      const limitVal = parseTRNumber(document.getElementById('uLimitVal').value) || 0;
       const dueDate = document.getElementById('uDueDate').value;
 
       if (!title || debtVal <= 0 || !dueDate) {
@@ -4015,7 +4167,7 @@ const STORAGE_KEY = 'finflow_portfolio_v18';
       }
 
       if (type === 'card') {
-        let minVal = parseFloat(document.getElementById('uMinVal').value);
+        let minVal = parseTRNumber(document.getElementById('uMinVal').value);
         if (isNaN(minVal) || minVal <= 0) minVal = limitVal > 25000 ? debtVal * 0.4 : debtVal * 0.2;
         minVal = Math.min(debtVal, minVal);
         userPortfolio.cards.unshift({
@@ -4028,7 +4180,7 @@ const STORAGE_KEY = 'finflow_portfolio_v18';
           isSettled: false
         });
       } else if (type === 'kmh') {
-        let minVal = parseFloat(document.getElementById('uMinVal').value);
+        let minVal = parseTRNumber(document.getElementById('uMinVal').value);
         if (isNaN(minVal) || minVal <= 0) minVal = debtVal * 0.05;
         minVal = Math.min(debtVal, minVal);
         userPortfolio.kmh.unshift({
@@ -4071,7 +4223,7 @@ const STORAGE_KEY = 'finflow_portfolio_v18';
       const card = userPortfolio.cards.find(c => c.id === id);
       if (card) {
         const origDebt = Number(card.debt) || 0;
-        if (origDebt > 0) {
+        if (origDebt > 0 && !card.isSettled) {
           archiveItem('card', card, origDebt);
         }
         card.debt = 0;
@@ -4084,11 +4236,11 @@ const STORAGE_KEY = 'finflow_portfolio_v18';
     function settleKMHFully(id) {
       const k = userPortfolio.kmh.find(item => item.id === id);
       if (k) {
-        const orig = k.debt || k.limit || 0;
+        const orig = Number(k.debt) || 0;
+        if (orig > 0 && !k.isSettled) archiveItem('kmh', k, orig);
         k.isSettled = true;
         k.debt = 0;
         k.monthlyPay = 0;
-        archiveItem('kmh', k, orig);
         saveState();
       }
     }
@@ -4206,10 +4358,11 @@ const STORAGE_KEY = 'finflow_portfolio_v18';
       title: ['kurum / kalem', 'kurum', 'kalem', 'banka', 'kart adi', 'hesap adi', 'kredi adi', 'borc adi', 'urun', 'aciklama', 'baslik', 'isim', 'adi'],
       amount: ['kalan tutar', 'donem borcu', 'guncel borc', 'kart borcu', 'borc tutari', 'toplam borc', 'taksit tutari', 'aylik tutar', 'bakiye', 'kullanilan', 'tutar', 'miktar', 'borc'],
       limit: ['kart limiti', 'toplam limit', 'limit', 'kredi limiti', 'hesap limiti', 'kullanilabilir'],
-      minPay: ['asgari', 'asgari odeme', 'asgari tutar', 'aylik asgari', 'aylik odeme', 'minimum', 'aylik faiz'],
+      minPay: ['asgari', 'asgari odeme', 'asgari tutar', 'aylik asgari', 'aylik odeme', 'aylik taksit', 'taksit miktari', 'minimum', 'aylik faiz'],
       day: ['yatis gunu', 'odeme gunu', 'gun', 'kesim gunu', 'hesap kesim'],
-      dueDate: ['vade gunu / not', 'vade gunu', 'son gun', 'son odeme', 'vade tarihi', 'hesap kesim tarihi', 'odeme tarihi', 'vade', 'tarih'],
-      instNo: ['taksit / durum bilgisi', 'taksit no', 'taksit sayisi', 'taksit', 'donem'],
+      dueDate: ['vade gunu / not', 'vade gunu', 'son gun', 'son odeme', 'sonraki odeme', 'sonraki taksit', 'ilk odeme', 'ilk taksit', 'vade tarihi', 'hesap kesim tarihi', 'odeme tarihi', 'vade', 'tarih'],
+      instCount: ['kalan taksit sayisi', 'kalan taksit', 'taksit sayisi', 'toplam taksit', 'vade sayisi', 'kalan vade', 'kalan ay'],
+      instNo: ['taksit / durum bilgisi', 'taksit no', 'taksit', 'donem'],
       principal: ['anapara', 'ana para'],
       interest: ['faiz', 'faiz+vergi', 'faiz tutari'],
       status: ['durum', 'odendi mi', 'statu']
@@ -4244,6 +4397,7 @@ const STORAGE_KEY = 'finflow_portfolio_v18';
         if (aliasKey === 'amount' && (cell.includes('kategori') || cell.includes('tur') || cell.includes('tip'))) continue;
         if (aliasKey === 'title' && (cell.includes('kategori') || cell.includes('tutar') || cell.includes('bakiye'))) continue;
         if (aliasKey === 'status' && cell.includes('taksit')) continue;
+        if (aliasKey === 'instNo' && /tutar|aylik|miktar|odeme/.test(cell)) continue;
         if (aliases.some(a => cell.includes(a))) return idx;
       }
       return -1;
@@ -4252,7 +4406,7 @@ const STORAGE_KEY = 'finflow_portfolio_v18';
     function detectColumnsInHeader(headerRow) {
       const assigned = new Set();
       const cols = {};
-      const priorityOrder = ['category', 'title', 'amount', 'instNo', 'dueDate', 'limit', 'minPay', 'day', 'principal', 'interest', 'status'];
+      const priorityOrder = ['category', 'title', 'amount', 'instCount', 'minPay', 'instNo', 'dueDate', 'limit', 'day', 'principal', 'interest', 'status'];
       priorityOrder.forEach(key => {
         const idx = findColumnIndexDisambiguated(headerRow, key, assigned);
         cols[key] = idx;
@@ -4403,7 +4557,10 @@ const STORAGE_KEY = 'finflow_portfolio_v18';
       reader.onload = (evt) => {
         try {
           const data = new Uint8Array(evt.target.result);
-          const wb = XLSX.read(data, { type: 'array', cellDates: true, codepage: 65001 });
+          // CSV'de SheetJS sayı/tarihleri ABD biçimiyle yorumlar (3.400,00 -> 3,4; 12.10.2026 -> 10 Aralık).
+          // raw: true ile metin olduğu gibi alınır ve Türkçe ayrıştırıcımız kullanılır.
+          const isTextFile = /\.(csv|txt|tsv)$/i.test(file.name || '');
+          const wb = XLSX.read(data, { type: 'array', cellDates: false, codepage: 65001, raw: isTextFile });
 
           const staged = { incomes: [], expenses: [], cards: [], kmh: [], loans: [] };
           let incCount = 0, expCount = 0, cardCount = 0, kmhCount = 0, loanCount = 0;
@@ -4411,19 +4568,25 @@ const STORAGE_KEY = 'finflow_portfolio_v18';
 
           wb.SheetNames.forEach(sheetName => {
             const sheet = wb.Sheets[sheetName];
-            const rawRows = XLSX.utils.sheet_to_json(sheet, { header: 1, raw: false });
+            // raw: true -> sayılar sayı, tarihler seri numarası olarak gelir (yerel ayar kaynaklı biçim hataları olmaz)
+            const rawRows = XLSX.utils.sheet_to_json(sheet, { header: 1, raw: true, defval: '' });
             if (!rawRows || rawRows.length < 2) return;
 
             const headerIdx = detectHeaderRowIndex(rawRows);
             const headerRow = rawRows[headerIdx] || [];
             const dataRows = rawRows.slice(headerIdx + 1);
             const sNameNorm = normalizeText(sheetName);
+            // Uygulamanın kendi dışa aktarımındaki kapatılmış borç arşivi tekrar borç olarak eklenmemeli
+            if (/kapatilan|arsiv|zafer|archive/.test(sNameNorm)) return;
 
             const cols = detectColumnsInHeader(headerRow);
 
             const isIncomeSheet = sNameNorm.includes('gelir') || sNameNorm.includes('maas') || sNameNorm.includes('income');
             const isExpenseSheet = sNameNorm.includes('gider') || sNameNorm.includes('harcama') || sNameNorm.includes('fatura') || sNameNorm.includes('expense') || sNameNorm.includes('abonelik');
-            const isScheduleSheet = (cols.instNo >= 0 || cols.principal >= 0 || cols.interest >= 0) && (sNameNorm.includes('taksit') || sNameNorm.includes('plan') || sNameNorm.includes('kredi'));
+            // Ödeme planı sayfası: her satır tek bir taksittir (anapara/faiz sütunu veya "Taksit No" sütunu olur)
+            const instNoHeader = cols.instNo >= 0 ? normalizeText(headerRow[cols.instNo]) : '';
+            const hasInstNoCol = cols.instNo >= 0 && cols.instCount < 0 && (instNoHeader.includes('no') || instNoHeader === 'taksit' || instNoHeader === 'donem');
+            const isScheduleSheet = (cols.principal >= 0 || cols.interest >= 0 || hasInstNoCol) && cols.limit < 0 && (sNameNorm.includes('taksit') || sNameNorm.includes('plan') || sNameNorm.includes('kredi'));
 
             for (let i = 0; i < dataRows.length; i++) {
               const row = dataRows[i];
@@ -4432,10 +4595,15 @@ const STORAGE_KEY = 'finflow_portfolio_v18';
               const amount = parseTRNumber(getCell(row, cols.amount));
               const limit = parseTRNumber(getCell(row, cols.limit));
               const minPay = parseTRNumber(getCell(row, cols.minPay));
-              const dueDate = parseExcelDate(getCell(row, cols.dueDate)) || getLocalDateString();
+              const dayCellRaw = getCell(row, cols.day);
+              const dayCellIsDate = cols.day >= 0 && ((typeof dayCellRaw === 'number' && dayCellRaw > 31) || /\d{1,4}[./-]\d{1,2}[./-]\d{1,4}/.test(String(dayCellRaw)));
+              const dueDate = parseExcelDate(getCell(row, cols.dueDate)) || (dayCellIsDate ? parseExcelDate(dayCellRaw) : '') || (cols.day >= 0 && dayCellRaw !== '' ? parseExcelDate(dayCellRaw) : '') || getLocalDateString();
               const categoryStr = String(getCell(row, cols.category) || '').trim();
               const instStr = String(getCell(row, cols.instNo) || '').trim();
-              const day = cols.day >= 0 ? (parseInt(parseTRNumber(getCell(row, cols.day))) || 15) : 15;
+              const day = cols.day >= 0
+                ? (dayCellIsDate ? (parseInt(dueDate.split('-')[2], 10) || 15) : (parseInt(parseTRNumber(dayCellRaw)) || 15))
+                : (cols.dueDate >= 0 && getCell(row, cols.dueDate) !== '' ? (parseInt(dueDate.split('-')[2], 10) || 15) : 15);
+              const instCountCell = cols.instCount >= 0 ? parseInt(parseTRNumber(getCell(row, cols.instCount))) || 0 : 0;
               const statusRaw = normalizeText(String(getCell(row, cols.status) || ''));
               const isSettled = statusRaw.includes('odendi') || statusRaw === 'true' || statusRaw === '1' || statusRaw === 'kapali';
 
@@ -4443,7 +4611,8 @@ const STORAGE_KEY = 'finflow_portfolio_v18';
               const catNorm = normalizeText(categoryStr);
 
               // Tablo sonu toplam satırları veya takvim alt tablolarında dur
-              if (nameNorm.includes('alt toplam') || catNorm.includes('alt toplam') || nameNorm.includes('genel toplam') || catNorm.includes('genel toplam') || /^\d{4}-\d{2}-\d{2}$/.test(catNorm)) {
+              const isTotalRow = (t) => /^(toplam|genel toplam|ara toplam|alt toplam|total|grand total|sum)\b/.test(t) || t.includes('alt toplam') || t.includes('genel toplam');
+              if (isTotalRow(nameNorm) || isTotalRow(catNorm) || /^\d{4}-\d{2}-\d{2}$/.test(catNorm)) {
                 break;
               }
 
@@ -4468,10 +4637,16 @@ const STORAGE_KEY = 'finflow_portfolio_v18';
                   isSettled
                 });
                 loanCount++;
-              } else if (isIncomeSheet || catNorm.includes('gelir') || catNorm.includes('maas')) {
+              } else if (catNorm && /gelir|maas|kazanc|income/.test(catNorm)) {
                 staged.incomes.push({ id: generateId(), title: name, amount, day: Math.max(1, Math.min(31, day)) });
                 incCount++;
-              } else if (isExpenseSheet || catNorm.includes('gider') || catNorm.includes('fatura') || catNorm.includes('kira')) {
+              } else if (catNorm && /gider|fatura|kira|abonelik|harcama|expense|odeme$/.test(catNorm)) {
+                staged.expenses.push({ id: generateId(), title: name, amount, day: Math.max(1, Math.min(31, day)), isSub: catNorm.includes('abonelik') || nameNorm.includes('netflix') || nameNorm.includes('spotify') });
+                expCount++;
+              } else if (isIncomeSheet && !isExpenseSheet) {
+                staged.incomes.push({ id: generateId(), title: name, amount, day: Math.max(1, Math.min(31, day)) });
+                incCount++;
+              } else if (isExpenseSheet && !isIncomeSheet) {
                 staged.expenses.push({ id: generateId(), title: name, amount, day: Math.max(1, Math.min(31, day)), isSub: catNorm.includes('abonelik') || nameNorm.includes('netflix') || nameNorm.includes('spotify') });
                 expCount++;
               } else if (KMH_IDENTIFIERS.some(kw => testStr.includes(kw)) && !testStr.includes('taksit')) {
@@ -4499,12 +4674,17 @@ const STORAGE_KEY = 'finflow_portfolio_v18';
                 });
                 cardCount++;
               } else if (LOAN_IDENTIFIERS.some(kw => testStr.includes(kw))) {
-                let instCount = 1;
+                let instCount = 0;
                 const mCount = instStr.match(/(\d+)\s*taksit/i);
-                if (mCount) {
+                const mSlash = instStr.match(/^\s*(\d+)\s*\/\s*(\d+)\s*$/); // ör. "6/24" -> 18 kalan
+                if (instCountCell > 0) {
+                  instCount = instCountCell;
+                } else if (mCount) {
                   instCount = parseInt(mCount[1]);
-                } else if (cols.instNo >= 0) {
-                  instCount = parseInt(parseTRNumber(instStr)) || 1;
+                } else if (mSlash) {
+                  instCount = Math.max(1, parseInt(mSlash[2]) - parseInt(mSlash[1]) + 1);
+                } else if (cols.instNo >= 0 && /^\d{1,3}$/.test(instStr)) {
+                  instCount = parseInt(instStr);
                 }
 
                 let monthlyPay = minPay;
@@ -4512,6 +4692,10 @@ const STORAGE_KEY = 'finflow_portfolio_v18';
                 if (mPay) {
                   monthlyPay = parseTRNumber(mPay[1]);
                 }
+                if (!(instCount > 0)) {
+                  instCount = monthlyPay > 0 && amount > monthlyPay ? Math.ceil(amount / monthlyPay) : 1;
+                }
+                instCount = Math.max(1, Math.min(360, instCount));
 
                 const instAmount = monthlyPay > 0 ? monthlyPay : Math.round((amount / instCount) * 100) / 100;
                 const parts = dueDate.split('-').map(Number);
