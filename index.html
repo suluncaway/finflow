@@ -455,23 +455,23 @@
           <nav id="appNav" class="space-y-1.5 flex md:flex-col overflow-x-auto md:overflow-visible no-scrollbar pb-1 md:pb-0">
             <button onclick="switchSidebarTab('dashboard')" id="nav-dashboard" class="sidebar-btn active w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all shrink-0">
               <i data-lucide="layout-grid" class="w-4 h-4 text-cyan-400"></i>
-              <span class="hidden md:inline">Dashboard</span><span class="md:hidden">Panel</span>
+              <span class="hidden md:inline">Kontrol Paneli</span><span class="md:hidden">Panel</span>
             </button>
             <button onclick="switchSidebarTab('investments')" id="nav-investments" class="sidebar-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-medium transition-all shrink-0">
               <i data-lucide="pie-chart" class="w-4 h-4"></i>
-              <span class="hidden md:inline">Investments</span><span class="md:hidden">Portföy</span>
+              <span class="hidden md:inline">Portföy</span><span class="md:hidden">Portföy</span>
             </button>
             <button onclick="switchSidebarTab('analytics')" id="nav-analytics" class="sidebar-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-medium transition-all shrink-0">
               <i data-lucide="bar-chart-2" class="w-4 h-4"></i>
-              <span class="hidden md:inline">Analytics</span><span class="md:hidden">Analiz</span>
+              <span class="hidden md:inline">Analizler</span><span class="md:hidden">Analiz</span>
             </button>
             <button onclick="switchSidebarTab('reports')" id="nav-reports" class="sidebar-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-medium transition-all shrink-0">
               <i data-lucide="file-text" class="w-4 h-4"></i>
-              <span class="hidden md:inline">Reports</span><span class="md:hidden">Rapor</span>
+              <span class="hidden md:inline">Raporlar</span><span class="md:hidden">Rapor</span>
             </button>
             <button onclick="switchSidebarTab('settings')" id="nav-settings" class="sidebar-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-medium transition-all shrink-0">
               <i data-lucide="settings" class="w-4 h-4"></i>
-              <span class="hidden md:inline">Settings</span><span class="md:hidden">Ayarlar</span>
+              <span class="hidden md:inline">Ayarlar</span><span class="md:hidden">Ayarlar</span>
             </button>
           </nav>
         </div>
@@ -507,10 +507,10 @@
               <div>
                 <!-- Header of Hero Card -->
                 <div class="flex items-center justify-between mb-2">
-                  <span class="text-xs font-medium text-slate-300 tracking-wide">Total Portfolio Value</span>
+                  <span class="text-xs font-medium text-rose-300 tracking-wide uppercase">Toplam Portföy Borcu</span>
                   <div class="relative">
-                    <button onclick="toggleSummaryDropdown()" class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-[11px] text-slate-300 hover:bg-white/10 hover:border-cyan-400/40 transition">
-                      <span class="text-slate-400 font-mono">#</span> <span>Summcy</span>
+                    <button onclick="toggleSummaryDropdown()" class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-[11px] text-slate-300 hover:bg-white/10 hover:border-rose-400/40 transition">
+                      <span class="text-slate-400 font-mono">#</span> <span>Özet</span>
                       <i data-lucide="chevron-down" class="w-3 h-3 text-slate-400"></i>
                     </button>
                   </div>
@@ -518,15 +518,15 @@
 
                 <!-- Balance & Growth Badge -->
                 <div class="flex items-baseline gap-3 my-1">
-                  <h2 id="heroPortfolioValue" class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">₺0,00</h2>
+                  <h2 id="heroPortfolioValue" class="text-4xl sm:text-5xl font-black text-rose-500 tracking-tight drop-shadow-[0_0_15px_rgba(244,63,94,0.5)]">₺0,00</h2>
                   <div class="flex flex-col">
                     <span id="heroPortfolioGrowth" class="text-xs font-bold text-[#00f5a0] flex items-center gap-0.5">
                       +0.0%
                     </span>
-                    <span class="text-[10px] text-slate-400 -mt-0.5">Today</span>
+                    <span class="text-[10px] text-slate-400 -mt-0.5">Bugün</span>
                   </div>
                 </div>
-                <div id="heroPortfolioDesc" class="text-[11px] text-slate-400 font-medium">Portfolio Growth</div>
+                <div id="heroPortfolioDesc" class="text-[11px] text-slate-400 font-medium">Net Tasarruf Oranı</div>
               </div>
 
               <!-- Glowing Line Wave Chart -->
@@ -546,7 +546,7 @@
                   <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400"></i>
                 </div>
                 <div class="mt-4">
-                  <div class="text-xs text-slate-400 font-medium">Total Investments</div>
+                  <div class="text-xs text-slate-400 font-medium">Toplam Limitler</div>
                   <div id="statTotalInvestments" class="text-2xl font-bold text-white tracking-tight mt-1">₺0,00</div>
                 </div>
               </div>
@@ -560,7 +560,7 @@
                   <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400"></i>
                 </div>
                 <div class="mt-4">
-                  <div class="text-xs text-slate-400 font-medium">Cash Balance</div>
+                  <div class="text-xs text-slate-400 font-medium">Serbest Bütçe</div>
                   <div id="statCashBalance" class="text-2xl font-bold text-white tracking-tight mt-1">₺0,00</div>
                 </div>
               </div>
@@ -569,7 +569,7 @@
             <!-- CARD 4: INVESTMENT MIX DONUT (Takes 3 cols) -->
             <div class="lg:col-span-3 cyber-card p-4 sm:p-5 flex flex-col justify-between">
               <div class="flex items-center justify-between mb-1">
-                <h3 class="text-xs font-bold text-white tracking-wide">Investment Mix</h3>
+                <h3 class="text-xs font-bold text-white tracking-wide">Borç Dağılımı</h3>
                 <button class="text-slate-400 hover:text-white" onclick="switchSidebarTab('investments')">
                   <i data-lucide="more-horizontal" class="w-4 h-4"></i>
                 </button>
@@ -1663,7 +1663,7 @@
         // Serbest Kalan Bütçe
         cashValue = f.freeCash;
         // Toplam Portföy Değeri = Net pozisyon (Gelir - Zorunlu Çıkışlar veya Varlıklar - Borçlar)
-        portValue = Math.max(0, investValue - f.grandTotal + Math.max(0, f.freeCash));
+        portValue = f.grandTotal;
         if (f.totalIncome > 0) {
           const ratio = Math.round((f.freeCash / f.totalIncome) * 100);
           growthText = `${ratio >= 0 ? '+' : ''}${ratio}%`;
