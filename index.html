@@ -581,18 +581,18 @@
               </div>
 
               <!-- Dynamic Legend underneath -->
-              <div id="investmentMixLegend" class="flex items-center justify-around text-[10px] text-slate-300 pt-2 border-t border-white/5">
-                <div class="flex items-center gap-1.5">
-                  <span class="w-2 h-2 rounded-full bg-[#00f5a0]" style="box-shadow: 0 0 6px #00f5a0;"></span>
-                  <span>Kartlar <b class="text-white font-normal" id="mixKartVal">0%</b></span>
+              <div id="investmentMixLegend" class="flex flex-col gap-1.5 text-[11px] text-slate-300 pt-3 border-t border-white/5">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-[#00f5a0]" style="box-shadow: 0 0 6px #00f5a0;"></span><span>Kartlar</span></div>
+                  <b class="text-white font-medium text-right tracking-tight" id="mixKartVal">0% (₺0,00)</b>
                 </div>
-                <div class="flex items-center gap-1.5">
-                  <span class="w-2 h-2 rounded-full bg-[#8b5cf6]" style="box-shadow: 0 0 6px #8b5cf6;"></span>
-                  <span>Kredi <b class="text-white font-normal" id="mixKrediVal">0%</b></span>
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-[#8b5cf6]" style="box-shadow: 0 0 6px #8b5cf6;"></span><span>Kredi</span></div>
+                  <b class="text-white font-medium text-right tracking-tight" id="mixKrediVal">0% (₺0,00)</b>
                 </div>
-                <div class="flex items-center gap-1.5">
-                  <span class="w-2 h-2 rounded-full bg-[#00d2ff]" style="box-shadow: 0 0 6px #00d2ff;"></span>
-                  <span>KMH <b class="text-white font-normal" id="mixKmhVal">0%</b></span>
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-[#00d2ff]" style="box-shadow: 0 0 6px #00d2ff;"></span><span>KMH</span></div>
+                  <b class="text-white font-medium text-right tracking-tight" id="mixKmhVal">0% (₺0,00)</b>
                 </div>
               </div>
             </div>
@@ -1798,9 +1798,9 @@
         labels = ['Kartlar', 'Krediler', 'KMH'];
       }
 
-      document.getElementById('mixKartVal').textContent = `${cPct}%`;
-      document.getElementById('mixKrediVal').textContent = `${lPct}%`;
-      document.getElementById('mixKmhVal').textContent = `${kPct}%`;
+      document.getElementById('mixKartVal').textContent = `${cPct}% (${formatTRY(cDebt)})`;
+      document.getElementById('mixKrediVal').textContent = `${lPct}% (${formatTRY(lDebt)})`;
+      document.getElementById('mixKmhVal').textContent = `${kPct}% (${formatTRY(kDebt)})`;
 
       if (investmentMixChart) {
         investmentMixChart.destroy();
