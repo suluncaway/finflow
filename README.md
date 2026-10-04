@@ -1,10 +1,10 @@
 <div align="center">
 
-  <img src="./banner.png" alt="ParaPusula Pro - Akıllı Borç ve Nakit Akışı Yönetim Paneli" width="100%" style="border-radius: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.6);" />
+  <img src="./banner.png" alt="ParaPusula - Akıllı Borç ve Nakit Akışı Yönetim Paneli" width="100%" style="border-radius: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.6);" />
 
   <br/><br/>
 
-  # ⚡ ParaPusula Pro
+  # ⚡ ParaPusula
   ### Yeni Nesil Siber-Neon Borç Kapatma, Nakit Akışı ve Portföy Yönetim Paneli
 
   <p align="center">
@@ -33,11 +33,11 @@
 
 ---
 
-## 💡 Neden ParaPusula Pro?
+## 💡 Neden ParaPusula?
 
 Geleneksel bütçe uygulamaları ya banka giriş şifrelerinizi talep eder ya da verilerinizi uzak sunucularda saklar. Üstelik Türkiye'deki bankacılık dinamiklerini (kredi kartı asgari tutar kademeleri, KMH bileşik faizleri, KKDF + BSMV kesintileri) dikkate almazlar.
 
-**ParaPusula Pro**, finansal özgürlüğe ulaşmanız için tasarlanmış bağımsız, açık kaynaklı ve **sıfır sunuculu (serverless)** bir finansal yönetim kokpitidir:
+**ParaPusula**, finansal özgürlüğe ulaşmanız için tasarlanmış bağımsız, açık kaynaklı ve **sıfır sunuculu (serverless)** bir finansal yönetim kokpitidir:
 
 * 🛡️ **Banka Şifresi Yok, Üyelik Yok:** Hiçbir kişisel veri veya banka giriş bilgisi istenmez.
 * 🔒 **Verileriniz Yalnızca Sizin Cihazınızda:** Tüm portföy tarayıcınızın yerel depolama alanında (`localStorage`) güvenle saklanır.
@@ -48,12 +48,12 @@ Geleneksel bütçe uygulamaları ya banka giriş şifrelerinizi talep eder ya da
 
 ## 🌟 Canlı Demo
 
-ParaPusula Pro'yu herhangi bir kurulum yapmadan doğrudan tarayıcınızda deneyimleyebilirsiniz:
+ParaPusula'yu herhangi bir kurulum yapmadan doğrudan tarayıcınızda deneyimleyebilirsiniz:
 
-👉 **[ParaPusula Pro'yu Canlı Kullanın](https://SULUNCAWAY_GITHUB_IO_PARAPUSULA_TEMP/)**
+👉 **[ParaPusula'yu Canlı Kullanın](https://SULUNCAWAY_GITHUB_IO_PARAPUSULA_TEMP/)**
 
 > [!TIP]
-> ParaPusula Pro bir **PWA (Progressive Web App)**'tir. Telefonunuzun veya bilgisayarınızın tarayıcısından *"Ana Ekrana Ekle"* ya da *"Uygulamayı Yükle"* butonuna tıklayarak internetsiz dahi çalışan tam bir mobil/masaüstü uygulama gibi kullanabilirsiniz.
+> ParaPusula bir **PWA (Progressive Web App)**'tir. Telefonunuzun veya bilgisayarınızın tarayıcısından *"Ana Ekrana Ekle"* ya da *"Uygulamayı Yükle"* butonuna tıklayarak internetsiz dahi çalışan tam bir mobil/masaüstü uygulama gibi kullanabilirsiniz.
 
 ---
 
@@ -101,7 +101,7 @@ ParaPusula Pro'yu herhangi bir kurulum yapmadan doğrudan tarayıcınızda deney
 
 ## 🛠️ Teknoloji Yığını
 
-ParaPusula Pro, gereksiz framework yüklerinden arındırılmış, hafif ve son derece hızlı modern web standartlarıyla inşa edilmiştir:
+ParaPusula, gereksiz framework yüklerinden arındırılmış, hafif ve son derece hızlı modern web standartlarıyla inşa edilmiştir:
 
 | Katman | Teknoloji | Açıklama |
 | :--- | :--- | :--- |
@@ -117,7 +117,7 @@ ParaPusula Pro, gereksiz framework yüklerinden arındırılmış, hafif ve son 
 
 ## 🚀 Hızlı Başlangıç & Kurulum
 
-ParaPusula Pro'yu çalıştırmak için Node.js veya herhangi bir sunucu kurmanıza gerek yoktur.
+ParaPusula'yu çalıştırmak için Node.js veya herhangi bir sunucu kurmanıza gerek yoktur.
 
 ### Yöntem 1: Doğrudan Tarayıcıda Açma (Önerilen)
 1. Repoyu bilgisayarınıza klonlayın:
@@ -138,7 +138,7 @@ Tarayıcınızda `http://localhost:3000` adresine gidin.
 
 ## 📊 Excel ile Veri Nasıl Yüklenir?
 
-ParaPusula Pro, banka ekstrelerinizi ve borç tablolarınızı tek tıkla içeri aktarır:
+ParaPusula, banka ekstrelerinizi ve borç tablolarınızı tek tıkla içeri aktarır:
 
 1. Üst menüdeki veya Ayarlar'daki **"Örnek Şablon"** butonuna basarak örnek `.xlsx` dosyasını indirin.
 2. Gelir, gider, kart ve kredi verilerinizi şablona girin ya da bankanızın verdiği tabloyu doğrudan yükleyin.
@@ -148,7 +148,7 @@ ParaPusula Pro, banka ekstrelerinizi ve borç tablolarınızı tek tıkla içeri
 
 ## 🔐 Güvenlik ve Gizlilik Bildirgesi
 
-ParaPusula Pro kullanıcı mahremiyetini birinci öncelik olarak kabul eder:
+ParaPusula kullanıcı mahremiyetini birinci öncelik olarak kabul eder:
 
 ```
 [Kullanıcı Cihazı / Tarayıcı]
@@ -182,5 +182,5 @@ Topluluk katkılarını memnuniyetle karşılıyoruz!
 Bu proje [MIT Lisansı](LICENSE) kapsamında açık kaynak olarak sunulmaktadır. Dilediğiniz gibi kullanabilir, özelleştirebilir ve geliştirebilirsiniz.
 
 <div align="center">
-  <sub>Finansal özgürlüğe giden yol haritanız • <strong>ParaPusula Pro</strong> ile kontrol sizde.</sub>
+  <sub>Finansal özgürlüğe giden yol haritanız • <strong>ParaPusula</strong> ile kontrol sizde.</sub>
 </div>
