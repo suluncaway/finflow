@@ -1,10 +1,10 @@
 <div align="center">
 
-  <img src="./banner.png" alt="FinFlow Pro - Akıllı Borç ve Nakit Akışı Yönetim Paneli" width="100%" style="border-radius: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.6);" />
+  <img src="./banner.png" alt="ParaPusula Pro - Akıllı Borç ve Nakit Akışı Yönetim Paneli" width="100%" style="border-radius: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.6);" />
 
   <br/><br/>
 
-  # ⚡ FinFlow Pro
+  # ⚡ ParaPusula Pro
   ### Yeni Nesil Siber-Neon Borç Kapatma, Nakit Akışı ve Portföy Yönetim Paneli
 
   <p align="center">
@@ -12,9 +12,9 @@
   </p>
 
   <p align="center">
-    <a href="https://github.com/suluncaway/finflow/stargazers"><img src="https://img.shields.io/github/stars/suluncaway/finflow?style=for-the-badge&color=00f2fe" alt="Stars"></a>
-    <a href="https://github.com/suluncaway/finflow/network/members"><img src="https://img.shields.io/github/forks/suluncaway/finflow?style=for-the-badge&color=4facfe" alt="Forks"></a>
-    <a href="https://github.com/suluncaway/finflow/blob/main/LICENSE"><img src="https://img.shields.io/badge/Lisans-MIT-10b981?style=for-the-badge" alt="License"></a>
+    <a href="https://github.com/SULUNCAWAY_PARAPUSULA_TEMP/stargazers"><img src="https://img.shields.io/github/stars/SULUNCAWAY_PARAPUSULA_TEMP?style=for-the-badge&color=00f2fe" alt="Stars"></a>
+    <a href="https://github.com/SULUNCAWAY_PARAPUSULA_TEMP/network/members"><img src="https://img.shields.io/github/forks/SULUNCAWAY_PARAPUSULA_TEMP?style=for-the-badge&color=4facfe" alt="Forks"></a>
+    <a href="https://github.com/SULUNCAWAY_PARAPUSULA_TEMP/blob/main/LICENSE"><img src="https://img.shields.io/badge/Lisans-MIT-10b981?style=for-the-badge" alt="License"></a>
     <img src="https://img.shields.io/badge/PWA-Destekli-0ea5e9?style=for-the-badge&logo=pwa&logoColor=white" alt="PWA">
     <img src="https://img.shields.io/badge/Excel-Geli%C5%9Fmi%C5%9F_Motor-107c41?style=for-the-badge&logo=microsoftexcel&logoColor=white" alt="Excel Engine">
     <img src="https://img.shields.io/badge/Veri_G%C3%BCvenli%C4%9Fi-%25100_Cihazda-00f2fe?style=for-the-badge" alt="Privacy">
@@ -33,11 +33,11 @@
 
 ---
 
-## 💡 Neden FinFlow Pro?
+## 💡 Neden ParaPusula Pro?
 
 Geleneksel bütçe uygulamaları ya banka giriş şifrelerinizi talep eder ya da verilerinizi uzak sunucularda saklar. Üstelik Türkiye'deki bankacılık dinamiklerini (kredi kartı asgari tutar kademeleri, KMH bileşik faizleri, KKDF + BSMV kesintileri) dikkate almazlar.
 
-**FinFlow Pro**, finansal özgürlüğe ulaşmanız için tasarlanmış bağımsız, açık kaynaklı ve **sıfır sunuculu (serverless)** bir finansal yönetim kokpitidir:
+**ParaPusula Pro**, finansal özgürlüğe ulaşmanız için tasarlanmış bağımsız, açık kaynaklı ve **sıfır sunuculu (serverless)** bir finansal yönetim kokpitidir:
 
 * 🛡️ **Banka Şifresi Yok, Üyelik Yok:** Hiçbir kişisel veri veya banka giriş bilgisi istenmez.
 * 🔒 **Verileriniz Yalnızca Sizin Cihazınızda:** Tüm portföy tarayıcınızın yerel depolama alanında (`localStorage`) güvenle saklanır.
@@ -48,12 +48,12 @@ Geleneksel bütçe uygulamaları ya banka giriş şifrelerinizi talep eder ya da
 
 ## 🌟 Canlı Demo
 
-FinFlow Pro'yu herhangi bir kurulum yapmadan doğrudan tarayıcınızda deneyimleyebilirsiniz:
+ParaPusula Pro'yu herhangi bir kurulum yapmadan doğrudan tarayıcınızda deneyimleyebilirsiniz:
 
-👉 **[FinFlow Pro'yu Canlı Kullanın](https://suluncaway.github.io/finflow/)**
+👉 **[ParaPusula Pro'yu Canlı Kullanın](https://SULUNCAWAY_GITHUB_IO_PARAPUSULA_TEMP/)**
 
 > [!TIP]
-> FinFlow Pro bir **PWA (Progressive Web App)**'tir. Telefonunuzun veya bilgisayarınızın tarayıcısından *"Ana Ekrana Ekle"* ya da *"Uygulamayı Yükle"* butonuna tıklayarak internetsiz dahi çalışan tam bir mobil/masaüstü uygulama gibi kullanabilirsiniz.
+> ParaPusula Pro bir **PWA (Progressive Web App)**'tir. Telefonunuzun veya bilgisayarınızın tarayıcısından *"Ana Ekrana Ekle"* ya da *"Uygulamayı Yükle"* butonuna tıklayarak internetsiz dahi çalışan tam bir mobil/masaüstü uygulama gibi kullanabilirsiniz.
 
 ---
 
@@ -90,7 +90,7 @@ FinFlow Pro'yu herhangi bir kurulum yapmadan doğrudan tarayıcınızda deneyiml
 
 ### 7. 📥 Çift Yönlü Excel & JSON Yedekleme
 * **5 Sayfalı Excel İhracı:** Portföyünüzü (Gelirler, Giderler, Kartlar, KMH, Taksitler ve Kapatılanlar) tek tıkla biçimlendirilmiş bir `.xlsx` çalışma kitabı olarak indirin.
-* **Akıllı Kolon Eşleme (Fuzzy Header Matcher):** Başka tablolardan kopyaladığınız veya bankalardan indirdiğiniz karmaşık Excel dosyalarını otomatik sütun tanıma algoritmasıyla doğrudan FinFlow'a yükleyin.
+* **Akıllı Kolon Eşleme (Fuzzy Header Matcher):** Başka tablolardan kopyaladığınız veya bankalardan indirdiğiniz karmaşık Excel dosyalarını otomatik sütun tanıma algoritmasıyla doğrudan ParaPusula'a yükleyin.
 * **JSON Tam Yedek:** Tek tıkla yedek alın, dilediğiniz zaman geri yükleyin.
 
 ### 8. 🔐 Güvenlik PIN & Biyometrik Kilit
@@ -101,7 +101,7 @@ FinFlow Pro'yu herhangi bir kurulum yapmadan doğrudan tarayıcınızda deneyiml
 
 ## 🛠️ Teknoloji Yığını
 
-FinFlow Pro, gereksiz framework yüklerinden arındırılmış, hafif ve son derece hızlı modern web standartlarıyla inşa edilmiştir:
+ParaPusula Pro, gereksiz framework yüklerinden arındırılmış, hafif ve son derece hızlı modern web standartlarıyla inşa edilmiştir:
 
 | Katman | Teknoloji | Açıklama |
 | :--- | :--- | :--- |
@@ -110,19 +110,19 @@ FinFlow Pro, gereksiz framework yüklerinden arındırılmış, hafif ve son der
 | **Grafikler** | [Chart.js](https://www.chartjs.org/) | Nakit akışı ve borç karşılama oranları için reaktif grafikler |
 | **İkonlar** | [Lucide Icons](https://lucide.dev/) | Minimalist ve tutarlı vektörel arayüz simgeleri |
 | **Excel Motoru** | [SheetJS (xlsx.full.min.js)](https://sheetjs.com/) | Tarayıcı içinde doğrudan istemci taraflı Excel okuma & yazma |
-| **Algoritma Motoru** | FinFlow Avalanche & Snowball Engine | Yerel, anlık borç kapatma ve optimizasyon simülasyonu |
+| **Algoritma Motoru** | ParaPusula Avalanche & Snowball Engine | Yerel, anlık borç kapatma ve optimizasyon simülasyonu |
 | **PWA & Önbellek** | Service Worker (v7) & Manifest | Çevrimdışı (offline) kullanım ve tam PWA deneyimi |
 
 ---
 
 ## 🚀 Hızlı Başlangıç & Kurulum
 
-FinFlow Pro'yu çalıştırmak için Node.js veya herhangi bir sunucu kurmanıza gerek yoktur.
+ParaPusula Pro'yu çalıştırmak için Node.js veya herhangi bir sunucu kurmanıza gerek yoktur.
 
 ### Yöntem 1: Doğrudan Tarayıcıda Açma (Önerilen)
 1. Repoyu bilgisayarınıza klonlayın:
    ```bash
-   git clone https://github.com/suluncaway/finflow.git
+   git clone https://github.com/SULUNCAWAY_PARAPUSULA_TEMP.git
    ```
 2. Klasördeki `index.html` dosyasına çift tıklayarak herhangi bir modern tarayıcıda (Chrome, Edge, Safari, Brave) açın.
 
@@ -138,17 +138,17 @@ Tarayıcınızda `http://localhost:3000` adresine gidin.
 
 ## 📊 Excel ile Veri Nasıl Yüklenir?
 
-FinFlow Pro, banka ekstrelerinizi ve borç tablolarınızı tek tıkla içeri aktarır:
+ParaPusula Pro, banka ekstrelerinizi ve borç tablolarınızı tek tıkla içeri aktarır:
 
 1. Üst menüdeki veya Ayarlar'daki **"Örnek Şablon"** butonuna basarak örnek `.xlsx` dosyasını indirin.
 2. Gelir, gider, kart ve kredi verilerinizi şablona girin ya da bankanızın verdiği tabloyu doğrudan yükleyin.
-3. **"Excel İçe Aktar"** butonuna basarak dosyanızı seçin; FinFlow akıllı doğrulama motoru verileri otomatik olarak ayrıştırıp portföyünüze ekleyecektir.
+3. **"Excel İçe Aktar"** butonuna basarak dosyanızı seçin; ParaPusula akıllı doğrulama motoru verileri otomatik olarak ayrıştırıp portföyünüze ekleyecektir.
 
 ---
 
 ## 🔐 Güvenlik ve Gizlilik Bildirgesi
 
-FinFlow Pro kullanıcı mahremiyetini birinci öncelik olarak kabul eder:
+ParaPusula Pro kullanıcı mahremiyetini birinci öncelik olarak kabul eder:
 
 ```
 [Kullanıcı Cihazı / Tarayıcı]
@@ -182,5 +182,5 @@ Topluluk katkılarını memnuniyetle karşılıyoruz!
 Bu proje [MIT Lisansı](LICENSE) kapsamında açık kaynak olarak sunulmaktadır. Dilediğiniz gibi kullanabilir, özelleştirebilir ve geliştirebilirsiniz.
 
 <div align="center">
-  <sub>Finansal özgürlüğe giden yol haritanız • <strong>FinFlow Pro</strong> ile kontrol sizde.</sub>
+  <sub>Finansal özgürlüğe giden yol haritanız • <strong>ParaPusula Pro</strong> ile kontrol sizde.</sub>
 </div>

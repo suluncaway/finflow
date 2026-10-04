@@ -1,4 +1,4 @@
-const CACHE_NAME = 'finflow-pro-cache-v12';
+const CACHE_NAME = 'parapusula-pro-cache-v12';
 const STATIC_ASSETS = [
   './',
   './index.html',

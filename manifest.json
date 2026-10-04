@@ -1,6 +1,6 @@
 {
-  "name": "FinFlow Pro",
-  "short_name": "FinFlow",
+  "name": "ParaPusula Pro",
+  "short_name": "ParaPusula",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#020617",
