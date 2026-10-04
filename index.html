@@ -836,6 +836,9 @@
               </div>
             </div>
 
+            <!-- LOAN TOTALS SUMMARY CONTAINER -->
+            <div id="loanTotalsSummary" class="flex flex-wrap gap-2 mb-4 mt-2"></div>
+
             <div class="hidden md:block overflow-x-auto">
               <table class="w-full text-left text-xs">
                 <thead class="bg-[#080d19] text-slate-400 border-b border-white/5">
@@ -3503,6 +3506,29 @@ const STORAGE_KEY = 'finflow_portfolio_v18';
       const mobileList = document.getElementById('installmentsMobileList');
       if (!tbody) return;
       const today = getLocalDateString();
+
+      const totalsContainer = document.getElementById('loanTotalsSummary');
+      if (totalsContainer) {
+        const activeLoans = userPortfolio.loans.filter(l => !l.isSettled && (Number(l.amount) || 0) > 0);
+        const loanMap = {};
+        activeLoans.forEach(l => {
+          const name = l.loanName || 'Kredi';
+          if (!loanMap[name]) loanMap[name] = 0;
+          loanMap[name] += Number(l.amount) || 0;
+        });
+        
+        let badgesHtml = '';
+        Object.entries(loanMap).forEach(([name, total]) => {
+          badgesHtml += `<div class="px-3 py-1.5 bg-blue-500/10 border border-blue-500/30 rounded-lg flex items-center gap-2">
+            <span class="text-xs font-semibold text-blue-300">${escapeHtml(name)}:</span>
+            <span class="text-xs font-bold text-white">${formatTRY(total)}</span>
+          </div>`;
+        });
+        if (!badgesHtml) {
+          badgesHtml = `<span class="text-xs text-slate-500 italic">Aktif kredi borcu bulunmuyor.</span>`;
+        }
+        totalsContainer.innerHTML = badgesHtml;
+      }
 
       const sortedLoans = [...userPortfolio.loans].sort((a, b) => {
         if (a.isSettled !== b.isSettled) return a.isSettled ? 1 : -1;
