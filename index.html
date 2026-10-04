@@ -605,7 +605,7 @@
             <!-- CARD 5: DEBT PAYOFF VISUALIZATION (Takes 8 cols) -->
             <div class="lg:col-span-8 cyber-card p-5 sm:p-6 flex flex-col justify-between">
               <div class="flex items-center justify-between mb-3 border-b border-white/5 pb-2.5">
-                <h3 class="text-xs font-bold text-white tracking-wide">Debt Payoff visualization</h3>
+                <h3 class="text-xs font-bold text-white tracking-wide">Borç Kapatma Görselleştirmesi</h3>
                 <button class="text-slate-400 hover:text-white" onclick="switchSidebarTab('analytics')">
                   <i data-lucide="more-horizontal" class="w-4 h-4"></i>
                 </button>
@@ -616,7 +616,7 @@
                 <div class="lg:col-span-7 flex flex-col justify-between">
                   <div class="flex items-start justify-between">
                     <div>
-                      <h4 class="text-xs font-bold text-white">Debt Free Timeline</h4>
+                      <h4 class="text-xs font-bold text-white">Borçsuzluk Zaman Çizelgesi</h4>
                       <p id="debtTimelineSubtitle" class="text-[10px] text-slate-400 mt-0.5">Borç Kapatma İlerleme Planı</p>
                     </div>
                     <div class="text-right">
@@ -646,7 +646,7 @@
                 <!-- Sub-panel B: Assets vs. Liabilities (5 cols) -->
                 <div class="lg:col-span-5 flex flex-col justify-between lg:border-l lg:border-white/5 lg:pl-5">
                   <div>
-                    <h4 class="text-xs font-bold text-white">Assets vs. Liabilities</h4>
+                    <h4 class="text-xs font-bold text-white">Varlıklar ve Yükümlülükler</h4>
                     <p class="text-[10px] text-slate-400 mt-0.5">Varlıklar & Gelir vs. Toplam Borç</p>
                   </div>
 
@@ -659,11 +659,11 @@
                   <div class="flex items-center justify-center gap-6 text-[10px] text-slate-300 mt-2">
                     <div class="flex items-center gap-1.5">
                       <span class="w-2 h-2 rounded-full bg-[#00f5a0]"></span>
-                      <span>Assets (Gelir/Limit)</span>
+                      <span>Varlıklar (Gelir/Limit)</span>
                     </div>
                     <div class="flex items-center gap-1.5">
                       <span class="w-2 h-2 rounded-full bg-[#00d2ff]"></span>
-                      <span>Liabilities (Borç)</span>
+                      <span>Yükümlülükler (Borç)</span>
                     </div>
                   </div>
                 </div>
@@ -676,7 +676,7 @@
               <!-- CARD 6: UPCOMING TRANSACTIONS -->
               <div class="cyber-card p-4 sm:p-5 flex flex-col justify-between flex-1">
                 <div class="flex items-center justify-between mb-3 border-b border-white/5 pb-2">
-                  <h3 class="text-xs font-bold text-white tracking-wide">Upcoming Transactions</h3>
+                  <h3 class="text-xs font-bold text-white tracking-wide">Yaklaşan İşlemler</h3>
                   <button class="text-slate-400 hover:text-white" onclick="switchSidebarTab('reports')">
                     <i data-lucide="more-horizontal" class="w-4 h-4"></i>
                   </button>
@@ -690,7 +690,7 @@
               <!-- CARD 7: MARKET WATCH -->
               <div class="cyber-card p-4 sm:p-5 flex flex-col justify-between flex-1">
                 <div class="flex items-center justify-between mb-3 border-b border-white/5 pb-2">
-                  <h3 class="text-xs font-bold text-white tracking-wide">Market Watch</h3>
+                  <h3 class="text-xs font-bold text-white tracking-wide">Piyasa Takibi</h3>
                   <button class="text-slate-400 hover:text-white">
                     <i data-lucide="more-horizontal" class="w-4 h-4"></i>
                   </button>
@@ -700,7 +700,7 @@
                   <!-- Item 1: BIST / Stocks -->
                   <div class="flex items-center justify-between">
                     <div class="w-24">
-                      <div class="text-xs font-semibold text-white">BIST / Stocks</div>
+                      <div class="text-xs font-semibold text-white">BIST / Hisse Senetleri</div>
                       <div class="text-[10px] text-slate-400">10,248.50</div>
                     </div>
                     <!-- Neon Sparkline -->
@@ -718,7 +718,7 @@
                   <!-- Item 2: USD/TRY or Gold -->
                   <div class="flex items-center justify-between">
                     <div class="w-24">
-                      <div class="text-xs font-semibold text-white">USD / Global</div>
+                      <div class="text-xs font-semibold text-white">USD / Küresel</div>
                       <div class="text-[10px] text-slate-400">Endeks 104.2</div>
                     </div>
                     <!-- Neon Sparkline -->
@@ -893,10 +893,10 @@
                 <div>
                   <h2 class="text-sm sm:text-base font-bold text-white">Akıllı Kapatma Stratejisti (FinFlow Pro Algoritması)</h2>
                   <div class="flex items-center gap-2.5 mt-1">
-                    <span id="modelBadge" class="text-[10px] bg-cyan-950 text-cyan-300 border border-cyan-700 px-2.5 py-0.5 rounded-full font-semibold">Avalanche Modeli</span>
+                    <span id="modelBadge" class="text-[10px] bg-cyan-950 text-cyan-300 border border-cyan-700 px-2.5 py-0.5 rounded-full font-semibold">Çığ Modeli</span>
                     <span class="text-[10px] text-slate-400">| Strateji Değiştir:</span>
                     <button onclick="toggleStrategyModel()" class="text-[10px] text-cyan-400 hover:text-cyan-300 font-bold underline cursor-pointer">
-                      <span id="modelToggleText">Kartopu (Snowball) Yap</span>
+                      <span id="modelToggleText">Kartopu Yap</span>
                     </button>
                   </div>
                 </div>
@@ -2796,9 +2796,9 @@ const STORAGE_KEY = 'finflow_portfolio_v18';
       const f = computeFinancials();
       const isSnowball = userPortfolio.settings.strategy === 'snowball';
       const badge = document.getElementById('modelBadge');
-      if (badge) badge.textContent = isSnowball ? 'Kartopu Modeli' : 'Avalanche Modeli';
+      if (badge) badge.textContent = isSnowball ? 'Kartopu Modeli' : 'Çığ Modeli';
       const toggleText = document.getElementById('modelToggleText');
-      if (toggleText) toggleText.textContent = isSnowball ? 'Avalanche Yap' : 'Kartopu Yap';
+      if (toggleText) toggleText.textContent = isSnowball ? 'Çığ Yap' : 'Kartopu Yap';
       const tag = document.getElementById('priorityListTag');
       if (tag) tag.textContent = isSnowball ? 'En Küçük Bakiyeden Başlayın' : 'En Yüksek Faiz/Maliyetten Başlayın';
 
