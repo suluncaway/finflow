@@ -815,42 +815,86 @@
             <div id="kmhGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
           </div>
 
-          <!-- INSTALLMENTS TABLE -->
-          <div id="section-installments" class="cyber-card p-5 sm:p-6 space-y-4 border border-blue-500/20 shadow-[0_4px_25px_rgba(0,0,0,0.3)]">
-            <div class="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between border-b border-white/5 pb-4">
+          <!-- INSTALLMENTS SECTION -->
+          <div id="section-installments" class="cyber-card p-5 sm:p-6 space-y-5 border border-cyan-500/20 shadow-[0_4px_30px_rgba(0,0,0,0.35)]">
+            <!-- SECTION HEADER & CONTROLS -->
+            <div class="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between border-b border-white/5 pb-4">
               <div>
-                <h3 class="text-xs sm:text-sm font-bold text-white flex items-center gap-2">
-                  <i data-lucide="calendar-range" class="w-4 h-4 text-blue-400"></i> Kredi Taksit Ödeme Takvimi
-                </h3>
-                <p class="text-[11px] text-slate-400 mt-0.5">Vade tarihleri, anapara ve faiz dağılımı</p>
+                <div class="flex items-center gap-2.5">
+                  <div class="p-2.5 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 shadow-[0_0_12px_rgba(0,240,255,0.15)]">
+                    <i data-lucide="layers" class="w-5 h-5"></i>
+                  </div>
+                  <div>
+                    <div class="flex items-center gap-2">
+                      <h3 class="text-sm sm:text-base font-bold text-white tracking-wide">Krediler & Taksit Yönetimi</h3>
+                      <span id="loanTotalCountBadge" class="text-[10px] px-2.5 py-0.5 rounded-full bg-cyan-950 text-cyan-300 border border-cyan-800 font-bold">0 Kredi</span>
+                    </div>
+                    <p class="text-[11px] text-slate-400 mt-0.5">Kredi borçları, taksit takvimleri ve ödeme planları</p>
+                  </div>
+                </div>
               </div>
-              <div class="relative w-full sm:w-64">
+
+              <!-- VIEW SWITCHER & ADD BUTTON -->
+              <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto justify-between lg:justify-end">
+                <!-- VIEW MODE TOGGLE -->
+                <div class="inline-flex p-1 bg-[#060a14] rounded-xl border border-white/10 text-xs shadow-inner">
+                  <button type="button" id="btnLoanViewModeGrouped" onclick="setLoanViewMode('grouped')" class="px-3 py-1.5 rounded-lg font-bold flex items-center gap-1.5 transition bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 shadow-[0_0_10px_rgba(0,240,255,0.2)]">
+                    <i data-lucide="layout-grid" class="w-3.5 h-3.5"></i>
+                    <span>Kredilerim (Gruplu)</span>
+                  </button>
+                  <button type="button" id="btnLoanViewModeTimeline" onclick="setLoanViewMode('timeline')" class="px-3 py-1.5 rounded-lg font-semibold flex items-center gap-1.5 transition text-slate-400 hover:text-white border border-transparent">
+                    <i data-lucide="calendar-range" class="w-3.5 h-3.5"></i>
+                    <span>Tüm Taksitler (Tablo)</span>
+                  </button>
+                </div>
+
+                <!-- ADD LOAN BUTTON -->
+                <button type="button" onclick="openAddLoanModal()" class="cyber-btn bg-cyan-500 hover:bg-cyan-400 text-slate-950 px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-[0_0_15px_rgba(0,240,255,0.25)] transition">
+                  <i data-lucide="plus" class="w-4 h-4"></i>
+                  <span>Yeni Kredi Ekle</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- TOP 4 FINANCIAL METRIC CARDS -->
+            <div id="loanTotalsSummary" class="grid grid-cols-2 lg:grid-cols-4 gap-3"></div>
+
+            <!-- SEARCH & FILTER TOOLBAR -->
+            <div class="flex flex-col sm:flex-row gap-2.5 items-stretch sm:items-center justify-between bg-[#080d19]/80 p-2.5 rounded-xl border border-white/5">
+              <!-- Filter Tabs -->
+              <div id="loanFiltersBar" class="flex flex-wrap items-center gap-1.5 overflow-x-auto no-scrollbar"></div>
+
+              <!-- Search Box -->
+              <div class="relative w-full sm:w-64 flex-shrink-0">
                 <i data-lucide="search" class="w-3.5 h-3.5 text-slate-500 absolute left-3 top-2.5"></i>
-                <input type="text" id="loanSearch" oninput="renderInstallmentsTable()" placeholder="Kredi veya tarih ara..." class="w-full bg-[#080d19] border border-slate-800 rounded-xl pl-8 pr-3 py-1.5 text-xs text-white focus:outline-none focus:border-cyan-400 transition">
+                <input type="text" id="loanSearch" oninput="renderInstallmentsTable()" placeholder="Kredi veya tarih ara..." class="w-full bg-[#040711] border border-slate-800 rounded-xl pl-8 pr-3 py-1.5 text-xs text-white focus:outline-none focus:border-cyan-400 transition placeholder:text-slate-500">
               </div>
             </div>
 
-            <!-- LOAN TOTALS SUMMARY CONTAINER -->
-            <div id="loanTotalsSummary" class="flex flex-wrap gap-2 mb-4 mt-2"></div>
+            <!-- VIEW 1: GROUPED CARDS CONTAINER -->
+            <div id="loanGroupedContainer" class="space-y-4"></div>
 
-            <div class="hidden md:block overflow-x-auto">
-              <table class="w-full text-left text-xs">
-                <thead class="bg-[#080d19] text-slate-400 border-b border-white/5">
-                  <tr>
-                    <th class="p-3">Kredi Adı</th>
-                    <th class="p-3">Taksit</th>
-                    <th class="p-3">Vade</th>
-                    <th class="p-3">Tutar</th>
-                    <th class="p-3">Anapara</th>
-                    <th class="p-3">Faiz+Vergi</th>
-                    <th class="p-3">Durum</th>
-                    <th class="p-3 text-right">İşlem</th>
-                  </tr>
-                </thead>
-                <tbody id="installmentsTableBody" class="divide-y divide-white/5"></tbody>
-              </table>
+            <!-- VIEW 2: TIMELINE TABLE CONTAINER -->
+            <div id="loanTimelineContainer" class="space-y-3 hidden">
+              <div class="hidden md:block overflow-x-auto rounded-xl border border-white/5">
+                <table class="w-full text-left text-xs">
+                  <thead class="bg-[#080d19] text-slate-400 border-b border-white/10 uppercase text-[10px] tracking-wider">
+                    <tr>
+                      <th class="p-3">Kredi Bilgisi</th>
+                      <th class="p-3">Taksit</th>
+                      <th class="p-3">Vade Tarihi</th>
+                      <th class="p-3">Tutar</th>
+                      <th class="p-3">Anapara</th>
+                      <th class="p-3">Faiz+Vergi</th>
+                      <th class="p-3">Durum</th>
+                      <th class="p-3 text-right">İşlem</th>
+                    </tr>
+                  </thead>
+                  <tbody id="installmentsTableBody" class="divide-y divide-white/5 bg-[#080d19]/40"></tbody>
+                </table>
+              </div>
+              <div id="installmentsMobileList" class="md:hidden divide-y divide-white/5 space-y-2"></div>
             </div>
-            <div id="installmentsMobileList" class="md:hidden divide-y divide-white/5 p-2 space-y-2"></div>
           </div>
 
           <!-- INCOMES GRID -->
@@ -3486,129 +3530,773 @@ const STORAGE_KEY = 'finflow_portfolio_v18';
       }
     }
 
+    let loanViewMode = 'grouped'; // 'grouped' | 'timeline'
+    let loanStatusFilter = 'all'; // 'all' | 'overdue' | 'this_month' | 'pending' | 'settled'
+    let loanSelectedFilter = 'all';
+    let loanGroupFilter = 'all'; // 'all' | 'overdue' | 'active' | 'settled'
+    let expandedLoanKeys = new Set();
     let showAllInstallments = false;
-    const INSTALLMENT_PAGE_SIZE = 12;
+    const INSTALLMENT_PAGE_SIZE = 15;
+
     function toggleShowAllInstallments() {
       showAllInstallments = !showAllInstallments;
       renderInstallmentsTable();
       safeCreateIcons();
     }
 
+    function setLoanViewMode(mode) {
+      loanViewMode = mode;
+      const btnGrouped = document.getElementById('btnLoanViewModeGrouped');
+      const btnTimeline = document.getElementById('btnLoanViewModeTimeline');
+      if (btnGrouped && btnTimeline) {
+        if (mode === 'grouped') {
+          btnGrouped.className = 'px-3 py-1.5 rounded-lg font-bold flex items-center gap-1.5 transition bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 shadow-[0_0_10px_rgba(0,240,255,0.2)]';
+          btnTimeline.className = 'px-3 py-1.5 rounded-lg font-semibold flex items-center gap-1.5 transition text-slate-400 hover:text-white border border-transparent';
+        } else {
+          btnTimeline.className = 'px-3 py-1.5 rounded-lg font-bold flex items-center gap-1.5 transition bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 shadow-[0_0_10px_rgba(0,240,255,0.2)]';
+          btnGrouped.className = 'px-3 py-1.5 rounded-lg font-semibold flex items-center gap-1.5 transition text-slate-400 hover:text-white border border-transparent';
+        }
+      }
+      renderInstallmentsTable();
+      safeCreateIcons();
+    }
+
+    function setLoanStatusFilter(filter) {
+      loanStatusFilter = filter;
+      renderInstallmentsTable();
+      safeCreateIcons();
+    }
+
+    function setLoanGroupFilter(filter) {
+      loanGroupFilter = filter;
+      renderInstallmentsTable();
+      safeCreateIcons();
+    }
+
+    function setLoanSelectedFilter(val) {
+      loanSelectedFilter = val;
+      renderInstallmentsTable();
+      safeCreateIcons();
+    }
+
+    function openAddLoanModal() {
+      openUniversalDebtModal();
+      const radio = document.querySelector('input[name="debtCategoryType"][value="loan"]');
+      if (radio) {
+        radio.checked = true;
+        toggleDebtFields('loan');
+      }
+    }
+
+    function getSafeLoanKey(name) {
+      return 'lk_' + encodeURIComponent(name || 'loan').replace(/[^a-zA-Z0-9]/g, '_');
+    }
+
+    function toggleLoanAccordion(key) {
+      if (expandedLoanKeys.has(key)) {
+        expandedLoanKeys.delete(key);
+      } else {
+        expandedLoanKeys.add(key);
+      }
+      const el = document.getElementById('loan-accordion-' + key);
+      const icon = document.getElementById('loan-icon-' + key);
+      if (el) {
+        const isHidden = el.classList.toggle('hidden');
+        if (icon) {
+          if (!isHidden) icon.classList.add('rotate-180');
+          else icon.classList.remove('rotate-180');
+        }
+        safeCreateIcons();
+      } else {
+        renderInstallmentsTable();
+      }
+    }
+
+    function payNextLoanInstallment(loanName) {
+      const sameLoan = userPortfolio.loans.filter(l => l.loanName === loanName && !l.isSettled)
+        .sort((a, b) => {
+          if (a.dueDate && b.dueDate) {
+            if (a.dueDate < b.dueDate) return -1;
+            if (a.dueDate > b.dueDate) return 1;
+          }
+          return (a.instNo || 0) - (b.instNo || 0);
+        });
+      if (!sameLoan.length) {
+        alert('Bu krediye ait bekleyen taksit bulunamadı.');
+        return;
+      }
+      const nextInst = sameLoan[0];
+      toggleLoan(nextInst.id);
+    }
+
+    function payNextLoanByIndex(idx) {
+      const group = window._loanGroupsList && window._loanGroupsList[idx];
+      if (!group) return;
+      payNextLoanInstallment(group.name);
+    }
+
+    function settleLoanGroup(loanName) {
+      const sameLoan = userPortfolio.loans.filter(l => l.loanName === loanName);
+      if (!sameLoan.length) return;
+      const allSettled = sameLoan.every(l => l.isSettled);
+      if (allSettled) {
+        if (!confirm(`"${loanName}" kredisinin tüm taksitleri zaten ödenmiş görünüyor. Ödenmedi olarak geri almak istiyor musunuz?`)) return;
+        sameLoan.forEach(l => l.isSettled = false);
+        const archiveKey = `${loanName} (Tüm Taksitler)`;
+        userPortfolio.archive = userPortfolio.archive.filter(a => !(a.title === archiveKey && a.type === 'Kredi (Tamamlandı)'));
+      } else {
+        const unsettledCount = sameLoan.filter(l => !l.isSettled).length;
+        if (!confirm(`"${loanName}" kredisinin kalan tüm taksitlerini (${unsettledCount} taksit) tamamen kapatmak (ödendi işaretlemek) istiyor musunuz?`)) return;
+        sameLoan.forEach(l => l.isSettled = true);
+        const archiveKey = `${loanName} (Tüm Taksitler)`;
+        const alreadyArchived = userPortfolio.archive.some(a => a.title === archiveKey && a.type === 'Kredi (Tamamlandı)');
+        if (!alreadyArchived) {
+          const totalAmount = sameLoan.reduce((s, x) => s + (Number(x.amount) || 0), 0);
+          userPortfolio.archive.unshift({
+            id: generateId(),
+            title: archiveKey,
+            type: 'Kredi (Tamamlandı)',
+            settledDate: getLocalDateString(),
+            originalAmount: totalAmount
+          });
+        }
+      }
+      saveState();
+    }
+
+    function settleLoanGroupByIndex(idx) {
+      const group = window._loanGroupsList && window._loanGroupsList[idx];
+      if (!group) return;
+      settleLoanGroup(group.name);
+    }
+
+    function deleteLoanGroup(loanName) {
+      if (!confirm(`"${loanName}" kredisini ve bu krediye ait TÜM taksitleri silmek istediğinize emin misiniz? Bu işlem geri alınamaz.`)) return;
+      userPortfolio.loans = userPortfolio.loans.filter(l => l.loanName !== loanName);
+      const archiveKey = `${loanName} (Tüm Taksitler)`;
+      userPortfolio.archive = userPortfolio.archive.filter(a => !(a.title === archiveKey && a.type === 'Kredi (Tamamlandı)'));
+      saveState();
+    }
+
+    function deleteLoanGroupByIndex(idx) {
+      const group = window._loanGroupsList && window._loanGroupsList[idx];
+      if (!group) return;
+      deleteLoanGroup(group.name);
+    }
+
+    function getLoanCategoryMeta(loanName) {
+      const lower = (loanName || '').toLowerCase();
+      if (lower.includes('avans')) {
+        return {
+          label: 'Taksitli Avans',
+          icon: 'zap',
+          color: 'text-amber-400',
+          bg: 'bg-amber-500/10 border border-amber-500/30',
+          badgeClass: 'bg-amber-950 text-amber-300 border border-amber-800'
+        };
+      }
+      if (lower.includes('konut') || lower.includes('ev') || lower.includes('mortgage')) {
+        return {
+          label: 'Konut Kredisi',
+          icon: 'home',
+          color: 'text-teal-400',
+          bg: 'bg-teal-500/10 border border-teal-500/30',
+          badgeClass: 'bg-teal-950 text-teal-300 border border-teal-800'
+        };
+      }
+      if (lower.includes('taşıt') || lower.includes('araç') || lower.includes('araba') || lower.includes('oto')) {
+        return {
+          label: 'Taşıt Kredisi',
+          icon: 'car',
+          color: 'text-blue-400',
+          bg: 'bg-blue-500/10 border border-blue-500/30',
+          badgeClass: 'bg-blue-950 text-blue-300 border border-blue-800'
+        };
+      }
+      if (lower.includes('ihtiyaç') || lower.includes('tüketici')) {
+        return {
+          label: 'Tüketici Kredisi',
+          icon: 'badge-percent',
+          color: 'text-indigo-400',
+          bg: 'bg-indigo-500/10 border border-indigo-500/30',
+          badgeClass: 'bg-indigo-950 text-indigo-300 border border-indigo-800'
+        };
+      }
+      return {
+        label: 'Taksitli Kredi',
+        icon: 'landmark',
+        color: 'text-cyan-400',
+        bg: 'bg-cyan-500/10 border border-cyan-500/30',
+        badgeClass: 'bg-cyan-950 text-cyan-300 border border-cyan-800'
+      };
+    }
+
+    function formatRelativeDaysBadge(dueDateStr, todayStr) {
+      if (!dueDateStr) return '';
+      const d1 = new Date(dueDateStr + 'T00:00:00');
+      const d2 = new Date((todayStr || getLocalDateString()) + 'T00:00:00');
+      const diff = Math.round((d1 - d2) / (1000 * 60 * 60 * 24));
+      if (diff < 0) {
+        return `<span class="text-[10px] text-rose-300 font-bold bg-rose-950 px-1.5 py-0.5 rounded border border-rose-800/80 inline-flex items-center gap-1"><i data-lucide="clock-alert" class="w-2.5 h-2.5"></i>${Math.abs(diff)}g gecikti</span>`;
+      }
+      if (diff === 0) {
+        return `<span class="text-[10px] text-amber-300 font-bold bg-amber-950 px-1.5 py-0.5 rounded border border-amber-800/80 inline-flex items-center gap-1"><i data-lucide="bell" class="w-2.5 h-2.5"></i>Bugün Vade</span>`;
+      }
+      if (diff <= 7) {
+        return `<span class="text-[10px] text-yellow-300 font-medium bg-yellow-950/70 px-1.5 py-0.5 rounded border border-yellow-800/50">${diff} gün kaldı</span>`;
+      }
+      return `<span class="text-[10px] text-slate-400 font-medium">${diff} gün</span>`;
+    }
+
     function renderInstallmentsTable() {
-      const q = (document.getElementById('loanSearch')?.value || '').toLowerCase();
+      const q = (document.getElementById('loanSearch')?.value || '').toLowerCase().trim();
+      const groupedContainer = document.getElementById('loanGroupedContainer');
+      const timelineContainer = document.getElementById('loanTimelineContainer');
       const tbody = document.getElementById('installmentsTableBody');
       const mobileList = document.getElementById('installmentsMobileList');
-      if (!tbody) return;
-      const today = getLocalDateString();
-
       const totalsContainer = document.getElementById('loanTotalsSummary');
-      if (totalsContainer) {
-        const activeLoans = userPortfolio.loans.filter(l => !l.isSettled && (Number(l.amount) || 0) > 0);
-        const loanMap = {};
-        activeLoans.forEach(l => {
-          const name = l.loanName || 'Kredi';
-          if (!loanMap[name]) loanMap[name] = 0;
-          loanMap[name] += Number(l.amount) || 0;
-        });
-        
-        let badgesHtml = '';
-        Object.entries(loanMap).forEach(([name, total]) => {
-          badgesHtml += `<div class="px-3 py-1.5 bg-blue-500/10 border border-blue-500/30 rounded-lg flex items-center gap-2">
-            <span class="text-xs font-semibold text-blue-300">${escapeHtml(name)}:</span>
-            <span class="text-xs font-bold text-white">${formatTRY(total)}</span>
-          </div>`;
-        });
-        if (!badgesHtml) {
-          badgesHtml = `<span class="text-xs text-slate-500 italic">Aktif kredi borcu bulunmuyor.</span>`;
+      const filtersBar = document.getElementById('loanFiltersBar');
+      const countBadge = document.getElementById('loanTotalCountBadge');
+
+      const allLoans = userPortfolio.loans || [];
+      const today = getLocalDateString();
+      const currentMonthPrefix = today.substring(0, 7);
+
+      // Group installments by loanName
+      const groupsMap = {};
+      allLoans.forEach(inst => {
+        const name = inst.loanName || 'Kredi';
+        if (!groupsMap[name]) {
+          groupsMap[name] = {
+            name,
+            key: getSafeLoanKey(name),
+            installments: [],
+            totalDebt: 0,
+            remainingDebt: 0,
+            totalCount: 0,
+            settledCount: 0,
+            overdueCount: 0,
+            thisMonthCount: 0,
+            thisMonthTotal: 0,
+            nextUnpaid: null,
+            meta: getLoanCategoryMeta(name)
+          };
         }
-        totalsContainer.innerHTML = badgesHtml;
+        const g = groupsMap[name];
+        g.installments.push(inst);
+        g.totalCount++;
+        const amt = Number(inst.amount) || 0;
+        g.totalDebt += amt;
+        if (inst.isSettled) {
+          g.settledCount++;
+        } else {
+          g.remainingDebt += amt;
+          if (inst.dueDate && inst.dueDate < today) {
+            g.overdueCount++;
+          }
+          if (inst.dueDate && inst.dueDate.startsWith(currentMonthPrefix)) {
+            g.thisMonthCount++;
+            g.thisMonthTotal += amt;
+          }
+        }
+      });
+
+      const loanGroups = Object.values(groupsMap);
+
+      // Sort installments inside each group
+      loanGroups.forEach(g => {
+        g.installments.sort((a, b) => {
+          if (a.instNo && b.instNo && a.instNo !== b.instNo) return a.instNo - b.instNo;
+          if (a.dueDate && b.dueDate) return a.dueDate < b.dueDate ? -1 : 1;
+          return 0;
+        });
+        g.nextUnpaid = g.installments.find(x => !x.isSettled) || null;
+        g.monthlyAmount = g.nextUnpaid ? Number(g.nextUnpaid.amount) || 0 : (g.installments[0] ? Number(g.installments[0].amount) || 0 : 0);
+        g.progressPercent = g.totalCount > 0 ? Math.round((g.settledCount / g.totalCount) * 100) : 0;
+        g.isFinished = g.totalCount > 0 && g.settledCount === g.totalCount;
+      });
+
+      // Global calculations
+      const totalRemainingDebt = loanGroups.reduce((s, g) => s + g.remainingDebt, 0);
+      const totalRemainingInstCount = allLoans.filter(l => !l.isSettled).length;
+      const totalOverdueCount = allLoans.filter(l => !l.isSettled && l.dueDate && l.dueDate < today).length;
+      const totalOverdueAmount = allLoans.filter(l => !l.isSettled && l.dueDate && l.dueDate < today)
+        .reduce((s, l) => s + (Number(l.amount) || 0), 0);
+      const thisMonthInsts = allLoans.filter(l => !l.isSettled && l.dueDate && l.dueDate.startsWith(currentMonthPrefix));
+      const thisMonthTotal = thisMonthInsts.reduce((s, l) => s + (Number(l.amount) || 0), 0);
+      const totalSettledCount = allLoans.filter(l => l.isSettled).length;
+      const overallProgress = allLoans.length > 0 ? Math.round((totalSettledCount / allLoans.length) * 100) : 0;
+      const activeLoansCount = loanGroups.filter(g => !g.isFinished).length;
+
+      // Update badge
+      if (countBadge) {
+        countBadge.textContent = `${loanGroups.length} Kredi • ${totalRemainingInstCount} Kalan Taksit`;
       }
 
-      const sortedLoans = [...userPortfolio.loans].sort((a, b) => {
-        if (a.isSettled !== b.isSettled) return a.isSettled ? 1 : -1;
-        if (a.dueDate && b.dueDate) {
-          if (a.dueDate < b.dueDate) return -1;
-          if (a.dueDate > b.dueDate) return 1;
+      // Render Top 4 Financial Metric Cards
+      if (totalsContainer) {
+        if (!allLoans.length) {
+          totalsContainer.innerHTML = '';
+        } else {
+          totalsContainer.innerHTML = `
+            <!-- Card 1: Toplam Kalan Borç -->
+            <div class="cyber-card p-3.5 sm:p-4 rounded-xl border border-cyan-500/25 bg-slate-900/60 shadow-[0_0_15px_rgba(0,240,255,0.06)] flex flex-col justify-between">
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="text-[11px] text-slate-400 font-semibold">Toplam Kalan Borç</span>
+                <span class="p-1 rounded-lg bg-cyan-500/10 text-cyan-400 border border-cyan-500/20"><i data-lucide="wallet" class="w-3.5 h-3.5"></i></span>
+              </div>
+              <div class="font-black text-base sm:text-lg text-cyan-400 tracking-tight">${formatTRY(totalRemainingDebt)}</div>
+              <span class="text-[10px] text-slate-400 mt-1">${activeLoansCount} Aktif Kredi • ${totalRemainingInstCount} Taksit</span>
+            </div>
+
+            <!-- Card 2: Bu Ay Ödenecek -->
+            <div class="cyber-card p-3.5 sm:p-4 rounded-xl border border-blue-500/25 bg-slate-900/60 shadow-[0_0_15px_rgba(59,130,246,0.06)] flex flex-col justify-between">
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="text-[11px] text-slate-400 font-semibold">Bu Ayki Taksitler</span>
+                <span class="p-1 rounded-lg bg-blue-500/10 text-blue-400 border border-blue-500/20"><i data-lucide="calendar" class="w-3.5 h-3.5"></i></span>
+              </div>
+              <div class="font-black text-base sm:text-lg text-white tracking-tight">${formatTRY(thisMonthTotal)}</div>
+              <span class="text-[10px] text-slate-400 mt-1">${thisMonthInsts.length} taksit bu ay ödenecek</span>
+            </div>
+
+            <!-- Card 3: Gecikmiş Durumu -->
+            <div class="cyber-card p-3.5 sm:p-4 rounded-xl ${totalOverdueCount > 0 ? 'border-rose-500/40 bg-rose-950/20 shadow-[0_0_20px_rgba(244,63,94,0.15)]' : 'border-emerald-500/25 bg-slate-900/60'} flex flex-col justify-between">
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="text-[11px] ${totalOverdueCount > 0 ? 'text-rose-300 font-bold' : 'text-slate-400'} font-semibold">Gecikmiş Tutar</span>
+                <span class="p-1 rounded-lg ${totalOverdueCount > 0 ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30' : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'}">
+                  <i data-lucide="${totalOverdueCount > 0 ? 'alert-triangle' : 'shield-check'}" class="w-3.5 h-3.5"></i>
+                </span>
+              </div>
+              <div class="font-black text-base sm:text-lg ${totalOverdueCount > 0 ? 'text-rose-400' : 'text-emerald-400'} tracking-tight">
+                ${totalOverdueCount > 0 ? formatTRY(totalOverdueAmount) : 'Gecikme Yok ✓'}
+              </div>
+              <span class="text-[10px] ${totalOverdueCount > 0 ? 'text-rose-300/80 font-semibold' : 'text-slate-400'} mt-1">
+                ${totalOverdueCount > 0 ? `${totalOverdueCount} taksit vadesi geçti!` : 'Ödemeler düzenli'}
+              </span>
+            </div>
+
+            <!-- Card 4: Genel İlerleme -->
+            <div class="cyber-card p-3.5 sm:p-4 rounded-xl border border-emerald-500/25 bg-slate-900/60 flex flex-col justify-between">
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="text-[11px] text-slate-400 font-semibold">Taksit İlerlemesi</span>
+                <span class="p-1 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"><i data-lucide="trophy" class="w-3.5 h-3.5"></i></span>
+              </div>
+              <div class="font-black text-base sm:text-lg text-emerald-400 tracking-tight">%${overallProgress}</div>
+              <span class="text-[10px] text-slate-400 mt-1">${totalSettledCount} / ${allLoans.length} taksit ödendi</span>
+            </div>
+          `;
         }
-        return (a.instNo || 0) - (b.instNo || 0);
-      });
+      }
 
-      const filtered = sortedLoans.filter(l => {
-        if (!q) return true;
-        return (l.loanName || '').toLowerCase().includes(q) || (l.dueDate || '').includes(q);
-      });
-
-      if (!filtered.length) {
-        tbody.innerHTML = `<tr><td colspan="8" class="text-center py-8 text-slate-500 text-xs">Aktif kredi veya taksit planı bulunamadı.</td></tr>`;
-        if (mobileList) mobileList.innerHTML = `<div class="text-center py-6 text-slate-500 text-xs">Aktif kredi veya taksit planı bulunamadı.</div>`;
+      // Check if empty
+      if (!allLoans.length) {
+        if (filtersBar) filtersBar.innerHTML = '';
+        if (groupedContainer) {
+          groupedContainer.classList.remove('hidden');
+          groupedContainer.innerHTML = `
+            <div class="text-center py-12 px-4 cyber-item-card rounded-2xl border border-white/5 space-y-3">
+              <div class="w-12 h-12 rounded-2xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 flex items-center justify-center mx-auto">
+                <i data-lucide="landmark" class="w-6 h-6"></i>
+              </div>
+              <h4 class="text-sm font-bold text-white">Henüz Kayıtlı Kredi Bulunmuyor</h4>
+              <p class="text-xs text-slate-400 max-w-sm mx-auto">Taksitli ihtiyaç, konut, taşıt kredilerinizi veya nakit avans taksitlerinizi ekleyerek vadelerinizi düzenli takip edin.</p>
+              <button onclick="openAddLoanModal()" class="cyber-btn bg-cyan-500 hover:bg-cyan-400 text-slate-950 text-xs font-bold px-4 py-2 rounded-xl inline-flex items-center gap-2 mt-2">
+                <i data-lucide="plus" class="w-4 h-4"></i> + İlk Kredini Ekle
+              </button>
+            </div>
+          `;
+        }
+        if (timelineContainer) timelineContainer.classList.add('hidden');
         return;
       }
 
-      // Uzun ödeme planlarında (ör. 96 aylık konut kredisi) sayfa kilometrelerce uzamasın
-      const limited = !q && !showAllInstallments && filtered.length > INSTALLMENT_PAGE_SIZE;
-      const visible = limited ? filtered.slice(0, INSTALLMENT_PAGE_SIZE) : filtered;
-      const moreLabel = limited
-        ? `Tüm taksitleri göster (${filtered.length - INSTALLMENT_PAGE_SIZE} taksit daha)`
-        : (filtered.length > INSTALLMENT_PAGE_SIZE && !q ? 'Daha az göster' : '');
-      const moreBtn = moreLabel ? `<button onclick="toggleShowAllInstallments()" class="cyber-btn w-full py-2.5 rounded-xl border border-cyan-500/30 text-cyan-300 text-xs font-semibold hover:bg-cyan-500/10 transition">${moreLabel}</button>` : '';
+      // VIEW MODE 1: GROUPED BY LOAN
+      if (loanViewMode === 'grouped') {
+        if (groupedContainer) groupedContainer.classList.remove('hidden');
+        if (timelineContainer) timelineContainer.classList.add('hidden');
 
-      tbody.innerHTML = visible.map(l => {
-        const isPast = !l.isSettled && l.dueDate && l.dueDate < today;
-        const isToday = !l.isSettled && l.dueDate && l.dueDate === today;
+        // Render Filter Tabs for Grouped view
+        if (filtersBar) {
+          const overdueGroupCount = loanGroups.filter(g => g.overdueCount > 0).length;
+          const activeGroupCount = loanGroups.filter(g => !g.isFinished).length;
+          const settledGroupCount = loanGroups.filter(g => g.isFinished).length;
 
-        let statusBadge = '';
-        if (l.isSettled) {
-          statusBadge = '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-950 text-emerald-400 border border-emerald-800">Ödendi</span>';
-        } else if (isPast) {
-          statusBadge = '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-950 text-rose-300 border border-rose-800">Gecikmiş</span>';
-        } else if (isToday) {
-          statusBadge = '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-950 text-amber-300 border border-amber-800">Bugün Vade</span>';
-        } else {
-          statusBadge = '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-slate-900 text-slate-400 border border-white/10">Bekliyor</span>';
+          filtersBar.innerHTML = `
+            <button onclick="setLoanGroupFilter('all')" class="px-2.5 py-1 rounded-lg text-xs font-semibold transition ${loanGroupFilter === 'all' ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40' : 'text-slate-400 hover:text-white border border-transparent'}">
+              Tüm Krediler (${loanGroups.length})
+            </button>
+            <button onclick="setLoanGroupFilter('overdue')" class="px-2.5 py-1 rounded-lg text-xs font-semibold transition ${loanGroupFilter === 'overdue' ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40' : 'text-slate-400 hover:text-white border border-transparent'} flex items-center gap-1">
+              <span>⚠️ Gecikenler</span>
+              <span class="px-1.5 py-0.2 rounded-full text-[10px] ${overdueGroupCount > 0 ? 'bg-rose-950 text-rose-300 border border-rose-800 font-bold' : 'bg-slate-800 text-slate-400'}">${overdueGroupCount}</span>
+            </button>
+            <button onclick="setLoanGroupFilter('active')" class="px-2.5 py-1 rounded-lg text-xs font-semibold transition ${loanGroupFilter === 'active' ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40' : 'text-slate-400 hover:text-white border border-transparent'}">
+              Aktif Krediler (${activeGroupCount})
+            </button>
+            <button onclick="setLoanGroupFilter('settled')" class="px-2.5 py-1 rounded-lg text-xs font-semibold transition ${loanGroupFilter === 'settled' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40' : 'text-slate-400 hover:text-white border border-transparent'}">
+              Kapananlar (${settledGroupCount})
+            </button>
+          `;
         }
 
-        return `
-          <tr class="hover:bg-cyan-500/5 transition-colors ${l.isSettled ? 'opacity-40 line-through' : ''}">
-            <td class="p-3 font-semibold text-slate-200">${escapeHtml(l.loanName || 'Kredi')}</td>
-            <td class="p-3 text-slate-400 font-medium">Taksit #${l.instNo}</td>
-            <td class="p-3 font-medium ${isPast ? 'text-rose-400 font-bold' : (isToday ? 'text-amber-400 font-bold' : 'text-slate-300')}">${escapeHtml(l.dueDate || '-')}</td>
-            <td class="p-3 font-black text-cyan-400">${formatTRY(l.amount)}</td>
-            <td class="p-3 text-slate-400">${formatTRY(l.principal || Math.round(l.amount * 0.6 * 100) / 100)}</td>
-            <td class="p-3 text-slate-500">${formatTRY(l.interest || Math.round(l.amount * 0.4 * 100) / 100)}</td>
-            <td class="p-3">${statusBadge}</td>
-            <td class="p-3 text-right space-x-1.5 whitespace-nowrap">
-              <button onclick="openPartialPay('loan', '${l.id}')" class="cyber-btn px-2.5 py-1 text-[11px] rounded-lg border border-teal-800/80 text-teal-300 hover:bg-teal-950 font-bold">Ara Öde</button>
-              <button onclick="toggleLoan('${l.id}')" class="cyber-btn px-3 py-1 text-[11px] rounded-lg border ${l.isSettled ? 'border-emerald-800 text-emerald-400 bg-emerald-950/40' : 'border-white/10 text-slate-300 hover:border-cyan-400 hover:text-white'} font-bold">
-                ${l.isSettled ? 'Geri Al' : 'Öde'}
-              </button>
-              <button onclick="deleteLoan('${l.id}')" class="cyber-btn px-2 py-1 text-[11px] rounded-lg border border-rose-900/60 text-rose-400 hover:bg-rose-950 font-bold">Sil</button>
-            </td>
-          </tr>
-        `;
-      }).join('') + (moreBtn ? `<tr><td colspan="8" class="p-3">${moreBtn}</td></tr>` : '');
+        // Filter groups based on search `q` and `loanGroupFilter`
+        let filteredGroups = loanGroups.filter(g => {
+          if (loanGroupFilter === 'overdue' && g.overdueCount === 0) return false;
+          if (loanGroupFilter === 'active' && g.isFinished) return false;
+          if (loanGroupFilter === 'settled' && !g.isFinished) return false;
+          if (q) {
+            const matchesName = g.name.toLowerCase().includes(q);
+            const matchesInst = g.installments.some(i => (i.dueDate || '').includes(q));
+            if (!matchesName && !matchesInst) return false;
+          }
+          return true;
+        });
 
-      if (mobileList) {
-        mobileList.innerHTML = visible.map(l => {
-          const isPast = !l.isSettled && l.dueDate && l.dueDate < today;
-          const isToday = !l.isSettled && l.dueDate && l.dueDate === today;
-          const st = l.isSettled ? '<span class="text-emerald-400 font-bold">Ödendi</span>'
-            : (isPast ? '<span class="text-rose-400 font-bold">Gecikmiş</span>' : (isToday ? '<span class="text-amber-400 font-bold">Bugün</span>' : ''));
+        // Sort groups: overdue first, then earliest upcoming payment, then finished
+        filteredGroups.sort((a, b) => {
+          if (a.isFinished !== b.isFinished) return a.isFinished ? 1 : -1;
+          if (a.overdueCount > 0 && b.overdueCount === 0) return -1;
+          if (b.overdueCount > 0 && a.overdueCount === 0) return 1;
+          if (a.nextUnpaid && b.nextUnpaid && a.nextUnpaid.dueDate && b.nextUnpaid.dueDate) {
+            return a.nextUnpaid.dueDate < b.nextUnpaid.dueDate ? -1 : 1;
+          }
+          return a.name.localeCompare(b.name);
+        });
+
+        window._loanGroupsList = filteredGroups;
+
+        if (!filteredGroups.length) {
+          groupedContainer.innerHTML = `<div class="text-center py-8 text-slate-500 text-xs">Aradığınız kriterlere uygun kredi bulunamadı.</div>`;
+          return;
+        }
+
+        // Render Cards
+        groupedContainer.innerHTML = filteredGroups.map((g, idx) => {
+          const isOverdue = g.overdueCount > 0;
+          const isFinished = g.isFinished;
+          const isExpanded = expandedLoanKeys.has(g.key);
+
+          let statusBadge = '';
+          if (isFinished) {
+            statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-950 text-emerald-300 border border-emerald-800 flex items-center gap-1"><i data-lucide="check-check" class="w-3 h-3"></i> Kapatıldı</span>`;
+          } else if (isOverdue) {
+            statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-950 text-rose-300 border border-rose-800 flex items-center gap-1"><i data-lucide="alert-triangle" class="w-3 h-3"></i> ${g.overdueCount} Taksit Gecikti</span>`;
+          } else if (g.nextUnpaid && g.nextUnpaid.dueDate === today) {
+            statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-950 text-amber-300 border border-amber-800 flex items-center gap-1"><i data-lucide="bell" class="w-3 h-3"></i> Bugün Vade</span>`;
+          } else {
+            statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-slate-900 text-cyan-300 border border-white/10 flex items-center gap-1"><i data-lucide="clock" class="w-3 h-3"></i> Düzenli</span>`;
+          }
+
+          let nextDueDateText = '-';
+          let nextDueDateClass = 'text-slate-300';
+          if (g.nextUnpaid) {
+            nextDueDateText = `<span class="text-xs sm:text-sm font-bold text-white">${escapeHtml(g.nextUnpaid.dueDate)}</span> <span class="ml-1">${formatRelativeDaysBadge(g.nextUnpaid.dueDate, today)}</span>`;
+            if (g.nextUnpaid.dueDate < today) {
+              nextDueDateClass = 'text-rose-400 font-bold';
+            } else if (g.nextUnpaid.dueDate === today) {
+              nextDueDateClass = 'text-amber-300 font-bold';
+            }
+          } else {
+            nextDueDateText = '<span class="text-xs text-emerald-400 font-bold">Tüm Taksitler Ödendi</span>';
+            nextDueDateClass = 'text-emerald-400 font-bold';
+          }
+
+          // Build installment rows inside accordion
+          const instRowsHtml = g.installments.map(inst => {
+            const isInstPast = !inst.isSettled && inst.dueDate && inst.dueDate < today;
+            const isInstToday = !inst.isSettled && inst.dueDate && inst.dueDate === today;
+
+            let rowStatusBadge = '';
+            if (inst.isSettled) {
+              rowStatusBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-950 text-emerald-400 border border-emerald-800">Ödendi</span>';
+            } else if (isInstPast) {
+              rowStatusBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-950 text-rose-300 border border-rose-800">Gecikmiş</span>';
+            } else if (isInstToday) {
+              rowStatusBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-950 text-amber-300 border border-amber-800">Bugün</span>';
+            } else {
+              rowStatusBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-medium bg-slate-900 text-slate-400 border border-white/10">Bekliyor</span>';
+            }
+
+            return `
+              <tr class="hover:bg-cyan-500/5 transition-colors ${inst.isSettled ? 'opacity-40 line-through' : ''}">
+                <td class="p-2.5 font-bold text-slate-300">Taksit #${inst.instNo}</td>
+                <td class="p-2.5 ${isInstPast ? 'text-rose-400 font-bold' : (isInstToday ? 'text-amber-300 font-bold' : 'text-slate-300')}">
+                  ${escapeHtml(inst.dueDate || '-')}
+                  <span class="ml-1">${formatRelativeDaysBadge(inst.dueDate, today)}</span>
+                </td>
+                <td class="p-2.5 font-black text-cyan-400">${formatTRY(inst.amount)}</td>
+                <td class="p-2.5 text-slate-400">${formatTRY(inst.principal || Math.round(inst.amount * 0.6 * 100) / 100)}</td>
+                <td class="p-2.5 text-slate-500">${formatTRY(inst.interest || Math.round(inst.amount * 0.4 * 100) / 100)}</td>
+                <td class="p-2.5">${rowStatusBadge}</td>
+                <td class="p-2.5 text-right whitespace-nowrap space-x-1">
+                  <button onclick="openPartialPay('loan', '${inst.id}')" class="cyber-btn px-2 py-0.5 text-[10px] rounded border border-teal-800/80 text-teal-300 hover:bg-teal-950 font-bold">Ara Öde</button>
+                  <button onclick="toggleLoan('${inst.id}')" class="cyber-btn px-2.5 py-0.5 text-[10px] rounded border ${inst.isSettled ? 'border-emerald-800 text-emerald-400 bg-emerald-950/40' : 'border-white/10 text-slate-300 hover:border-cyan-400 hover:text-white'} font-bold">
+                    ${inst.isSettled ? 'Geri Al' : 'Öde'}
+                  </button>
+                  <button onclick="deleteLoan('${inst.id}')" class="cyber-btn p-1 text-[10px] rounded border border-rose-900/60 text-slate-500 hover:text-rose-400 hover:bg-rose-950/40" title="Taksiti Sil">
+                    <i data-lucide="trash-2" class="w-3 h-3"></i>
+                  </button>
+                </td>
+              </tr>
+            `;
+          }).join('');
+
           return `
-          <div class="cyber-item-card p-3 space-y-2 text-xs ${l.isSettled ? 'opacity-50' : ''}">
-            <div class="flex justify-between items-start gap-2">
-              <div class="min-w-0">
-                <span class="font-bold text-white">${escapeHtml(l.loanName || 'Kredi')}</span>
-                <span class="text-[10px] text-slate-400 block">Taksit #${l.instNo} | Vade: ${escapeHtml(l.dueDate || '-')} ${st ? '| ' + st : ''}</span>
+            <div class="cyber-item-card border ${isOverdue ? 'border-rose-500/40 shadow-[0_0_20px_rgba(244,63,94,0.12)]' : (isFinished ? 'border-emerald-500/30' : 'border-blue-500/20')} p-4 sm:p-5 rounded-2xl space-y-4 transition">
+              <!-- Top Header -->
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div class="flex items-start sm:items-center gap-3">
+                  <div class="p-2.5 rounded-xl ${g.meta.bg} ${g.meta.color} flex-shrink-0">
+                    <i data-lucide="${g.meta.icon}" class="w-5 h-5"></i>
+                  </div>
+                  <div>
+                    <div class="flex items-center gap-2 flex-wrap">
+                      <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-md ${g.meta.badgeClass}">${g.meta.label}</span>
+                      ${statusBadge}
+                    </div>
+                    <h4 class="text-sm font-bold text-white mt-1 break-words">${escapeHtml(g.name)}</h4>
+                  </div>
+                </div>
+
+                <!-- Action buttons on card header -->
+                <div class="flex items-center gap-1.5 self-end sm:self-center">
+                  <button onclick="settleLoanGroupByIndex(${idx})" title="${isFinished ? 'Ödenmedi Olarak Geri Al' : 'Tüm Krediyi Kapat'}" class="px-2.5 py-1 text-slate-400 hover:text-emerald-400 hover:bg-emerald-950/40 rounded-lg border border-white/10 transition text-xs flex items-center gap-1 font-semibold">
+                    <i data-lucide="check-check" class="w-3.5 h-3.5"></i>
+                    <span>${isFinished ? 'Geri Al' : 'Tümünü Kapat'}</span>
+                  </button>
+                  <button onclick="deleteLoanGroupByIndex(${idx})" title="Tüm Krediyi Sil" class="p-1 text-slate-500 hover:text-rose-400 hover:bg-rose-950/40 rounded-lg border border-white/10 transition" title="Krediyi Sil">
+                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                  </button>
+                </div>
               </div>
-              <span class="font-black text-cyan-400">${formatTRY(l.amount)}</span>
+
+              <!-- 4-Column Key Metrics -->
+              <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 bg-[#080d19]/80 p-3 rounded-xl border border-white/5 text-xs">
+                <div>
+                  <span class="text-[10px] text-slate-400 block mb-0.5 font-medium">Kalan Borç</span>
+                  <span class="font-black text-sm ${isFinished ? 'text-emerald-400' : 'text-cyan-400'}">${formatTRY(g.remainingDebt)}</span>
+                </div>
+                <div>
+                  <span class="text-[10px] text-slate-400 block mb-0.5 font-medium">Aylık Taksit</span>
+                  <span class="font-bold text-sm text-slate-200">${formatTRY(g.monthlyAmount)}</span>
+                </div>
+                <div>
+                  <span class="text-[10px] text-slate-400 block mb-0.5 font-medium">Sıradaki Vade</span>
+                  <div class="${nextDueDateClass} flex flex-wrap items-center gap-1">${nextDueDateText}</div>
+                </div>
+                <div>
+                  <span class="text-[10px] text-slate-400 block mb-0.5 font-medium">Taksit Durumu</span>
+                  <span class="font-bold text-sm text-slate-200">${g.settledCount} / ${g.totalCount} <span class="text-[11px] text-slate-400 font-normal">(%${g.progressPercent})</span></span>
+                </div>
+              </div>
+
+              <!-- Progress Bar -->
+              <div class="space-y-1">
+                <div class="w-full bg-slate-900 h-2 rounded-full overflow-hidden border border-white/5">
+                  <div class="h-full rounded-full transition-all duration-500 ${isFinished ? 'bg-emerald-500' : (isOverdue ? 'bg-gradient-to-r from-rose-500 to-amber-500' : 'bg-gradient-to-r from-cyan-500 to-blue-500')}" style="width: ${g.progressPercent}%;"></div>
+                </div>
+              </div>
+
+              <!-- Action Bar / Accordion trigger -->
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pt-2 border-t border-white/5">
+                <div>
+                  ${g.nextUnpaid ? `
+                    <button onclick="payNextLoanByIndex(${idx})" class="cyber-btn bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 text-xs px-3.5 py-1.5 rounded-xl font-bold flex items-center gap-1.5 transition shadow-[0_0_10px_rgba(16,185,129,0.15)]">
+                      <i data-lucide="check" class="w-3.5 h-3.5"></i>
+                      <span>Sıradaki Taksiti Öde: #${g.nextUnpaid.instNo} (${formatTRY(g.nextUnpaid.amount)})</span>
+                    </button>
+                  ` : `
+                    <span class="text-xs text-emerald-400 font-semibold flex items-center gap-1.5">
+                      <i data-lucide="check-circle" class="w-4 h-4"></i> Bu krediye ait tüm taksitler ödendi.
+                    </span>
+                  `}
+                </div>
+
+                <button onclick="toggleLoanAccordion('${g.key}')" class="cyber-btn text-xs text-cyan-300 hover:text-cyan-200 hover:bg-cyan-500/10 px-3 py-1.5 rounded-xl border border-cyan-500/20 flex items-center justify-between sm:justify-start gap-2 transition">
+                  <span class="font-semibold">Taksit Planını Göster (${g.totalCount} Taksit)</span>
+                  <i id="loan-icon-${g.key}" data-lucide="chevron-down" class="w-4 h-4 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}"></i>
+                </button>
+              </div>
+
+              <!-- Collapsible Schedule Table -->
+              <div id="loan-accordion-${g.key}" class="${isExpanded ? '' : 'hidden'} pt-2 transition-all">
+                <div class="overflow-x-auto rounded-xl border border-white/10 bg-[#080d19]/90">
+                  <table class="w-full text-left text-xs">
+                    <thead class="bg-[#050811] text-slate-400 border-b border-white/10 text-[10px] uppercase font-bold tracking-wider">
+                      <tr>
+                        <th class="p-2.5">Taksit</th>
+                        <th class="p-2.5">Vade Tarihi</th>
+                        <th class="p-2.5">Tutar</th>
+                        <th class="p-2.5">Anapara</th>
+                        <th class="p-2.5">Faiz+Vergi</th>
+                        <th class="p-2.5">Durum</th>
+                        <th class="p-2.5 text-right">İşlem</th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-white/5 font-medium">
+                      ${instRowsHtml}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
             </div>
-            <div class="flex justify-end gap-1.5 pt-1 border-t border-white/5">
-              <button onclick="openPartialPay('loan', '${l.id}')" class="cyber-btn px-2 py-1 rounded border border-teal-800 text-teal-300 text-[10px]">Ara Öde</button>
-              <button onclick="toggleLoan('${l.id}')" class="cyber-btn px-2.5 py-1 rounded border border-white/10 text-slate-300 text-[10px]">${l.isSettled ? 'Geri Al' : 'Öde'}</button>
-              <button onclick="deleteLoan('${l.id}')" class="cyber-btn px-2 py-1 rounded border border-rose-900/60 text-rose-400 text-[10px]">Sil</button>
+          `;
+        }).join('');
+
+      // VIEW MODE 2: TIMELINE TABLE VIEW
+      } else {
+        if (groupedContainer) groupedContainer.classList.add('hidden');
+        if (timelineContainer) timelineContainer.classList.remove('hidden');
+
+        // Render Filters for Timeline view
+        if (filtersBar) {
+          const overdueInstCount = allLoans.filter(l => !l.isSettled && l.dueDate && l.dueDate < today).length;
+          const thisMonthCount = allLoans.filter(l => !l.isSettled && l.dueDate && l.dueDate.startsWith(currentMonthPrefix)).length;
+          const pendingCount = allLoans.filter(l => !l.isSettled).length;
+          const settledCount = allLoans.filter(l => l.isSettled).length;
+
+          // Unique loan options for dropdown
+          const loanOptions = loanGroups.map(g => `<option value="${escapeHtml(g.name)}" ${loanSelectedFilter === g.name ? 'selected' : ''}>${escapeHtml(g.name)}</option>`).join('');
+
+          filtersBar.innerHTML = `
+            <div class="flex flex-wrap items-center gap-1.5 flex-1">
+              <button onclick="setLoanStatusFilter('all')" class="px-2.5 py-1 rounded-lg text-xs font-semibold transition ${loanStatusFilter === 'all' ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40' : 'text-slate-400 hover:text-white border border-transparent'}">
+                Tümü (${allLoans.length})
+              </button>
+              <button onclick="setLoanStatusFilter('overdue')" class="px-2.5 py-1 rounded-lg text-xs font-semibold transition ${loanStatusFilter === 'overdue' ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40' : 'text-slate-400 hover:text-white border border-transparent'} flex items-center gap-1">
+                <span>⚠️ Gecikmiş</span>
+                <span class="px-1.5 py-0.2 rounded-full text-[10px] ${overdueInstCount > 0 ? 'bg-rose-950 text-rose-300 border border-rose-800 font-bold' : 'bg-slate-800 text-slate-400'}">${overdueInstCount}</span>
+              </button>
+              <button onclick="setLoanStatusFilter('this_month')" class="px-2.5 py-1 rounded-lg text-xs font-semibold transition ${loanStatusFilter === 'this_month' ? 'bg-blue-500/20 text-blue-300 border border-blue-500/40' : 'text-slate-400 hover:text-white border border-transparent'}">
+                📅 Bu Ay (${thisMonthCount})
+              </button>
+              <button onclick="setLoanStatusFilter('pending')" class="px-2.5 py-1 rounded-lg text-xs font-semibold transition ${loanStatusFilter === 'pending' ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40' : 'text-slate-400 hover:text-white border border-transparent'}">
+                ⏳ Bekleyenler (${pendingCount})
+              </button>
+              <button onclick="setLoanStatusFilter('settled')" class="px-2.5 py-1 rounded-lg text-xs font-semibold transition ${loanStatusFilter === 'settled' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40' : 'text-slate-400 hover:text-white border border-transparent'}">
+                ✅ Ödenenler (${settledCount})
+              </button>
             </div>
-          </div>
-        `; }).join('') + (moreBtn ? `<div class="pt-1">${moreBtn}</div>` : '');
+            <div class="flex items-center gap-1.5 flex-shrink-0">
+              <select onchange="setLoanSelectedFilter(this.value)" class="bg-[#040711] border border-slate-800 rounded-lg px-2.5 py-1 text-xs text-slate-300 focus:outline-none focus:border-cyan-400">
+                <option value="all">Tüm Krediler (${loanGroups.length})</option>
+                ${loanOptions}
+              </select>
+            </div>
+          `;
+        }
+
+        // Filter installments
+        const sortedLoans = [...allLoans].sort((a, b) => {
+          if (a.isSettled !== b.isSettled) return a.isSettled ? 1 : -1;
+          if (a.dueDate && b.dueDate) {
+            if (a.dueDate < b.dueDate) return -1;
+            if (a.dueDate > b.dueDate) return 1;
+          }
+          return (a.instNo || 0) - (b.instNo || 0);
+        });
+
+        const filtered = sortedLoans.filter(l => {
+          if (loanSelectedFilter !== 'all' && l.loanName !== loanSelectedFilter) return false;
+          if (loanStatusFilter === 'overdue' && (l.isSettled || !l.dueDate || l.dueDate >= today)) return false;
+          if (loanStatusFilter === 'this_month' && (l.isSettled || !l.dueDate || !l.dueDate.startsWith(currentMonthPrefix))) return false;
+          if (loanStatusFilter === 'pending' && l.isSettled) return false;
+          if (loanStatusFilter === 'settled' && !l.isSettled) return false;
+          if (q) {
+            return (l.loanName || '').toLowerCase().includes(q) || (l.dueDate || '').includes(q);
+          }
+          return true;
+        });
+
+        if (!filtered.length) {
+          if (tbody) tbody.innerHTML = `<tr><td colspan="8" class="text-center py-8 text-slate-500 text-xs">Seçilen kriterlere uygun taksit bulunamadı.</td></tr>`;
+          if (mobileList) mobileList.innerHTML = `<div class="text-center py-6 text-slate-500 text-xs">Seçilen kriterlere uygun taksit bulunamadı.</div>`;
+          return;
+        }
+
+        const limited = !q && !showAllInstallments && filtered.length > INSTALLMENT_PAGE_SIZE;
+        const visible = limited ? filtered.slice(0, INSTALLMENT_PAGE_SIZE) : filtered;
+        const moreLabel = limited
+          ? `Tüm taksitleri göster (${filtered.length - INSTALLMENT_PAGE_SIZE} taksit daha)`
+          : (filtered.length > INSTALLMENT_PAGE_SIZE && !q ? 'Daha az göster' : '');
+        const moreBtn = moreLabel ? `<button onclick="toggleShowAllInstallments()" class="cyber-btn w-full py-2.5 rounded-xl border border-cyan-500/30 text-cyan-300 text-xs font-semibold hover:bg-cyan-500/10 transition">${moreLabel}</button>` : '';
+
+        if (tbody) {
+          tbody.innerHTML = visible.map(l => {
+            const isPast = !l.isSettled && l.dueDate && l.dueDate < today;
+            const isToday = !l.isSettled && l.dueDate && l.dueDate === today;
+            const meta = getLoanCategoryMeta(l.loanName);
+
+            let statusBadge = '';
+            if (l.isSettled) {
+              statusBadge = '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-950 text-emerald-400 border border-emerald-800">Ödendi</span>';
+            } else if (isPast) {
+              statusBadge = '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-950 text-rose-300 border border-rose-800">Gecikmiş</span>';
+            } else if (isToday) {
+              statusBadge = '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-950 text-amber-300 border border-amber-800">Bugün Vade</span>';
+            } else {
+              statusBadge = '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-slate-900 text-slate-400 border border-white/10">Bekliyor</span>';
+            }
+
+            return `
+              <tr class="hover:bg-cyan-500/5 transition-colors ${l.isSettled ? 'opacity-40 line-through' : ''}">
+                <td class="p-3">
+                  <div class="flex items-center gap-2">
+                    <span class="p-1.5 rounded-lg ${meta.bg} ${meta.color} flex-shrink-0"><i data-lucide="${meta.icon}" class="w-3.5 h-3.5"></i></span>
+                    <div>
+                      <span class="font-bold text-slate-200 block text-xs">${escapeHtml(l.loanName || 'Kredi')}</span>
+                      <span class="text-[10px] text-slate-400">${meta.label}</span>
+                    </div>
+                  </div>
+                </td>
+                <td class="p-3 text-slate-300 font-semibold">Taksit #${l.instNo}</td>
+                <td class="p-3 font-medium ${isPast ? 'text-rose-400 font-bold' : (isToday ? 'text-amber-400 font-bold' : 'text-slate-300')}">
+                  ${escapeHtml(l.dueDate || '-')}
+                  <span class="ml-1">${formatRelativeDaysBadge(l.dueDate, today)}</span>
+                </td>
+                <td class="p-3 font-black text-cyan-400">${formatTRY(l.amount)}</td>
+                <td class="p-3 text-slate-400">${formatTRY(l.principal || Math.round(l.amount * 0.6 * 100) / 100)}</td>
+                <td class="p-3 text-slate-500">${formatTRY(l.interest || Math.round(l.amount * 0.4 * 100) / 100)}</td>
+                <td class="p-3">${statusBadge}</td>
+                <td class="p-3 text-right space-x-1.5 whitespace-nowrap">
+                  <button onclick="openPartialPay('loan', '${l.id}')" class="cyber-btn px-2.5 py-1 text-[11px] rounded-lg border border-teal-800/80 text-teal-300 hover:bg-teal-950 font-bold">Ara Öde</button>
+                  <button onclick="toggleLoan('${l.id}')" class="cyber-btn px-3 py-1 text-[11px] rounded-lg border ${l.isSettled ? 'border-emerald-800 text-emerald-400 bg-emerald-950/40' : 'border-white/10 text-slate-300 hover:border-cyan-400 hover:text-white'} font-bold">
+                    ${l.isSettled ? 'Geri Al' : 'Öde'}
+                  </button>
+                  <button onclick="deleteLoan('${l.id}')" class="cyber-btn px-2 py-1 text-[11px] rounded-lg border border-rose-900/60 text-rose-400 hover:bg-rose-950 font-bold" title="Sil">Sil</button>
+                </td>
+              </tr>
+            `;
+          }).join('') + (moreBtn ? `<tr><td colspan="8" class="p-3">${moreBtn}</td></tr>` : '');
+        }
+
+        if (mobileList) {
+          mobileList.innerHTML = visible.map(l => {
+            const isPast = !l.isSettled && l.dueDate && l.dueDate < today;
+            const isToday = !l.isSettled && l.dueDate && l.dueDate === today;
+            const meta = getLoanCategoryMeta(l.loanName);
+            const st = l.isSettled ? '<span class="text-emerald-400 font-bold">Ödendi</span>'
+              : (isPast ? '<span class="text-rose-400 font-bold">Gecikmiş</span>' : (isToday ? '<span class="text-amber-400 font-bold">Bugün</span>' : ''));
+            return `
+              <div class="cyber-item-card p-3 space-y-2 text-xs ${l.isSettled ? 'opacity-50' : ''}">
+                <div class="flex justify-between items-start gap-2">
+                  <div class="min-w-0">
+                    <div class="flex items-center gap-1.5">
+                      <span class="p-1 rounded ${meta.bg} ${meta.color}"><i data-lucide="${meta.icon}" class="w-3 h-3"></i></span>
+                      <span class="font-bold text-white truncate">${escapeHtml(l.loanName || 'Kredi')}</span>
+                    </div>
+                    <span class="text-[10px] text-slate-400 block mt-0.5">Taksit #${l.instNo} | Vade: ${escapeHtml(l.dueDate || '-')} ${st ? '| ' + st : ''}</span>
+                  </div>
+                  <span class="font-black text-cyan-400">${formatTRY(l.amount)}</span>
+                </div>
+                <div class="flex justify-end gap-1.5 pt-1 border-t border-white/5">
+                  <button onclick="openPartialPay('loan', '${l.id}')" class="cyber-btn px-2 py-1 rounded border border-teal-800 text-teal-300 text-[10px]">Ara Öde</button>
+                  <button onclick="toggleLoan('${l.id}')" class="cyber-btn px-2.5 py-1 rounded border border-white/10 text-slate-300 text-[10px]">${l.isSettled ? 'Geri Al' : 'Öde'}</button>
+                  <button onclick="deleteLoan('${l.id}')" class="cyber-btn px-2 py-1 rounded border border-rose-900/60 text-rose-400 text-[10px]">Sil</button>
+                </div>
+              </div>
+            `;
+          }).join('') + (moreBtn ? `<div class="pt-1">${moreBtn}</div>` : '');
+        }
       }
     }
 
